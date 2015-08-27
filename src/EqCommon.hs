@@ -68,7 +68,3 @@ toCSV f@(n, cs) = intercalate "\n" $ header : map showCategory cs ++ [totals]
                                , show . totalRaw
                                , show . totalAdjustment
                                ]
-
--- unneeded?
-saveCSV :: Form -> IO ()
-saveCSV f = writeFile (fst f ++ ".csv") $ toCSV f
