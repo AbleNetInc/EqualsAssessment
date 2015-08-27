@@ -1,6 +1,7 @@
 module EqSQL where
 
 import EqCommon
+import EqLessons
 import Database.SQLite
 
 saveForm :: EqVersion -> Form -> IO (Maybe String)
