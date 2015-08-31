@@ -46,7 +46,7 @@ invalidLessons :: Category -> Category
 invalidLessons (n, ls) = (n, [l | l <- ls, not $ validLesson l])
 
 validForm :: Form -> Bool
-validForm (_,cs) = (== 0) . length . concat $ map (snd . invalidLessons) cs
+validForm (_,cs) = (concat $ map (snd . invalidLessons) cs) == []
 
 scoreLesson :: Integral a => Lesson -> a
 scoreLesson (_,s,_) = toIntegral s
