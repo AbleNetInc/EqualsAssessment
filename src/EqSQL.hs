@@ -11,7 +11,7 @@ saveForm v f = do let dbName = "EqDB"
                   s <- openConnection dbName
                   let tests = encodeForm f
                   let cols  = intercalate "," $ map (show . show) [0..((length . concatMap (encodeCategory) $ snd f)-1)]
-                  let query = "INSERT INTO " ++ show v ++ " (\"id\"," ++ cols ++ ") VALUES (\"" ++ fst f ++ "\"," ++ tests ++ ")"
+                  let query = "INSERT OR REPLACE INTO " ++ show v ++ " (\"id\"," ++ cols ++ ") VALUES (\"" ++ fst f ++ "\"," ++ tests ++ ")"
                   e <- execStatement_ s query
                   closeConnection s
                   return e
