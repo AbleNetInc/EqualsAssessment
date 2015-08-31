@@ -6,12 +6,22 @@ import Database.SQLite
 import Data.Maybe
 import Data.List
 
+initDB :: EqVersion -> IO (Maybe String)
+initDB v = do let dbName = "EqDB"
+              s <- openConnection dbName
+              let len   = (length $ unzippedLessonList v) - 1
+                  cols  = "\"id\"," ++ (intercalate "," $ map ((++ " DEFAULT \"BF\"") . show . show) [0..len])
+                  query = "CREATE TABLE " ++ show v ++ " (" ++ cols ++ ")"
+              e <- execStatement_ s query
+              return e
+
 saveForm :: EqVersion -> Form -> IO (Maybe String)
 saveForm v f = do let dbName = "EqDB"
                   s <- openConnection dbName
                   let tests = encodeForm f
-                  let cols  = intercalate "," $ map (show . show) [0..((length . concatMap (encodeCategory) $ snd f)-1)]
-                  let query = "INSERT OR REPLACE INTO " ++ show v ++ " (\"id\"," ++ cols ++ ") VALUES (\"" ++ fst f ++ "\"," ++ tests ++ ")"
+                      len   = (length . concatMap encodeCategory $ snd f) - 1
+                      cols  = intercalate "," $ map (show . show) [0..len]
+                      query = "INSERT OR REPLACE INTO " ++ show v ++ " (\"id\"," ++ cols ++ ") VALUES (\"" ++ fst f ++ "\"," ++ tests ++ ")"
                   e <- execStatement_ s query
                   closeConnection s
                   return e
