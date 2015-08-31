@@ -13,6 +13,7 @@ initDB v = do let dbName = "EqDB"
                   cols  = "\"id\"," ++ (intercalate "," $ map ((++ " DEFAULT \"BF\"") . show . show) [0..len])
                   query = "CREATE TABLE " ++ show v ++ " (" ++ cols ++ ")"
               e <- execStatement_ s query
+              closeConnection e
               return e
 
 saveForm :: EqVersion -> Form -> IO (Maybe String)
