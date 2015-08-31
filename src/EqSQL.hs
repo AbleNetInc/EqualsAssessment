@@ -3,11 +3,15 @@ module EqSQL where
 import EqCommon
 import EqLessons
 import Database.SQLite
+import Data.Maybe
+import Data.List
 
 saveForm :: EqVersion -> Form -> IO (Maybe String)
 saveForm v f = do let dbName = "EqDB"
                   s <- openConnection dbName
-                  let query = "INSERT INTO " ++ show v ++ " VALUES (\"" ++ (fst f) ++ "\",\"" ++ toCSV f ++ "\")"
+                  let tests = encodeForm f
+                  let cols  = intercalate "," $ map (show . show) [0..((length . concatMap (encodeCategory) $ snd f)-1)]
+                  let query = "INSERT INTO " ++ show v ++ " (\"id\"," ++ cols ++ ") VALUES (\"" ++ fst f ++ "\"," ++ tests ++ ")"
                   e <- execStatement_ s query
                   closeConnection s
                   return e

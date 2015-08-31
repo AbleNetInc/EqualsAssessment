@@ -5,6 +5,7 @@ module EqCommon where
 import Data.List
 
 data Score     = Nil | Zero | One deriving (Eq)
+data Test      = BF | ZF | ZT | OF | OT deriving (Eq, Show, Enum)
 type IsAdapted = Bool
 type Name      = String
 type Lesson    = (Name, Score, IsAdapted)
@@ -29,6 +30,14 @@ showCategory (n,ls) = intercalate "\n" [n ++ "," ++ showLesson l | l <- ls]
 toIntegral :: Integral a => Score -> a
 toIntegral s | s == One  = 1
              | otherwise = 0
+
+encodeLesson :: Lesson -> Test
+encodeLesson (_,s,a) | s == Nil  = BF
+                     | s == Zero = if a then ZT else ZF
+                     | s == One  = if a then OT else OF
+
+encodeCategory :: Category -> [Test]
+encodeCategory (_,ls) = map encodeLesson ls
 
 validLesson :: Lesson -> Bool
 validLesson (_,s,a) = not $ s == Nil && a
@@ -59,6 +68,9 @@ totalScore :: Form -> Double
 totalScore f = raw - 0.5 * adj
              where raw = fromIntegral $ totalRaw f
                    adj = fromIntegral $ totalAdjustment f
+
+encodeForm :: Form -> String
+encodeForm (_,cs) = intercalate "," . map (show . show) $ concatMap (encodeCategory) cs
 
 toCSV :: Form -> String
 toCSV f@(n, cs) = intercalate "\n" $ header : map showCategory cs ++ [totals]
