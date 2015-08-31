@@ -13,7 +13,7 @@ initDB v = do let dbName = "EqDB"
                   query = "CREATE TABLE " ++ show v ++ " (" ++ cols ++ ")"
               s <- openConnection dbName
               e <- execStatement_ s query
-              closeConnection e
+              closeConnection s
               return e
 
 saveForm :: EqVersion -> Form -> IO (Maybe String)
