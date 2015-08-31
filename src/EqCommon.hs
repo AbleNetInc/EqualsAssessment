@@ -5,7 +5,7 @@ module EqCommon where
 import Data.List
 
 data Score     = Nil | Zero | One deriving (Eq)
-data Test      = BF | ZF | ZT | OF | OT deriving (Eq, Show, Enum)
+data Test      = BF | ZF | ZT | OF | OT deriving (Eq, Show, Read, Enum)
 type IsAdapted = Bool
 type Name      = String
 type Lesson    = (Name, Score, IsAdapted)
