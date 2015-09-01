@@ -1,82 +1,94 @@
-{-# LANGUAGE FlexibleInstances #-}
-
 module EqCommon where
 
-import Data.List
+import           Data.List
+import           Data.Maybe
+import qualified Data.Map       as Map
+import           Data.Map          (Map)
+import qualified Data.Sequence  as Seq
+import           Data.Sequence     (Seq)
 
-data Score     = Nil | Zero | One deriving (Eq)
-data Test      = BF | ZF | ZT | OF | OT deriving (Eq, Show, Read, Enum)
-type IsAdapted = Bool
-type Name      = String
-type Lesson    = (Name, Score, IsAdapted)
-type Category  = (Name, [Lesson])
-type Form      = (Name, [Category])
-data EqVersion = Eq2 | Eq3 deriving (Eq, Show)
+data EqVersion  = Eq2 | Eq3 deriving (Eq, Ord, Show)
+type Chapter    = Int
+type Section    = Char
+type Name       = String
+type Tag        = String
+type Score      = Int
+data Lesson     = Lesson { chapter :: Chapter
+                         , section :: Section
+                         , count   :: Int
+                         , lName   :: Name
+                         , tag     :: Tag
+                         , score   :: Score
+                         , adapted :: Bool
+                         } deriving (Eq)
 
-instance Show Score where
-    show Nil  = ""
-    show Zero = "0"
-    show One  = "1"
+adaptedScore :: Lesson -> Double
+adaptedScore l | score l == 0 = 0
+               | adapted l    = 0.5
+               | otherwise    = 1
 
-showAdapted :: IsAdapted -> String
-showAdapted a = if a then "Adapted" else "Unadapted"
+instance Show Lesson where
+    show l = concat ["(", t, ") ", c,s,o, ". ", n, ": ", a, " (", r, ")"]
+           where t = tag l
+                 c = show $ chapter l
+                 o = show $ count l
+                 s = [section l]
+                 n = lName l
+                 a = show $ score l
+                 r = show $ adaptedScore l
 
-showLesson :: Lesson -> String
-showLesson (n,s,a) = intercalate "," $ [n, show s, showAdapted a]
+data Assessment = Assessment { student :: Name
+                             , ver     :: EqVersion
+                             , teacher :: Name
+                             , lessons :: Seq Lesson
+                             }
 
-showCategory :: Category -> String
-showCategory (n,ls) = intercalate "\n" [n ++ "," ++ showLesson l | l <- ls]
+toCSV :: Assessment -> String
+toCSV a@(Assessment i v t ls) = "Teacher:," ++ t ++ "\nStudent:," ++ i
+                             ++ "\nStart at:,Chapter " ++ st ++ ",("
+                             ++ s ++ ")\n\n" ++ hdr
+                              where st  = show $ suggestedStart a
+                                    s   = show $ adaptedTotal a
+                                    hdr = "Chapter,Section,Number,Lesson,Score,Adapted"
 
-toIntegral :: Integral a => Score -> a
-toIntegral s | s == One  = 1
-             | otherwise = 0
+type Specifier  = (Chapter, Section, Int, Name)
 
-encodeLesson :: Lesson -> Test
-encodeLesson (_,s,a) | s == Nil  = BF
-                     | s == Zero = if a then ZT else ZF
-                     | s == One  = if a then OT else OF
+newLesson :: EqVersion -> Specifier -> Tag -> Score -> Bool -> Lesson
+newLesson v (c,s,o,n) t r a | vCh && vSec && vScr = (Lesson c s o n t r a)
+                            | otherwise           = error "invalid fields"
+                            where vCh  = c `validChapterIn` v
+                                  vSec = s `validSectionIn` v
+                                  vScr = r == 0 || r == 1
 
-encodeCategory :: Category -> [Test]
-encodeCategory (_,ls) = map encodeLesson ls
+validChapterIn :: Chapter -> EqVersion -> Bool
+validChapterIn c v = (Seq.elemIndexL c cList) /= Nothing
+                   where cList    = fromJust $ Map.lookup v chapters
+                         chapters = Map.fromList [ (Eq2, Seq.fromList [1..12])
+                                                 , (Eq3, Seq.fromList [1..10])
+                                                 ]
 
-validLesson :: Lesson -> Bool
-validLesson (_,s,a) = not $ s == Nil && a
+validSectionIn :: Section -> EqVersion -> Bool
+validSectionIn s v = (Seq.elemIndexL s sList) /= Nothing
+                   where sList    = fromJust $ Map.lookup v sections
+                         sections = Map.fromList [ (Eq2, Seq.fromList ['A'..'E'])
+                                                 , (Eq3, Seq.fromList ['A'..'E'])
+                                                 ]
 
-invalidLessons :: Category -> Category
-invalidLessons (n, ls) = (n, [l | l <- ls, not $ validLesson l])
+rawTotal :: Assessment -> Int
+rawTotal (Assessment _ _ _ ls) = foldl (+) 0 $ score <$> ls
 
-validForm :: Form -> Bool
-validForm (_,cs) = (concat $ map (snd . invalidLessons) cs) == []
+adaptedTotal :: Assessment -> Double
+adaptedTotal (Assessment _ _ _ ls) = foldl (+) 0 $ adaptedScore <$> ls
 
-scoreLesson :: Integral a => Lesson -> a
-scoreLesson (_,s,_) = toIntegral s
+suggestedStart :: Assessment -> Chapter
+suggestedStart a@(Assessment _ v _ _) = 1 + idx ch
+                                      where aScr   = adaptedTotal a
+                                            ch     = Seq.findIndexL (aScr <=) b
+                                            b      = scoreBounds v
+                                            idx (Just c) = c
+                                            idx Nothing  = 0
 
-rawScore :: Integral a => Category -> a
-rawScore (_,ls) = sum [scoreLesson l| l <- ls]
-
-rawAdjustment :: Integral a => Category -> a
-rawAdjustment (_,ls) = genericLength $ filter (== True) adjs
-                     where (_,_,adjs) = unzip3 ls
-
-totalRaw :: Integral a => Form -> a
-totalRaw (_,cs) = sum $ map rawScore cs
-
-totalAdjustment :: Integral a => Form -> a
-totalAdjustment (_,cs) = sum $ map rawAdjustment cs
-
-totalScore :: Form -> Double
-totalScore f = raw - 0.5 * adj
-             where raw = fromIntegral $ totalRaw f
-                   adj = fromIntegral $ totalAdjustment f
-
-encodeForm :: Form -> String
-encodeForm (_,cs) = intercalate "," . map (show . show) $ concatMap (encodeCategory) cs
-
-toCSV :: Form -> String
-toCSV f@(n, cs) = intercalate "\n" $ header : map showCategory cs ++ [totals]
-                where header = "Section,Lesson,Score,IsAdapted"
-                      totals = intercalate "," $ "Total" : fmap ($ f) fns
-                      fns    = [ show . totalScore
-                               , show . totalRaw
-                               , show . totalAdjustment
-                               ]
+scoreBounds :: EqVersion -> (Seq Double)
+scoreBounds Eq2 = Seq.fromList $ zipWith (+) ((27.5 *) <$> [1..12]) adj
+                where adj = [0,0.5,1] >>= replicate 5
+scoreBounds _   = Seq.empty
