@@ -20,57 +20,58 @@ taggedBlankLessons v c s ns t = [newLesson v (c,s,o,n) (Seq.fromList t) 0 False 
 lessonSets :: Map EqVersion (Seq Lesson)
 lessonSets = Map.fromList
            [(Eq2, Seq.fromList $ concat
-             [ taggedBlankLessons Eq2  1 'A' (zip [1..] ae2) ["Attending & Exploring"]
-             , taggedBlankLessons Eq2  1 'B' (zip [1..] pt2) ["Patterns & Algebra"]
-             , taggedBlankLessons Eq2  3 'B' (zip [1..] pu2) ["Patterns & Algebra"]
-             , taggedBlankLessons Eq2  8 'D' (zip [1..] np2) ["Patterns & Algebra"]
-             , taggedBlankLessons Eq2 10 'C' (zip [1..] ma2) ["Patterns & Algebra"]
-             , taggedBlankLessons Eq2  1 'C' (zip [1..] ms2) ["Data Analysis & Probability"]
-             , taggedBlankLessons Eq2  3 'D' (zip [1..] gp2) ["Data Analysis & Probability"]
-             , taggedBlankLessons Eq2  3 'E' (zip [1..] pb2) ["Data Analysis & Probability"]
-             , taggedBlankLessons Eq2  6 'A' (zip [1..] cd2) ["Data Analysis & Probability"]
-             , taggedBlankLessons Eq2 10 'A' (zip [1..] lp2) ["Data Analysis & Probability"]
-             , taggedBlankLessons Eq2 10 'B' (zip [1..] pc2) ["Data Analysis & Probability"]
-             , taggedBlankLessons Eq2  1 'D' (zip [1..] aa2) ["Geometry"]
-             , taggedBlankLessons Eq2  5 'D' (zip [1..] gs2) ["Geometry"]
-             , taggedBlankLessons Eq2  9 'B' (zip [1..] dc2) ["Geometry"]
-             , taggedBlankLessons Eq2  9 'C' (zip [1..] ap2) ["Geometry"]
-             , taggedBlankLessons Eq2  9 'D' (zip [1..] ds2) ["Geometry"]
-             , taggedBlankLessons Eq2  1 'D' (zip [7..] am2) ["Measurement"]
-             , taggedBlankLessons Eq2  3 'C' (zip [1..] ca2) ["Measurement"]
-             , taggedBlankLessons Eq2  5 'B' (zip [1..] ti2) ["Measurement"]
-             , taggedBlankLessons Eq2  6 'C' (zip [1..] mt2) ["Measurement"]
-             , taggedBlankLessons Eq2  8 'E' (zip [1..] tm2) ["Measurement"]
-             , taggedBlankLessons Eq2  9 'A' (zip [1..] wl2) ["Measurement"]
-             , taggedBlankLessons Eq2 11 'E' (zip [1..] mg2) ["Measurement"]
-             , taggedBlankLessons Eq2  2 'A' (zip [1..] c12) ["Numbers & Operations"]
-             , taggedBlankLessons Eq2  2 'B' (zip [1..] c32) ["Numbers & Operations"]
-             , taggedBlankLessons Eq2  2 'C' (zip [1..] c52) ["Numbers & Operations"]
-             , taggedBlankLessons Eq2  2 'D' (zip [1..] zm2) ["Numbers & Operations"]
-             , taggedBlankLessons Eq2  2 'E' (zip [1..] c72) ["Numbers & Operations"]
-             , taggedBlankLessons Eq2  3 'A' (zip [1..] on2) ["Numbers & Operations"]
-             , taggedBlankLessons Eq2  4 'A' (zip [1..] ct2) ["Numbers & Operations"]
-             , taggedBlankLessons Eq2  4 'B' (zip [1..] as2) ["Numbers & Operations"]
-             , taggedBlankLessons Eq2  4 'C' (zip [1..] mm2) ["Numbers & Operations"]
-             , taggedBlankLessons Eq2  5 'A' (zip [1..] c22) ["Numbers & Operations"]
-             , taggedBlankLessons Eq2  5 'C' (zip [1..] cn2) ["Numbers & Operations"]
-             , taggedBlankLessons Eq2  6 'B' (zip [1..] n52) ["Numbers & Operations"]
-             , taggedBlankLessons Eq2  7 'A' (zip [1..] a72) ["Numbers & Operations"]
-             , taggedBlankLessons Eq2  7 'B' (zip [1..] sa2) ["Numbers & Operations"]
-             , taggedBlankLessons Eq2  7 'C' (zip [1..] a32) ["Numbers & Operations"]
-             , taggedBlankLessons Eq2  7 'D' (zip [1..] dn2) ["Numbers & Operations"]
-             , taggedBlankLessons Eq2  8 'A' (zip [1..] dp2) ["Numbers & Operations"]
-             , taggedBlankLessons Eq2  8 'B' (zip [1..] re2) ["Numbers & Operations"]
-             , taggedBlankLessons Eq2  8 'C' (zip [1..] ln2) ["Numbers & Operations"]
-             , taggedBlankLessons Eq2 11 'A' (zip [1..] md2) ["Numbers & Operations"]
-             , taggedBlankLessons Eq2 11 'B' (zip [1..] sm2) ["Numbers & Operations"]
-             , taggedBlankLessons Eq2 11 'C' (zip [1..] dm2) ["Numbers & Operations"]
-             , taggedBlankLessons Eq2 11 'D' (zip [1..] sd2) ["Numbers & Operations"]
-             , taggedBlankLessons Eq2 12 'A' (zip [1..] fw2) ["Numbers & Operations"]
-             , taggedBlankLessons Eq2 12 'B' (zip [1..] cf2) ["Numbers & Operations"]
-             , taggedBlankLessons Eq2 12 'C' (zip [1..] af2) ["Numbers & Operations"]
-             , taggedBlankLessons Eq2 12 'D' (zip [1..] fd2) ["Numbers & Operations"]
-             ])
+             [ taggedBlankLessons Eq2 c s (zip [n..] l) t
+             | (c,s,n,l,t) <- [( 1,'A',1,ae2,["Attending & Exploring"])
+                              ,( 1,'B',1,pt2,["Patterns & Algebra"])
+                              ,( 3,'B',1,pu2,["Patterns & Algebra"])
+                              ,( 8,'D',1,np2,["Patterns & Algebra"])
+                              ,(10,'C',1,ma2,["Patterns & Algebra"])
+                              ,( 1,'C',1,ms2,["Data Analysis & Probability"])
+                              ,( 3,'D',1,gp2,["Data Analysis & Probability"])
+                              ,( 3,'E',1,pb2,["Data Analysis & Probability"])
+                              ,( 6,'A',1,cd2,["Data Analysis & Probability"])
+                              ,(10,'A',1,lp2,["Data Analysis & Probability"])
+                              ,(10,'B',1,pc2,["Data Analysis & Probability"])
+                              ,( 1,'D',1,aa2,["Geometry"])
+                              ,( 5,'D',1,gs2,["Geometry"])
+                              ,( 9,'B',1,dc2,["Geometry"])
+                              ,( 9,'C',1,ap2,["Geometry"])
+                              ,( 9,'D',1,ds2,["Geometry"])
+                              ,( 1,'D',7,am2,["Measurement"])
+                              ,( 3,'C',1,ca2,["Measurement"])
+                              ,( 5,'B',1,ti2,["Measurement"])
+                              ,( 6,'C',1,mt2,["Measurement"])
+                              ,( 8,'E',1,tm2,["Measurement"])
+                              ,( 9,'A',1,wl2,["Measurement"])
+                              ,(11,'E',1,mg2,["Measurement"])
+                              ,( 2,'A',1,c12,["Numbers & Operations"])
+                              ,( 2,'B',1,c32,["Numbers & Operations"])
+                              ,( 2,'C',1,c52,["Numbers & Operations"])
+                              ,( 2,'D',1,zm2,["Numbers & Operations"])
+                              ,( 2,'E',1,c72,["Numbers & Operations"])
+                              ,( 3,'A',1,on2,["Numbers & Operations"])
+                              ,( 4,'A',1,ct2,["Numbers & Operations"])
+                              ,( 4,'B',1,as2,["Numbers & Operations"])
+                              ,( 4,'C',1,mm2,["Numbers & Operations"])
+                              ,( 5,'A',1,c22,["Numbers & Operations"])
+                              ,( 5,'C',1,cn2,["Numbers & Operations"])
+                              ,( 6,'B',1,n52,["Numbers & Operations"])
+                              ,( 7,'A',1,a72,["Numbers & Operations"])
+                              ,( 7,'B',1,sa2,["Numbers & Operations"])
+                              ,( 7,'C',1,a32,["Numbers & Operations"])
+                              ,( 7,'D',1,dn2,["Numbers & Operations"])
+                              ,( 8,'A',1,dp2,["Numbers & Operations"])
+                              ,( 8,'B',1,re2,["Numbers & Operations"])
+                              ,( 8,'C',1,ln2,["Numbers & Operations"])
+                              ,(11,'A',1,md2,["Numbers & Operations"])
+                              ,(11,'B',1,sm2,["Numbers & Operations"])
+                              ,(11,'C',1,dm2,["Numbers & Operations"])
+                              ,(11,'D',1,sd2,["Numbers & Operations"])
+                              ,(12,'A',1,fw2,["Numbers & Operations"])
+                              ,(12,'B',1,cf2,["Numbers & Operations"])
+                              ,(12,'C',1,af2,["Numbers & Operations"])
+                              ,(12,'D',1,fd2,["Numbers & Operations"])
+             ]])
            , (Eq3, Seq.empty)]
            where ae2 = [ "attend to math materials and instruction"
                        , "touch math manipulatives"
