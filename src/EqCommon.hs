@@ -1,6 +1,7 @@
 module EqCommon where
 
 import           Data.List
+import           Data.Foldable     (toList)
 import           Data.Maybe
 import qualified Data.Map       as Map
 import           Data.Map          (Map)
@@ -20,22 +21,21 @@ data Lesson     = Lesson { chapter :: Chapter
                          , tag     :: (Seq Tag)
                          , score   :: Score
                          , adapted :: Bool
-                         } deriving (Eq)
+                         } deriving (Eq, Show, Read)
 
 adaptedScore :: Lesson -> Double
 adaptedScore l | score l == 0 = 0
                | adapted l    = 0.5
                | otherwise    = 1
 
-instance Show Lesson where
-    show l = concat ["(", t, ") ", c,s,o, ". ", n, ": ", a, " (", r, ")"]
-           where t = show $ tag l
-                 c = show $ chapter l
-                 o = show $ count l
-                 s = [section l]
-                 n = lName l
-                 a = show $ score l
-                 r = show $ adaptedScore l
+pfLesson :: Lesson -> String
+pfLesson l = intercalate "," [c,s,o,n,a,r]
+       where c = show $ chapter l
+             s = [section l]
+             o = show $ count l
+             n = lName l
+             a = show $ score l
+             r = show $ adaptedScore l
 
 data Assessment = Assessment { student :: Name
                              , ver     :: EqVersion
@@ -46,10 +46,11 @@ data Assessment = Assessment { student :: Name
 toCSV :: Assessment -> String
 toCSV a@(Assessment i v t ls) = concat [ "Teacher:,", t, "\nStudent:,", i
                                        , "\nStart at:,Chapter ",st,",(",s,")\n\n"
-                                       , hdr]
+                                       , hdr, bdy]
                               where st  = show $ suggestedStart a
                                     s   = show $ adaptedTotal a
-                                    hdr = "Chapter,Section,Number,Lesson,Score,Adapted"
+                                    hdr = "Chapter,Section,Number,Lesson,Score,Adapted\n"
+                                    bdy = concat . toList $ ((++ "\n") . pfLesson) <$> ls
 
 type Specifier  = (Chapter, Section, Int, Name)
 
