@@ -65,7 +65,7 @@ newLesson v (c,s,o,n) t r a | not vCh   = error "Invalid Chapter"
                             | otherwise = (Lesson c s o n t r a)
                             where vCh  = c `validChapterIn` v
                                   vSec = s `validSectionIn` v
-                                  vScr = r == 0 || r == 1
+                                  vScr = r `elem` [(-1)..1]
 
 validChapterIn :: Chapter -> EqVersion -> Bool
 validChapterIn c v = (Seq.elemIndexL c cList) /= Nothing

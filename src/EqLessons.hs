@@ -16,8 +16,10 @@ blankAssessment v = Assessment (Text.pack "") v (Text.pack "") . ls $ Map.lookup
                   where ls (Just s) = s
                         ls Nothing  = Seq.empty
 
+
+
 taggedBlankLessons :: EqVersion -> Chapter -> Section -> [(Int,Name)] -> [Tag] -> [Lesson]
-taggedBlankLessons v c s ns t = [newLesson v (c,s,o,n) (Seq.fromList t) 0 False | (o,n) <- ns]
+taggedBlankLessons v c s ns t = [newLesson v (c,s,o,n) (Seq.fromList t) (-1) False | (o,n) <- ns]
 
 lessonSets :: Map EqVersion (Seq Lesson)
 lessonSets = Map.fromList
