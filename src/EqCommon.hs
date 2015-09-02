@@ -90,5 +90,5 @@ suggestedStart a@(Assessment _ v _ _) = 1 + idx ch
 
 scoreBounds :: EqVersion -> (Seq Double)
 scoreBounds Eq2 = Seq.fromList $ zipWith (+) ((27.5 *) <$> [1..12]) adj
-                where adj = [0,0.5,1] >>= replicate 5
+                where adj = [0,0.5..] >>= replicate 5
 scoreBounds _   = Seq.empty
