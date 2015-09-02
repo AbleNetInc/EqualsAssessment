@@ -7,12 +7,14 @@ import qualified Data.Map       as Map
 import           Data.Map          (Map)
 import qualified Data.Sequence  as Seq
 import           Data.Sequence     (Seq)
+import qualified Data.Text      as Text
+import           Data.Text         (Text)
 
 data EqVersion  = Eq2 | Eq3 deriving (Eq, Ord, Show)
 type Chapter    = Int
 type Section    = Char
-type Name       = String
-type Tag        = String
+type Name       = Text
+type Tag        = Text
 type Score      = Int
 data Lesson     = Lesson { chapter :: Chapter
                          , section :: Section
@@ -28,12 +30,12 @@ adaptedScore l | score l == 0 = 0
                | adapted l    = 0.5
                | otherwise    = 1
 
-pfLesson :: Lesson -> String
-pfLesson l = intercalate "," [c,s,o,n,a,r]
+pfLesson :: Lesson -> Text
+pfLesson l = Text.pack $ intercalate "," [c,s,o,n,a,r]
        where c = show $ chapter l
              s = [section l]
              o = show $ count l
-             n = lName l
+             n = Text.unpack $ lName l
              a = show $ score l
              r = show $ adaptedScore l
 
@@ -43,14 +45,16 @@ data Assessment = Assessment { student :: Name
                              , lessons :: Seq Lesson
                              }
 
-toCSV :: Assessment -> String
-toCSV a@(Assessment i v t ls) = concat [ "Teacher:,", t, "\nStudent:,", i
+toCSV :: Assessment -> Text
+toCSV a@(Assessment i v t ls) = Text.pack $ concat [ "Teacher:,",n, "\nStudent:,", id
                                        , "\nStart at:,Chapter ",st,",(",s,")\n\n"
                                        , hdr, bdy]
-                              where st  = show $ suggestedStart a
+                              where n   = Text.unpack t
+                                    id  = Text.unpack i
+                                    st  = show $ suggestedStart a
                                     s   = show $ adaptedTotal a
                                     hdr = "Chapter,Section,Number,Lesson,Score,Adapted\n"
-                                    bdy = concat . toList $ ((++ "\n") . pfLesson) <$> ls
+                                    bdy = concat . toList $ ((++ "\n") . Text.unpack . pfLesson) <$> ls
 
 type Specifier  = (Chapter, Section, Int, Name)
 

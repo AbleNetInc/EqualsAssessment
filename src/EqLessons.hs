@@ -5,12 +5,14 @@ import qualified Data.Map       as Map
 import           Data.Map          (Map)
 import qualified Data.Sequence  as Seq
 import           Data.Sequence     (Seq)
+import qualified Data.Text      as Text
+import           Data.Text         (Text)
 
 import Data.List
 import Data.Maybe (fromJust)
 
 blankAssessment :: EqVersion -> Assessment
-blankAssessment v = Assessment "" v "" . ls $ Map.lookup v lessonSets
+blankAssessment v = Assessment (Text.pack "") v (Text.pack "") . ls $ Map.lookup v lessonSets
                   where ls (Just s) = s
                         ls Nothing  = Seq.empty
 
@@ -20,7 +22,7 @@ taggedBlankLessons v c s ns t = [newLesson v (c,s,o,n) (Seq.fromList t) 0 False 
 lessonSets :: Map EqVersion (Seq Lesson)
 lessonSets = Map.fromList
            [(Eq2, Seq.fromList $ concat
-             [ taggedBlankLessons Eq2 c s (zip [n..] l) t
+             [ taggedBlankLessons Eq2 c s (zip [n..] (Text.pack <$> l)) (Text.pack <$> t)
              | (c,s,n,l,t) <- [( 1,'A',1,ae2,["Attending & Exploring"])
                               ,( 1,'B',1,pt2,["Patterns & Algebra"])
                               ,( 3,'B',1,pu2,["Patterns & Algebra"])
