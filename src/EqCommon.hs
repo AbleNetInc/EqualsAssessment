@@ -44,9 +44,9 @@ data Assessment = Assessment { student :: Name
                              }
 
 toCSV :: Assessment -> String
-toCSV a@(Assessment i v t ls) = "Teacher:," ++ t ++ "\nStudent:," ++ i
-                             ++ "\nStart at:,Chapter " ++ st ++ ",("
-                             ++ s ++ ")\n\n" ++ hdr
+toCSV a@(Assessment i v t ls) = concat [ "Teacher:,", t, "\nStudent:,", i
+                                       , "\nStart at:,Chapter ",st,",(",s,")\n\n"
+                                       , hdr]
                               where st  = show $ suggestedStart a
                                     s   = show $ adaptedTotal a
                                     hdr = "Chapter,Section,Number,Lesson,Score,Adapted"
@@ -54,8 +54,10 @@ toCSV a@(Assessment i v t ls) = "Teacher:," ++ t ++ "\nStudent:," ++ i
 type Specifier  = (Chapter, Section, Int, Name)
 
 newLesson :: EqVersion -> Specifier -> (Seq Tag) -> Score -> Bool -> Lesson
-newLesson v (c,s,o,n) t r a | vCh && vSec && vScr = (Lesson c s o n t r a)
-                            | otherwise           = error "invalid fields"
+newLesson v (c,s,o,n) t r a | not vCh   = error "Invalid Chapter"
+                            | not vSec  = error "Invalid Section"
+                            | not vScr  = error "Invalid Score"
+                            | otherwise = (Lesson c s o n t r a)
                             where vCh  = c `validChapterIn` v
                                   vSec = s `validSectionIn` v
                                   vScr = r == 0 || r == 1
