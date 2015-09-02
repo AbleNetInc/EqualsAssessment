@@ -26,7 +26,7 @@ data Lesson     = Lesson { chapter :: Chapter
                          } deriving (Eq, Show, Read)
 
 adaptedScore :: Lesson -> Double
-adaptedScore l | score l == 0 = 0
+adaptedScore l | score l /= 1 = 0
                | adapted l    = 0.5
                | otherwise    = 1
 
@@ -36,7 +36,7 @@ pfLesson l = Text.pack $ intercalate "," [c,s,o,n,a,r]
              s = [section l]
              o = show $ count l
              n = Text.unpack $ lName l
-             a = show $ score l
+             a = if (score l) == (-1) then "" else show $ score l
              r = show $ adaptedScore l
 
 data Assessment = Assessment { student :: Name
