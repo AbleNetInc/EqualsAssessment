@@ -16,7 +16,11 @@ blankAssessment v = Assessment (Text.pack "") v (Text.pack "") . ls $ Map.lookup
                   where ls (Just s) = s
                         ls Nothing  = Seq.empty
 
-
+updateScore :: Assessment -> Lesson -> Assessment
+updateScore a@(Assessment n v t ls) l = Assessment n v t $ newLs x
+                                      where newLs Nothing  = ls Seq.|> l
+                                            newLs (Just i) = Seq.update i l ls
+                                            x              = Seq.elemIndexL l ls
 
 taggedBlankLessons :: EqVersion -> Chapter -> Section -> [(Int,Name)] -> [Tag] -> [Lesson]
 taggedBlankLessons v c s ns t = [newLesson v (c,s,o,n) (Seq.fromList t) (-1) False | (o,n) <- ns]
