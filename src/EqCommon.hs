@@ -17,7 +17,7 @@ data Lesson     = Lesson { chapter :: Chapter
                          , section :: Section
                          , count   :: Int
                          , lName   :: Name
-                         , tag     :: Tag
+                         , tag     :: (Seq Tag)
                          , score   :: Score
                          , adapted :: Bool
                          } deriving (Eq)
@@ -29,7 +29,7 @@ adaptedScore l | score l == 0 = 0
 
 instance Show Lesson where
     show l = concat ["(", t, ") ", c,s,o, ". ", n, ": ", a, " (", r, ")"]
-           where t = tag l
+           where t = show $ tag l
                  c = show $ chapter l
                  o = show $ count l
                  s = [section l]
@@ -53,7 +53,7 @@ toCSV a@(Assessment i v t ls) = "Teacher:," ++ t ++ "\nStudent:," ++ i
 
 type Specifier  = (Chapter, Section, Int, Name)
 
-newLesson :: EqVersion -> Specifier -> Tag -> Score -> Bool -> Lesson
+newLesson :: EqVersion -> Specifier -> (Seq Tag) -> Score -> Bool -> Lesson
 newLesson v (c,s,o,n) t r a | vCh && vSec && vScr = (Lesson c s o n t r a)
                             | otherwise           = error "invalid fields"
                             where vCh  = c `validChapterIn` v
