@@ -8,9 +8,6 @@ import           Data.Sequence     (Seq)
 import qualified Data.Text      as Text
 import           Data.Text         (Text)
 
-import Data.List
-import Data.Maybe (fromJust)
-
 blankAssessment :: EqVersion -> Assessment
 blankAssessment v = Assessment (Text.pack "") v (Text.pack "") . ls $ Map.lookup v lessonSets
                   where ls (Just s) = s
