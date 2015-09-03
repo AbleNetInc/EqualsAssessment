@@ -8,10 +8,10 @@ import           Data.Sequence     (Seq)
 import qualified Data.Text      as Text
 import           Data.Text         (Text)
 
-blankAssessment :: EqVersion -> Assessment
-blankAssessment v = Assessment (Text.pack "") v (Text.pack "") . ls $ Map.lookup v lessonSets
-                  where ls (Just s) = s
-                        ls Nothing  = Seq.empty
+blankAssessment :: EqVersion -> String -> String -> Assessment
+blankAssessment v s t = Assessment (Text.pack s) v (Text.pack t) . ls $ Map.lookup v lessonSets
+                      where ls (Just s) = s
+                            ls Nothing  = Seq.empty
 
 updateScore :: Assessment -> Lesson -> Assessment
 updateScore a@(Assessment n v t ls) l = Assessment n v t $ newLs x
