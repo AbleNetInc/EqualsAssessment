@@ -3,6 +3,7 @@ module Main where
 import EqCommon
 import EqLessons
 import EqSQL
+import WebUI
 import System.Environment (getArgs)
 import System.Exit        (exitWith, ExitCode(ExitFailure, ExitSuccess))
 import Data.List
@@ -20,14 +21,14 @@ usage = intercalate "\n"
       ]
 
 main :: IO ()
-main = getArgs >>= parse >>= putStrLn
+main = getArgs >>= parse
 
-exitFail, exitSucc :: IO String
+exitFail, exitSucc :: IO ()
 exitFail = exitWith $ ExitFailure 1
 exitSucc = exitWith   ExitSuccess
 
-parse :: [String] -> IO String
+parse :: [String] -> IO ()
 parse a | elem "-h" a || elem "--help"    a = putStrLn usage   >> exitSucc
         | elem "-v" a || elem "--version" a = putStrLn version >> exitSucc
-        | elem "-w" a || elem "--web"     a = putStrLn "NYI"   >> exitSucc
+        | elem "-w" a || elem "--web"     a = runWebServer
         | otherwise                         = putStrLn usage   >> exitFail
