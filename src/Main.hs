@@ -16,6 +16,7 @@ usage = intercalate "\n"
       , "Options:"
       , "  -h, --help      Print this help and exit"
       , "  -v, --version   Print the version and exit"
+      , "  -w, --web=PNUM  Start the web interface on port PNUM"
       ]
 
 main :: IO ()
@@ -26,6 +27,7 @@ exitFail = exitWith $ ExitFailure 1
 exitSucc = exitWith   ExitSuccess
 
 parse :: [String] -> IO String
-parse a | elem "-h" a || elem "--help" a    = putStrLn usage   >> exitSucc
+parse a | elem "-h" a || elem "--help"    a = putStrLn usage   >> exitSucc
         | elem "-v" a || elem "--version" a = putStrLn version >> exitSucc
+        | elem "-w" a || elem "--web"     a = putStrLn "NYI"   >> exitSucc
         | otherwise                         = putStrLn usage   >> exitFail
