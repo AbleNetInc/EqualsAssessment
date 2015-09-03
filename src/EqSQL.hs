@@ -1,20 +1,27 @@
 module EqSQL where
 
-import EqCommon
-import EqLessons
-import Database.SQLite
-import Data.Maybe
-import Data.List
+import           EqCommon
+import           EqLessons
+import           Database.SQLite
+import           Data.Maybe
+import           Data.List
+import qualified Data.Map        as Map
+import           Data.Map           (Map)
+import qualified Data.Sequence   as Seq
+import           Data.Sequence      (Seq)
+import qualified Data.Text       as Text
+import           Data.Text          (Text)
 
-initDB :: EqVersion -> IO (Maybe String)
-initDB v = do let dbName = "EqDB"
-                  len   = (length $ unzippedLessonList v) - 1
-                  cols  = "\"id\"," ++ (intercalate "," $ map ((++ " DEFAULT \"BF\"") . show . show) [0..len])
-                  query = "CREATE TABLE " ++ show v ++ " (" ++ cols ++ ")"
-              s <- openConnection dbName
-              e <- execStatement_ s query
-              closeConnection s
-              return e
+initDB :: EqVersion -> String -> IO (Maybe String)
+initDB v n = do let vSet = Map.lookup v lessonSets
+                    len Nothing  = 0
+                    len (Just l) = length l
+                    cols  = "\"id\",\"teacher\"," ++ (intercalate "," $ (show . show) <$> [0..(len vSet)])
+                    query = "CREATE TABLE " ++ show v ++ " (" ++ cols ++ ")"
+                s <- openConnection n
+                e <- execStatement_ s query
+                closeConnection s
+                return e
 
 saveForm :: EqVersion -> Form -> IO (Maybe String)
 saveForm v f = do let dbName = "EqDB"
