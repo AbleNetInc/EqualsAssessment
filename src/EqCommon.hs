@@ -37,8 +37,8 @@ adaptedScore l | score l /= 1 = 0
                | adapted l    = 0.5
                | otherwise    = 1
 
-pfLesson :: Lesson -> Text
-pfLesson l = Text.pack $ intercalate "," [c,s,o,n,a,r]
+csLesson :: Lesson -> Text
+csLesson l = Text.pack $ intercalate "," [c,s,o,n,a,r]
        where c = show $ chapter l
              s = [section l]
              o = show $ count l
@@ -61,7 +61,7 @@ toCSV a@(Assessment i v t ls) = Text.pack $ concat [ "Teacher:,",n, "\nStudent:,
                                     st  = show $ suggestedStart a
                                     s   = show $ adaptedTotal a
                                     hdr = "Chapter,Section,Number,Lesson,Score,Adapted\n"
-                                    bdy = concat . toList $ ((++ "\n") . Text.unpack . pfLesson) <$> ls
+                                    bdy = concat . toList $ ((++ "\n") . Text.unpack . csLesson) <$> ls
 
 type Specifier  = (Chapter, Section, Int, Name)
 
