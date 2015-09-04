@@ -13,8 +13,8 @@ import           Data.Sequence      (Seq)
 import qualified Data.Text       as Text
 import           Data.Text          (Text)
 
-initDB :: EqVersion -> String -> IO (Maybe String)
-initDB v d = do let vSet = Map.lookup v lessonSets
+initDB :: String -> EqVersion -> IO (Maybe String)
+initDB d v = do let vSet = Map.lookup v lessonSets
                     len Nothing  = 0
                     len (Just l) = length l
                     cols  = intercalate "," $ show <$> ("id" : "teacher" : (show <$> [0..(len vSet)-1]))
