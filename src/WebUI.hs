@@ -43,19 +43,23 @@ headers = mconcat [ "<!DOCTYPE html><html><head>"
 
 runWebServer :: Int -> IO ()
 runWebServer pnum = Web.scotty pnum $ do
-                  Web.get "/login" $ do
+                  Web.get "/" $ do
                           Web.html $ mconcat [ headers
                                              , "<body><h1>Load or Start an Assessment:</h1>"
-                                             , "<form method=\"GET\" action=\"/\">"
-                                             , "Username: <input type=\"text\" name=\"un\"><br>"
-                                             , "Student ID: <input type=\"text\" name=\"id\"><br>"
+                                             , "<form method=\"GET\" action=\"/assess\">"
+                                             , "Username: <input type=\"text\" name=\"u\"><br>"
+                                             , "Student ID: <input type=\"text\" name=\"i\"><br>"
+                                             , "<input type=\"text\" name=\"v\" value=\"Eq2\" style=\"visibility: hidden;\"><br>"
                                              , "<input type=\"submit\" value=\"Go!\">"
                                              , "</body></html>"
                                              ]
-                  Web.get "/" $ do
-                          teacher <- Web.param "un"
-                          student <- Web.param "id"
-                          let a   = blankAssessment Eq2 student teacher
+
+                  Web.get "/assess" $ do
+                          teacher <- Web.param "u"
+                          student <- Web.param "i"
+                          version <- Web.param "v"
+                          let v   = (read version) :: EqVersion
+                              a   = blankAssessment v student teacher
                               t   = Lazy.pack teacher
                               s   = Lazy.pack student
                               ls  = toList $ (Lazy.fromStrict . tbLesson) <$> (lessons a)
