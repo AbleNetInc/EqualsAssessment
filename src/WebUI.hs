@@ -64,7 +64,7 @@ runWebServer pnum = Web.scotty pnum $ do
                               a   = if (clobber :: String) == "New" then
                                        blankAssessment v student teacher
                                     else
-                                       blankAssessment v student teacher
+                                       blankAssessment v student teacher -- load the assessment from the db
                               t   = Lazy.pack teacher
                               s   = Lazy.pack student
                               ls  = toList $ (Lazy.fromStrict . tbLesson) <$> (lessons a)
@@ -74,8 +74,12 @@ runWebServer pnum = Web.scotty pnum $ do
                           Web.html $ mconcat [ headers
                                              , "<body><h1>Assessment by ",t," for ",s,":</h1>"
                                              , "<form method=\"POST\" enctype=\"multipart/form-data\">"
+                                             , "<input type=\"submit\" name=\"x\" value=\"Export\">"
+                                             , "<input type=\"submit\" name=\"s\" value=\"Save\"><br><br>"
                                              , "<table>"
                                              , "<tr><th>Score</th><th>Adapted</th><th>Test Name</th></tr>"
                                              , mconcat trs
                                              , "</table></form></body></html>"
                                              ]
+
+                  --Web.post "
