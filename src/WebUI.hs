@@ -24,10 +24,12 @@ tbLesson l = Text.pack $ "<td>" ++ intercalate "</td><td>" [c,s,o,n,a,r] ++ "</t
              r = show $ adaptedScore l
 
 runWebServer :: Int -> IO ()
-runWebServer pnum = Web.scotty pnum $ do Web.get "/"
-                  $ do let a   = blankAssessment Eq2 "1467" "Example"
-                           t   = Lazy.fromStrict $ teacher a
-                           s   = Lazy.fromStrict $ student a
+runWebServer pnum = Web.scotty pnum $ do Web.get "/:teacher/:student"
+                  $ do teacher <- Web.param "teacher"
+                       student <- Web.param "student"
+                       let a   = blankAssessment Eq2 student teacher
+                           t   = Lazy.pack teacher
+                           s   = Lazy.pack student
                            ls  = toList $ (Lazy.fromStrict . tbLesson) <$> (lessons a)
                            rs  = zip3 (repeat "<tr>") ls $ repeat "</tr>"
                            trs = fn <$> rs
