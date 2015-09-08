@@ -15,33 +15,49 @@ import           Data.Foldable     (toList)
 import           Data.List         (intercalate)
 
 tbLesson :: Lesson -> Text
-tbLesson l = Text.pack $ "<td>" ++ intercalate "</td><td>" [n,s,a] ++ "</td>"
-       where s = "<input type=\"radio\" name=\"" ++ n ++ "_score\" value=\"-1\" checked> blank"
-              ++ "<input type=\"radio\" name=\"" ++ n ++ "_score\" value=\"0\"> 0"
-              ++ "<input type=\"radio\" name=\"" ++ n ++ "_score\" value=\"1\"> 1"
-             n = Text.unpack $ lName l
-             a = "<input type=\"checkbox\" name\"" ++ n ++ "_adapted\" value=\"adapted\">"
+tbLesson l = Text.pack $ "<td>" ++ intercalate "</td><td>" [s,a,n] ++ "</td>"
+       where n = Text.unpack $ lName l
+             i = filter (`notElem` ['\"', ' ']) n
+             s = "<input type=\"radio\" name=\"" ++ i ++ "_score\" value=\"-1\" checked> blank"
+              ++ "<input type=\"radio\" name=\"" ++ i ++ "_score\" value=\"0\"> 0"
+              ++ "<input type=\"radio\" name=\"" ++ i ++ "_score\" value=\"1\"> 1"
+             a = "<input type=\"checkbox\" name=\"" ++ i ++ "_adapted\" value=\"adapted\">"
+
+headers :: Lazy.Text
+headers = mconcat [ "<!DOCTYPE html><html><head>"
+                  , "<meta charset=\"UTF-8\">"
+                  , css
+                  , "<title>Equals Assessment</title>"
+                  , "<link rel='icon' href='",ico,"' type='image/x-icon' />"
+                  , "<link rel='shortcut icon' href='",ico,"' type='image/x-icon' />"
+                  , "</head>"
+                  ] where ico = "https://www.ablenetinc.com/media/favicon/default/favicon.ico"
+                          css = Lazy.intercalate "\n" [ "<style>"
+                                                      , "table, th, td {"
+                                                      ,    "border: 1px solid black;"
+                                                      ,    "border-collapse: collapse;"
+                                                      ,    "padding: 5px;"
+                                                      , "}"
+                                                      , "</style>"
+                                                      ]
 
 runWebServer :: Int -> IO ()
-runWebServer pnum = Web.scotty pnum $ do Web.get "/:teacher/:student"
-                  $ do teacher <- Web.param "teacher"
-                       student <- Web.param "student"
-                       let a   = blankAssessment Eq2 student teacher
-                           t   = Lazy.pack teacher
-                           s   = Lazy.pack student
-                           ls  = toList $ (Lazy.fromStrict . tbLesson) <$> (lessons a)
-                           rs  = zip3 (repeat "<tr>") ls $ repeat "</tr>"
-                           trs = fn <$> rs
-                           fn (a,b,c) = Lazy.append (Lazy.append a b) c
-                           ico = "https://www.ablenetinc.com/media/favicon/default/favicon.ico"
-                       Web.html $ mconcat [ "<!DOCTYPE html><html><head>"
-                                          , "<meta charset=\"UTF-8\">"
-                                          , "<title>Equals Assessment</title>"
-                                          , "<link rel='icon' href='",ico,"' type='image/x-icon' />"
-                                          , "<link rel='shortcut icon' href='",ico,"' type='image/x-icon' />"
-                                          , "</head><body><h1>Assessment by ",t," for ",s,":</h1>"
-                                          , "<form method=\"post\" enctype=\"multipart/form-data\">"
-                                          , "<table>"
-                                          , mconcat trs
-                                          , "</table></form></body></html>"
-                                          ]
+runWebServer pnum = Web.scotty pnum
+                  $ do Web.get "/:teacher/:student"
+                       $ do teacher <- Web.param "teacher"
+                            student <- Web.param "student"
+                            let a   = blankAssessment Eq2 student teacher
+                                t   = Lazy.pack teacher
+                                s   = Lazy.pack student
+                                ls  = toList $ (Lazy.fromStrict . tbLesson) <$> (lessons a)
+                                rs  = zip3 (repeat "<tr>") ls $ repeat "</tr>"
+                                trs = fn <$> rs
+                                fn (a,b,c) = Lazy.append (Lazy.append a b) c
+                            Web.html $ mconcat [ headers
+                                               , "<body><h1>Assessment by ",t," for ",s,":</h1>"
+                                               , "<form method=\"post\" enctype=\"multipart/form-data\">"
+                                               , "<table>"
+                                               , "<tr><th>Score</th><th>Adapted</th><th>Test Name</th></tr>"
+                                               , mconcat trs
+                                               , "</table></form></body></html>"
+                                               ]
