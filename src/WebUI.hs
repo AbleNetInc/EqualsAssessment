@@ -42,22 +42,27 @@ headers = mconcat [ "<!DOCTYPE html><html><head>"
                                                       ]
 
 runWebServer :: Int -> IO ()
-runWebServer pnum = Web.scotty pnum
-                  $ do Web.get "/:teacher/:student"
-                       $ do teacher <- Web.param "teacher"
-                            student <- Web.param "student"
-                            let a   = blankAssessment Eq2 student teacher
-                                t   = Lazy.pack teacher
-                                s   = Lazy.pack student
-                                ls  = toList $ (Lazy.fromStrict . tbLesson) <$> (lessons a)
-                                rs  = zip3 (repeat "<tr>") ls $ repeat "</tr>"
-                                trs = fn <$> rs
-                                fn (a,b,c) = Lazy.append (Lazy.append a b) c
-                            Web.html $ mconcat [ headers
-                                               , "<body><h1>Assessment by ",t," for ",s,":</h1>"
-                                               , "<form method=\"post\" enctype=\"multipart/form-data\">"
-                                               , "<table>"
-                                               , "<tr><th>Score</th><th>Adapted</th><th>Test Name</th></tr>"
-                                               , mconcat trs
-                                               , "</table></form></body></html>"
-                                               ]
+runWebServer pnum = Web.scotty pnum $ do
+                  Web.get "/" $ do
+                          Web.html $ mconcat [ headers
+                                             , "<body>test</body>"
+                                             , "</html>"
+                                             ]
+                  Web.get "/:teacher/:student" $ do
+                          teacher <- Web.param "teacher"
+                          student <- Web.param "student"
+                          let a   = blankAssessment Eq2 student teacher
+                              t   = Lazy.pack teacher
+                              s   = Lazy.pack student
+                              ls  = toList $ (Lazy.fromStrict . tbLesson) <$> (lessons a)
+                              rs  = zip3 (repeat "<tr>") ls $ repeat "</tr>"
+                              trs = fn <$> rs
+                              fn (a,b,c) = Lazy.append (Lazy.append a b) c
+                          Web.html $ mconcat [ headers
+                                             , "<body><h1>Assessment by ",t," for ",s,":</h1>"
+                                             , "<form method=\"post\" enctype=\"multipart/form-data\">"
+                                             , "<table>"
+                                             , "<tr><th>Score</th><th>Adapted</th><th>Test Name</th></tr>"
+                                             , mconcat trs
+                                             , "</table></form></body></html>"
+                                             ]
