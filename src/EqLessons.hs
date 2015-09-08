@@ -290,7 +290,7 @@ lessonSets = Map.fromList
                        , "locate numbers 1-10 on number line"
                        , "place numerals 1-10 in order"
                        , "identify relative position numerals 1-10"
-                       , "compare 1-10 with < and > and = and language"
+                       , "compare 1-10 with &lt; and &gt; and = and language"
                        , "identify number words six through ten"
                        , "state one more than given number 1-10"
                        , "state one less than given number 1-10"
@@ -328,7 +328,7 @@ lessonSets = Map.fromList
                        , "construct a set to match numerals 16-20"
                        , "write numerals 16-20 to match sets"
                        ]
-                 cn2 = [ "compare 11-20 with < and > and = and language"
+                 cn2 = [ "compare 11-20 with &lt; and &gt; and = and language"
                        , "locate numbers 11-20 on number line"
                        , "count backwards from any number 11-20"
                        , "place numerals 11-20 in order"
@@ -400,7 +400,7 @@ lessonSets = Map.fromList
                        , "+/- 4-digit numerals with a calculator"
                        , "identify 5- and 6-digit numerals"
                        , "write 5- and 6-digit numbers"
-                       , "use < and > and = to compare numbers to 6-digits"
+                       , "use &lt; and &gt; and = to compare numbers to 6-digits"
                        ]
                  md2 = [ "use = sets to show understand multiplication"
                        , "use objects to multiply (factors 1-5 and 0)"
