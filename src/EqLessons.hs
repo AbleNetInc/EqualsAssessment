@@ -437,9 +437,9 @@ lessonSets = Map.fromList
                        , "write fraction name to match model (1/2- 1/8)"
                        , "identify 1/2 and 1/3 and 1/4 of a set"
                        ]
-                 cf2 = [ "use fraction models; numerator > 1"
+                 cf2 = [ "use fraction models; numerator &gt; 1"
                        , "use fraction models to match equivalents"
-                       , "identify fractions in a set; numerator >1"
+                       , "identify fractions in a set; numerator &gt; 1"
                        , "order common fraction with measuring cups"
                        , "compare fractions 0 1/2 1\""
                        , "identify linear measurement 1/2\" 1/4\""
