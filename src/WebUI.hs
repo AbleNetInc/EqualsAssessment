@@ -29,13 +29,17 @@ runWebServer pnum = Web.scotty pnum $ do Web.get "/"
                            t   = Lazy.fromStrict $ teacher a
                            s   = Lazy.fromStrict $ student a
                            ls  = toList $ (Lazy.fromStrict . tbLesson) <$> (lessons a)
-                           rs  = zip3 (repeat "<tr><td>") ls $ repeat "</td></tr>"
+                           rs  = zip3 (repeat "<tr>") ls $ repeat "</tr>"
                            trs = fn <$> rs
                            fn (a,b,c) = Lazy.append (Lazy.append a b) c
-                       Web.html $ mconcat [ "<!DOCTYPE html><html>"
-                                          , "<h1>Blank Assessment:</h1>"
-                                          , "<p>",t,"</p>"
-                                          , "<p>",s,"</p>"
+                           ico = "https://www.ablenetinc.com/media/favicon/default/favicon.ico"
+                       Web.html $ mconcat [ "<!DOCTYPE html><html><head>"
+                                          , "<meta charset=\"UTF-8\">"
+                                          , "<title>Equals Assessment</title>"
+                                          , "<link rel='icon' href='",ico,"' type='image/x-icon' />"
+                                          , "<link rel='shortcut icon' href='",ico,"' type='image/x-icon' />"
+                                          , "</head>"
+                                          , "<h1>Assessment by ",t," for ",s,":</h1>"
                                           , "<table>"
                                           , mconcat trs
                                           , "</table>"
