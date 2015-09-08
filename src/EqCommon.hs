@@ -10,7 +10,7 @@ import           Data.Sequence     (Seq)
 import qualified Data.Text      as Text
 import           Data.Text         (Text)
 
-data EqVersion  = Eq2 | Eq3 deriving (Eq, Ord, Show)
+data EqVersion  = Eq2 | Eq3 deriving (Eq, Ord, Show, Read)
 type Chapter    = Int
 type Section    = Char
 type Name       = Text
