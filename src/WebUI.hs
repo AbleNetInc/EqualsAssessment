@@ -13,6 +13,7 @@ import           Data.Text         (Text)
 import qualified Data.Text.Lazy as Lazy
 import           Data.Foldable     (toList)
 import           Data.List         (intercalate)
+import           Control.Monad.IO.Class    (liftIO)
 
 tbLesson :: Lesson -> Text
 tbLesson l = Text.pack $ "<td>" ++ intercalate "</td><td>" [s,a,n] ++ "</td>"
@@ -59,13 +60,9 @@ runWebServer pnum = Web.scotty pnum $ do
                           teacher <- Web.param "u"
                           student <- Web.param "i"
                           version <- Web.param "v"
-                          clobber <- Web.param "c"
                           let v   = (read version) :: EqVersion
-                              a   = if (clobber :: String) == "New" then
-                                       blankAssessment v student teacher
-                                    else
-                                       blankAssessment v student teacher -- load the assessment from the db
-                              t   = Lazy.pack teacher
+                          a       <- liftIO $ retrieveAssessment "EqDB" v student teacher
+                          let t   = Lazy.pack teacher
                               s   = Lazy.pack student
                               ls  = toList $ (Lazy.fromStrict . tbLesson) <$> (lessons a)
                               rs  = zip3 (repeat "<tr>") ls $ repeat "</tr>"
