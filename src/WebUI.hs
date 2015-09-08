@@ -43,14 +43,18 @@ headers = mconcat [ "<!DOCTYPE html><html><head>"
 
 runWebServer :: Int -> IO ()
 runWebServer pnum = Web.scotty pnum $ do
-                  Web.get "/" $ do
+                  Web.get "/login" $ do
                           Web.html $ mconcat [ headers
-                                             , "<body>test</body>"
-                                             , "</html>"
+                                             , "<body><h1>Load or Start an Assessment:</h1>"
+                                             , "<form method=\"GET\" action=\"/\">"
+                                             , "Username: <input type=\"text\" name=\"un\"><br>"
+                                             , "Student ID: <input type=\"text\" name=\"id\"><br>"
+                                             , "<input type=\"submit\" value=\"Go!\">"
+                                             , "</body></html>"
                                              ]
-                  Web.get "/:teacher/:student" $ do
-                          teacher <- Web.param "teacher"
-                          student <- Web.param "student"
+                  Web.get "/" $ do
+                          teacher <- Web.param "un"
+                          student <- Web.param "id"
                           let a   = blankAssessment Eq2 student teacher
                               t   = Lazy.pack teacher
                               s   = Lazy.pack student
@@ -60,7 +64,7 @@ runWebServer pnum = Web.scotty pnum $ do
                               fn (a,b,c) = Lazy.append (Lazy.append a b) c
                           Web.html $ mconcat [ headers
                                              , "<body><h1>Assessment by ",t," for ",s,":</h1>"
-                                             , "<form method=\"post\" enctype=\"multipart/form-data\">"
+                                             , "<form method=\"POST\" enctype=\"multipart/form-data\">"
                                              , "<table>"
                                              , "<tr><th>Score</th><th>Adapted</th><th>Test Name</th></tr>"
                                              , mconcat trs
