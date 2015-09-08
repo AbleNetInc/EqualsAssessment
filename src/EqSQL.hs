@@ -42,9 +42,21 @@ deleteAssessment v d s t = do let query = concat ["delete from ",show v," where 
                               closeConnection h
                               return e
 
-retrieveAssessment :: String -> EqVersion -> String -> String -> IO (Either String [[Row String]])
+rowToAssessment :: EqVersion -> (Row String) -> Assessment
+rowToAssessment v r = Assessment id v t $ Seq.fromList ls
+                    where id = Text.pack . fromJust $ lookup "id"      r
+                          t  = Text.pack . fromJust $ lookup "teacher" r
+                          vS = Map.lookup v lessonSets
+                          l Nothing     = 0
+                          l (Just lset) = Seq.length lset
+                          ls = [(read . fromJust $ lookup x r) :: Lesson| x <- show <$> [0..((l vS)-1)]]
+
+retrieveAssessment :: String -> EqVersion -> String -> String -> IO Assessment
 retrieveAssessment d v s t = do let query = concat ["select * from ",show v," where id=",s," and teacher=\"",t,"\";"]
                                 h <- openReadonlyConnection d
                                 e <- execStatement h query
                                 closeConnection h
-                                return e
+                                case e of
+                                     Left  s          -> return $ blankAssessment v s t
+                                     Right ((r:rs):_) -> return $ rowToAssessment v r
+                                     _                -> return $ blankAssessment v s t
