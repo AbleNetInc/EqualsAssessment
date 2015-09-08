@@ -50,7 +50,8 @@ runWebServer pnum = Web.scotty pnum $ do
                                              , "Username: <input type=\"text\" name=\"u\"><br>"
                                              , "Student ID: <input type=\"text\" name=\"i\"><br>"
                                              , "<input type=\"text\" name=\"v\" value=\"Eq2\" style=\"visibility: hidden;\"><br>"
-                                             , "<input type=\"submit\" value=\"Go!\">"
+                                             , "<input type=\"submit\" name=\"c\" value=\"Load\">"
+                                             , "<input type=\"submit\" name=\"c\" value=\"New\">"
                                              , "</body></html>"
                                              ]
 
@@ -58,8 +59,12 @@ runWebServer pnum = Web.scotty pnum $ do
                           teacher <- Web.param "u"
                           student <- Web.param "i"
                           version <- Web.param "v"
+                          clobber <- Web.param "c"
                           let v   = (read version) :: EqVersion
-                              a   = blankAssessment v student teacher
+                              a   = if (clobber :: String) == "New" then
+                                       blankAssessment v student teacher
+                                    else
+                                       blankAssessment v student teacher
                               t   = Lazy.pack teacher
                               s   = Lazy.pack student
                               ls  = toList $ (Lazy.fromStrict . tbLesson) <$> (lessons a)
