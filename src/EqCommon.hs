@@ -26,11 +26,10 @@ data Lesson     = Lesson { chapter :: Chapter
                          } deriving (Show, Read)
 
 instance Eq Lesson where
-    l == l' = sameCh && sameSc && sameCo && sameNm
+    l == l' = sameCh && sameSc && sameCo
             where sameCh = chapter l == chapter l'
                   sameSc = section l == section l'
                   sameCo = count   l == count   l'
-                  sameNm = lName   l == lName   l'
 
 adaptedScore :: Lesson -> Double
 adaptedScore l | score l /= 1 = 0
