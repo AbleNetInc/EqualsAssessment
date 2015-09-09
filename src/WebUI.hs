@@ -87,7 +87,9 @@ runWebServer pnum = Web.scotty pnum $ do
                                                          ,     "ls[i].style.display = \"table-row\";"
                                                          ,   "}"
                                                          ,   "document.getElementById(\"heading\").style.display = \"table-row\";"
-                                                         , "}" , mconcat ["window.onload = function () { showRows('",head (nub tgs),"'); };</script>"]
+                                                         , "}",
+                                                         , mconcat ["window.onload = function () { showRows('",head (nub tgs),"');"]
+                                                         , "};</script>"
                                                          ]
                           Web.html $ mconcat [ headers
                                              , "<body><h1>Assessment by ",t," for ",s,":</h1>"
