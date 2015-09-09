@@ -11,6 +11,7 @@ import           Data.Monoid       (mconcat)
 import qualified Data.Text      as Text
 import           Data.Text         (Text)
 import qualified Data.Text.Lazy as Lazy
+import           Data.Text.Lazy.Encoding    (decodeUtf8)
 import           Data.Foldable     (toList)
 import           Data.List         (intercalate)
 import           Control.Monad.IO.Class    (liftIO)
@@ -75,7 +76,7 @@ runWebServer pnum = Web.scotty pnum $ do
                               fn (a,b,c) = Lazy.append (Lazy.append a b) c
                           Web.html $ mconcat [ headers
                                              , "<body><h1>Assessment by ",t," for ",s,":</h1>"
-                                             , "<form method=\"POST\" enctype=\"multipart/form-data\">"
+                                             , "<form method=\"POST\" action=\"/save\" enctype=\"multipart/form-data\">"
                                              , "<input type=\"submit\" name=\"x\" value=\"Export\">"
                                              , "<input type=\"submit\" name=\"s\" value=\"Save\"><br><br>"
                                              , "<table>"
@@ -84,4 +85,6 @@ runWebServer pnum = Web.scotty pnum $ do
                                              , "</table></form></body></html>"
                                              ]
 
-                  --Web.post "
+                  Web.post "/save" $ do
+                           b <- Web.body
+                           Web.text $ decodeUtf8 b
