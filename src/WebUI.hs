@@ -51,7 +51,7 @@ runWebServer pnum = Web.scotty pnum $ do
                                              , "<form method=\"GET\" action=\"/assess\">"
                                              , "Username: <input type=\"text\" name=\"u\"><br>"
                                              , "Student ID: <input type=\"text\" name=\"i\"><br>"
-                                             , "<input type=\"text\" name=\"v\" value=\"Eq2\" style=\"visibility: hidden;\"><br>"
+                                             , "<input type=\"radio\" name=\"v\" value=\"Eq2\" style=\"visibility: hidden;\" checked><br>"
                                              , "<input type=\"submit\" name=\"c\" value=\"Load\">"
                                              , "<input type=\"submit\" name=\"c\" value=\"New\">"
                                              , "</body></html>"
