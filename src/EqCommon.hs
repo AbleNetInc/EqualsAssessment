@@ -20,7 +20,7 @@ data Lesson     = Lesson { chapter :: Chapter
                          , section :: Section
                          , count   :: Int
                          , lName   :: Name
-                         , tag     :: (Seq Tag)
+                         , tags    :: (Seq Tag)
                          , score   :: Score
                          , adapted :: Bool
                          } deriving (Show, Read)
