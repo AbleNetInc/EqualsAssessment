@@ -20,10 +20,12 @@ tbLesson :: Lesson -> Text
 tbLesson l = Text.pack $ concat ["<tr class=\"",c,"\" style=\"display: none;\">","<td>",s,"</td><td style=\"text-align: center;\">",a,"</td><td>",n,"</td>","</tr>"]
        where n = Text.unpack $ lName l
              c = Text.unpack . head . toList $ tags l
+             r = score l
              i = filter (`notElem` ['\"', ' ']) n
-             s = concat ["<input type=\"radio\" name=\"",i,"_score\" value=\"-1\" checked> blank"
-                        ,"<input type=\"radio\" name=\"",i,"_score\" value=\"0\"> 0"
-                        ,"<input type=\"radio\" name=\"",i,"_score\" value=\"1\"> 1"]
+             ch = [y | x <- [(-1)..1], let y = if r == x then "checked" else ""]
+             s = concat ["<input type=\"radio\" name=\"",i,"_score\" value=\"-1\" ",ch !! 0,"> blank"
+                        ,"<input type=\"radio\" name=\"",i,"_score\" value=\"0\" ",ch !! 1,"> 0"
+                        ,"<input type=\"radio\" name=\"",i,"_score\" value=\"1\" ",ch !! 2,"> 1"]
              a = "<input type=\"checkbox\" name=\"" ++ i ++ "_adapted\" value=\"adapted\">"
 
 headers :: Lazy.Text
@@ -85,7 +87,7 @@ runWebServer pnum = Web.scotty pnum $ do
                                                          ,     "ls[i].style.display = \"table-row\";"
                                                          ,   "}"
                                                          ,   "document.getElementById(\"heading\").style.display = \"table-row\";"
-                                                         , "}</script>"
+                                                         , "}" , mconcat ["window.onload = function () { showRows('",head (nub tgs),"'); };</script>"]
                                                          ]
                           Web.html $ mconcat [ headers
                                              , "<body><h1>Assessment by ",t," for ",s,":</h1>"
