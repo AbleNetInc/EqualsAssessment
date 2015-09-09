@@ -17,12 +17,12 @@ import           Data.List         (intercalate, nub)
 import           Control.Monad.IO.Class    (liftIO)
 
 tbLesson :: Lesson -> Text
-tbLesson l = Text.pack $ "<td>" ++ intercalate "</td><td>" [s,a,n] ++ "</td>"
+tbLesson l = Text.pack $ concat ["<td>",s,"</td><td style=\"text-align: center;\">",a,"</td><td>",n,"</td>"]
        where n = Text.unpack $ lName l
              i = filter (`notElem` ['\"', ' ']) n
-             s = "<input type=\"radio\" name=\"" ++ i ++ "_score\" value=\"-1\" checked> blank"
-              ++ "<input type=\"radio\" name=\"" ++ i ++ "_score\" value=\"0\"> 0"
-              ++ "<input type=\"radio\" name=\"" ++ i ++ "_score\" value=\"1\"> 1"
+             s = concat ["<input type=\"radio\" name=\"",i,"_score\" value=\"-1\" checked> blank"
+                        ,"<input type=\"radio\" name=\"",i,"_score\" value=\"0\"> 0"
+                        ,"<input type=\"radio\" name=\"",i,"_score\" value=\"1\"> 1"]
              a = "<input type=\"checkbox\" name=\"" ++ i ++ "_adapted\" value=\"adapted\">"
 
 headers :: Lazy.Text
