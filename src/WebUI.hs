@@ -17,7 +17,7 @@ import           Data.List         (intercalate, nub)
 import           Control.Monad.IO.Class    (liftIO)
 
 tbLesson :: Lesson -> Text
-tbLesson l = Text.pack $ concat ["<td>",s,"</td><td style=\"text-align: center;\">",a,"</td><td>",n,"</td>"]
+tbLesson l = Text.pack $ concat ["<tr>","<td>",s,"</td><td style=\"text-align: center;\">",a,"</td><td>",n,"</td>","</tr>"]
        where n = Text.unpack $ lName l
              i = filter (`notElem` ['\"', ' ']) n
              s = concat ["<input type=\"radio\" name=\"",i,"_score\" value=\"-1\" checked> blank"
@@ -74,9 +74,6 @@ runWebServer pnum = Web.scotty pnum $ do
                               tgs = Lazy.fromStrict <$> (concat $ (toList . tags) <$> ll)
                               nav n = mconcat [" <a href=\"#",n,"\">",n,"</a> |"]
                               tbs = mconcat ["<nav>| ", (mconcat $ nav <$> (nub tgs)), "</nav>"]
-                              rs  = zip3 (repeat "<tr>") ls $ repeat "</tr>"
-                              trs = fn <$> rs
-                              fn (a,b,c) = Lazy.append (Lazy.append a b) c
                           Web.html $ mconcat [ headers
                                              , "<body><h1>Assessment by ",t," for ",s,":</h1>"
                                              , "<form method=\"POST\" action=\"/save\" enctype=\"multipart/form-data\">"
@@ -85,7 +82,7 @@ runWebServer pnum = Web.scotty pnum $ do
                                              , tbs
                                              , "<table>"
                                              , "<tr><th>Score</th><th>Adapted</th><th>Test Name</th></tr>"
-                                             , mconcat trs
+                                             , mconcat ls
                                              , "</table></form></body></html>"
                                              ]
 
