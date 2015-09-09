@@ -35,14 +35,14 @@ headers = mconcat [ "<!DOCTYPE html><html><head>"
                   , "<link rel='shortcut icon' href='",ico,"' type='image/x-icon' />"
                   , "</head>"
                   ] where ico = "https://www.ablenetinc.com/media/favicon/default/favicon.ico"
-                          css = Lazy.intercalate "\n" [ "<style>"
-                                                      , "table, th, td {"
-                                                      ,    "border: 1px solid black;"
-                                                      ,    "border-collapse: collapse;"
-                                                      ,    "padding: 5px;"
-                                                      , "}"
-                                                      , "</style>"
-                                                      ]
+                          css = Lazy.intercalate " " [ "<style>"
+                                                     , "table, th, td {"
+                                                     ,    "border: 1px solid black;"
+                                                     ,    "border-collapse: collapse;"
+                                                     ,    "padding: 5px;"
+                                                     , "}"
+                                                     , "</style>"
+                                                     ]
 
 runWebServer :: Int -> IO ()
 runWebServer pnum = Web.scotty pnum $ do
@@ -75,19 +75,18 @@ runWebServer pnum = Web.scotty pnum $ do
                               tgs = Lazy.fromStrict <$> (concat $ (toList . tags) <$> ll)
                               nav n = mconcat [" <a href=\"#\" onclick=\"showRows('",n,"')\">",n,"</a> |"]
                               tbs = mconcat ["<nav>| ", (mconcat $ nav <$> (nub tgs)), "</nav>"]
-                              js  = Lazy.intercalate "\n" [ "<script>"
-                                                          , "function showRows(id) {"
-                                                          , "  var trs = document.getElementsByTagName(\"tr\");"
-                                                          , "  for (i = 0; i < trs.length; i++) {"
-                                                          , "    trs[i].style.display = \"none\";"
-                                                          , "  }"
-                                                          , "  var ls = document.getElementsByClassName(id);"
-                                                          , "  for (i = 0; i < ls.length; i++) {"
-                                                          , "    ls[i].style.display = \"table-row\";"
-                                                          , "  }"
-                                                          , "document.getElementById(\"heading\").style.display = \"table-row\";"
-                                                          , "}\n</script>"
-                                                          ]
+                              js  = Lazy.intercalate " " [ "<script>function showRows(id) {"
+                                                         ,   "var trs = document.getElementsByTagName(\"tr\");"
+                                                         ,   "for (i = 0; i < trs.length; i++) {"
+                                                         ,     "trs[i].style.display = \"none\";"
+                                                         ,   "}"
+                                                         ,   "var ls = document.getElementsByClassName(id);"
+                                                         ,   "for (i = 0; i < ls.length; i++) {"
+                                                         ,     "ls[i].style.display = \"table-row\";"
+                                                         ,   "}"
+                                                         ,   "document.getElementById(\"heading\").style.display = \"table-row\";"
+                                                         , "}</script>"
+                                                         ]
                           Web.html $ mconcat [ headers
                                              , "<body><h1>Assessment by ",t," for ",s,":</h1>"
                                              , js
@@ -95,7 +94,7 @@ runWebServer pnum = Web.scotty pnum $ do
                                              , "<input type=\"submit\" name=\"s\" value=\"Export\">"
                                              , "<input type=\"submit\" name=\"s\" value=\"Save\"><br><br>"
                                              , tbs
-                                             , "<table>"
+                                             , "<br><table>"
                                              , "<tr id=\"heading\"><th>Score</th><th>Adapted</th><th>Test Name</th></tr>"
                                              , mconcat ls
                                              , "</table></form></body></html>"
