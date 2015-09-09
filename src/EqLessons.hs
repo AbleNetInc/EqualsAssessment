@@ -1,7 +1,6 @@
 module EqLessons where
 
-import EqCommon
-import           Data.Maybe        (fromJust)
+import           EqCommon
 import qualified Data.Map       as Map
 import           Data.Map          (Map)
 import qualified Data.Sequence  as Seq
