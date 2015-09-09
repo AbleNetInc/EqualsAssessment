@@ -73,7 +73,7 @@ runWebServer pnum = Web.scotty pnum $ do
                               ls  = toList $ (Lazy.fromStrict . tbLesson) <$> ll
                               tgs = Lazy.fromStrict <$> (concat $ (toList . tags) <$> ll)
                               nav n = mconcat ["<a href=\"#",n,"\">",n,"</a> | "]
-                              tbs = mconcat ["<nav>", (mconcat $ nav <$> (nub tgs)), "</nav>"]
+                              tbs = mconcat ["<nav>| ", (mconcat $ nav <$> (nub tgs)), "</nav>"]
                               rs  = zip3 (repeat "<tr>") ls $ repeat "</tr>"
                               trs = fn <$> rs
                               fn (a,b,c) = Lazy.append (Lazy.append a b) c
