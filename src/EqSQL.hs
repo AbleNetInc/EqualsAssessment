@@ -52,11 +52,10 @@ rowToAssessment v r = Assessment id v t $ Seq.fromList ls
                           ls = [(read . fromJust $ lookup x r) :: Lesson| x <- show <$> [0..((l vS)-1)]]
 
 retrieveAssessment :: String -> EqVersion -> String -> String -> IO Assessment
-retrieveAssessment d v s t = do let query = concat ["select * from ",show v," where id=",s," and teacher=\"",t,"\";"]
+retrieveAssessment d v s t = do let query = concat ["select * from ",show v," where id=\"",s,"\" and teacher=\"",t,"\";"]
                                 h <- openReadonlyConnection d
                                 e <- execStatement h query
                                 closeConnection h
                                 case e of
-                                     Left  s          -> return $ blankAssessment v s t
-                                     Right ((r:rs):_) -> return $ rowToAssessment v r
-                                     _                -> return $ blankAssessment v s t
+                                     Right (r:_) -> return . rowToAssessment v $ head r
+                                     _           -> return $ blankAssessment v s t

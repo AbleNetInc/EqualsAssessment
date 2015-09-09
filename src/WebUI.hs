@@ -21,12 +21,13 @@ tbLesson l = Text.pack $ concat ["<tr class=\"",c,"\" style=\"display: none;\">"
        where n = Text.unpack $ lName l
              c = Text.unpack . head . toList $ tags l
              r = score l
+             b = if adapted l then " checked" else ""
              i = filter (`notElem` ['\"', ' ']) n
-             ch = [y | x <- [(-1)..1], let y = if r == x then "checked" else ""]
-             s = concat ["<input type=\"radio\" name=\"",i,"_score\" value=\"-1\" ",ch !! 0,"> blank"
-                        ,"<input type=\"radio\" name=\"",i,"_score\" value=\"0\" ",ch !! 1,"> 0"
-                        ,"<input type=\"radio\" name=\"",i,"_score\" value=\"1\" ",ch !! 2,"> 1"]
-             a = "<input type=\"checkbox\" name=\"" ++ i ++ "_adapted\" value=\"adapted\">"
+             ch = [y | x <- [(-1)..1], let y = if r == x then " checked" else ""]
+             s = concat ["<input type=\"radio\" name=\"",i,"_score\" value=\"-1\"",ch !! 0,"> blank"
+                        ,"<input type=\"radio\" name=\"",i,"_score\" value=\"0\"", ch !! 1,"> 0"
+                        ,"<input type=\"radio\" name=\"",i,"_score\" value=\"1\"", ch !! 2,"> 1"]
+             a = concat ["<input type=\"checkbox\" name=\"",i,"_adapted\" value=\"adapted\"",b,">"]
 
 headers :: Lazy.Text
 headers = mconcat [ "<!DOCTYPE html><html><head>"
