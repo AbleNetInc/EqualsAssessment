@@ -60,11 +60,16 @@ runWebServer pnum = Web.scotty pnum $ do
                           teacher <- Web.param "u"
                           student <- Web.param "i"
                           version <- Web.param "v"
+                          clobber <- Web.param "c"
                           let v   = (read version) :: EqVersion
                           a       <- liftIO $ retrieveAssessment "EqDB" v student teacher
-                          let t   = Lazy.pack teacher
+                          let as  = blankAssessment v student teacher
+                              t   = Lazy.pack teacher
                               s   = Lazy.pack student
-                              ls  = toList $ (Lazy.fromStrict . tbLesson) <$> (lessons a)
+                              ll  = lessons $ case (clobber :: String) of
+                                                   "New"  -> as
+                                                   "Load" -> a
+                              ls  = toList $ (Lazy.fromStrict . tbLesson) <$> ll
                               rs  = zip3 (repeat "<tr>") ls $ repeat "</tr>"
                               trs = fn <$> rs
                               fn (a,b,c) = Lazy.append (Lazy.append a b) c
