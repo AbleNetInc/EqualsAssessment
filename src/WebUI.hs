@@ -17,8 +17,9 @@ import           Data.List         (intercalate, nub)
 import           Control.Monad.IO.Class    (liftIO)
 
 tbLesson :: Lesson -> Text
-tbLesson l = Text.pack $ concat ["<tr>","<td>",s,"</td><td style=\"text-align: center;\">",a,"</td><td>",n,"</td>","</tr>"]
+tbLesson l = Text.pack $ concat ["<tr class=\"",c,"\" style=\"display: none;\">","<td>",s,"</td><td style=\"text-align: center;\">",a,"</td><td>",n,"</td>","</tr>"]
        where n = Text.unpack $ lName l
+             c = Text.unpack . head . toList $ tags l
              i = filter (`notElem` ['\"', ' ']) n
              s = concat ["<input type=\"radio\" name=\"",i,"_score\" value=\"-1\" checked> blank"
                         ,"<input type=\"radio\" name=\"",i,"_score\" value=\"0\"> 0"
@@ -72,16 +73,30 @@ runWebServer pnum = Web.scotty pnum $ do
                                                    "Load" -> a
                               ls  = toList $ (Lazy.fromStrict . tbLesson) <$> ll
                               tgs = Lazy.fromStrict <$> (concat $ (toList . tags) <$> ll)
-                              nav n = mconcat [" <a href=\"#",n,"\">",n,"</a> |"]
+                              nav n = mconcat [" <a href=\"#\" onclick=\"showRows('",n,"')\">",n,"</a> |"]
                               tbs = mconcat ["<nav>| ", (mconcat $ nav <$> (nub tgs)), "</nav>"]
+                              js  = Lazy.intercalate "\n" [ "<script>"
+                                                          , "function showRows(id) {"
+                                                          , "  var trs = document.getElementsByTagName(\"tr\");"
+                                                          , "  for (i = 0; i < trs.length; i++) {"
+                                                          , "    trs[i].style.display = \"none\";"
+                                                          , "  }"
+                                                          , "  var ls = document.getElementsByClassName(id);"
+                                                          , "  for (i = 0; i < ls.length; i++) {"
+                                                          , "    ls[i].style.display = \"table-row\";"
+                                                          , "  }"
+                                                          , "document.getElementById(\"heading\").style.display = \"table-row\";"
+                                                          , "}\n</script>"
+                                                          ]
                           Web.html $ mconcat [ headers
                                              , "<body><h1>Assessment by ",t," for ",s,":</h1>"
+                                             , js
                                              , "<form method=\"POST\" action=\"/save\" enctype=\"multipart/form-data\">"
                                              , "<input type=\"submit\" name=\"s\" value=\"Export\">"
                                              , "<input type=\"submit\" name=\"s\" value=\"Save\"><br><br>"
                                              , tbs
                                              , "<table>"
-                                             , "<tr><th>Score</th><th>Adapted</th><th>Test Name</th></tr>"
+                                             , "<tr id=\"heading\"><th>Score</th><th>Adapted</th><th>Test Name</th></tr>"
                                              , mconcat ls
                                              , "</table></form></body></html>"
                                              ]
