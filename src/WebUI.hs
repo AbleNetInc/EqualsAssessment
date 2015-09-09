@@ -13,7 +13,7 @@ import           Data.Text         (Text)
 import qualified Data.Text.Lazy as Lazy
 import           Data.Text.Lazy.Encoding    (decodeUtf8)
 import           Data.Foldable     (toList)
-import           Data.List         (intercalate)
+import           Data.List         (intercalate, nub)
 import           Control.Monad.IO.Class    (liftIO)
 
 tbLesson :: Lesson -> Text
@@ -71,6 +71,9 @@ runWebServer pnum = Web.scotty pnum $ do
                                                    "New"  -> as
                                                    "Load" -> a
                               ls  = toList $ (Lazy.fromStrict . tbLesson) <$> ll
+                              tgs = Lazy.fromStrict <$> (concat $ (toList . tags) <$> ll)
+                              nav n = mconcat ["<a href=\"#",n,"\">",n,"</a> | "]
+                              tbs = mconcat ["<nav>", (mconcat $ nav <$> (nub tgs)), "</nav>"]
                               rs  = zip3 (repeat "<tr>") ls $ repeat "</tr>"
                               trs = fn <$> rs
                               fn (a,b,c) = Lazy.append (Lazy.append a b) c
@@ -79,6 +82,7 @@ runWebServer pnum = Web.scotty pnum $ do
                                              , "<form method=\"POST\" action=\"/save\" enctype=\"multipart/form-data\">"
                                              , "<input type=\"submit\" name=\"s\" value=\"Export\">"
                                              , "<input type=\"submit\" name=\"s\" value=\"Save\"><br><br>"
+                                             , tbs
                                              , "<table>"
                                              , "<tr><th>Score</th><th>Adapted</th><th>Test Name</th></tr>"
                                              , mconcat trs
