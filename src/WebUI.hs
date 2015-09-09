@@ -87,7 +87,7 @@ runWebServer pnum = Web.scotty pnum $ do
                                                          ,     "ls[i].style.display = \"table-row\";"
                                                          ,   "}"
                                                          ,   "document.getElementById(\"heading\").style.display = \"table-row\";"
-                                                         , "}",
+                                                         , "}"
                                                          , mconcat ["window.onload = function () { showRows('",head (nub tgs),"');"]
                                                          , "};</script>"
                                                          ]
