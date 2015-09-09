@@ -77,7 +77,7 @@ runWebServer pnum = Web.scotty pnum $ do
                           Web.html $ mconcat [ headers
                                              , "<body><h1>Assessment by ",t," for ",s,":</h1>"
                                              , "<form method=\"POST\" action=\"/save\" enctype=\"multipart/form-data\">"
-                                             , "<input type=\"submit\" name=\"x\" value=\"Export\">"
+                                             , "<input type=\"submit\" name=\"s\" value=\"Export\">"
                                              , "<input type=\"submit\" name=\"s\" value=\"Save\"><br><br>"
                                              , "<table>"
                                              , "<tr><th>Score</th><th>Adapted</th><th>Test Name</th></tr>"
@@ -86,5 +86,8 @@ runWebServer pnum = Web.scotty pnum $ do
                                              ]
 
                   Web.post "/save" $ do
-                           b <- Web.body
-                           Web.text $ decodeUtf8 b
+                           ret <- Web.param "s"
+                           b   <- Web.body
+                           Web.text $ case (ret :: String) of
+                                "Export" -> Lazy.fromStrict . toCSV $ blankAssessment Eq2 "test" "test"
+                                "Save"   -> decodeUtf8 b
