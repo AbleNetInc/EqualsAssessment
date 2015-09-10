@@ -17,17 +17,21 @@ import           Data.List         (intercalate, nub)
 import           Control.Monad.IO.Class    (liftIO)
 
 tbLesson :: Lesson -> Text
-tbLesson l = Text.pack $ concat ["<tr class=\"",c,"\">","<td>",s,"</td><td style=\"text-align: center;\">",a,"</td><td>",n,"</td>","</tr>"]
+tbLesson l = Text.pack $ concat ["<tr class=\"",c,"\">","<td>",s,"</td>"
+                                ,"<td style=\"text-align: center;\">",a,"</td>"
+                                ,"<td>",n,"</td>","</tr>"]
        where n = Text.unpack $ lName l
              c = Text.unpack . head . toList $ tags l
              r = score l
+             i = show (chapter l, section l, count l)
+             ch = [if r == x then " checked" else "" | x <- [(-1)..1]]
+             t = "<input type=\""
+             m = "\" name=\"" ++ show (chapter l, section l, count l)
+             s = concat [t,"radio",m,"_s\" value=\"-1\"",ch !! 0,"> blank"
+                        ,t,"radio",m,"_s\" value=\"0\"", ch !! 1,"> 0"
+                        ,t,"radio",m,"_s\" value=\"1\"", ch !! 2,"> 1"]
+             a = concat [t,"checkbox",m,"_a\" value=\"True\"",b,">"]
              b = if adapted l then " checked" else ""
-             i = filter (`notElem` ['\"', ' ']) n
-             ch = [y | x <- [(-1)..1], let y = if r == x then " checked" else ""]
-             s = concat ["<input type=\"radio\" name=\"",i,"_score\" value=\"-1\"",ch !! 0,"> blank"
-                        ,"<input type=\"radio\" name=\"",i,"_score\" value=\"0\"", ch !! 1,"> 0"
-                        ,"<input type=\"radio\" name=\"",i,"_score\" value=\"1\"", ch !! 2,"> 1"]
-             a = concat ["<input type=\"checkbox\" name=\"",i,"_adapted\" value=\"adapted\"",b,">"]
 
 headers :: Lazy.Text
 headers = mconcat [ "<!DOCTYPE html><html><head>"
