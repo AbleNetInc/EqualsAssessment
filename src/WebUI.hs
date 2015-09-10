@@ -13,7 +13,7 @@ import           Data.Text         (Text)
 import qualified Data.Text.Lazy as Lazy
 import           Data.Text.Lazy.Encoding    (decodeUtf8)
 import           Data.Foldable     (toList)
-import           Data.List         (intercalate, nub)
+import           Data.List         (intercalate, nub, foldl')
 import           Control.Monad.IO.Class    (liftIO)
 
 tbLesson :: Lesson -> Text
@@ -26,11 +26,11 @@ tbLesson l = Text.pack $ concat ["<tr class=\"",c,"\">","<td>",s,"</td>"
              i = show (chapter l, section l, count l)
              ch = [if r == x then " checked" else "" | x <- [(-1)..1]]
              t = "<input type=\""
-             m = "\" name=\"" ++ show (chapter l, section l, count l)
-             s = concat [t,"radio",m,"_s\" value=\"-1\"",ch !! 0,"> blank"
-                        ,t,"radio",m,"_s\" value=\"0\"", ch !! 1,"> 0"
-                        ,t,"radio",m,"_s\" value=\"1\"", ch !! 2,"> 1"]
-             a = concat [t,"checkbox",m,"_a\" value=\"True\"",b,">"]
+             m = concat ["\" name=\"",show (chapter l, section l, count l)]
+             s = concat [t,"radio",m,"\" value=\"(Just (-1),Nothing)\"",ch !! 0,"> blank"
+                        ,t,"radio",m,"\" value=\"(Just 0,Nothing)\"", ch !! 1,"> 0"
+                        ,t,"radio",m,"\" value=\"(Just 1,Nothing)\"", ch !! 2,"> 1"]
+             a = concat [t,"checkbox",m,"\" value=\"(Nothing,Just True)\"",b,">"]
              b = if adapted l then " checked" else ""
 
 headers :: Lazy.Text
@@ -106,12 +106,28 @@ runWebServer pnum = Web.scotty pnum $ do
                                              , "<br><table>"
                                              , "<tr id=\"heading\"><th>Score</th><th>Adapted</th><th>Test Name</th></tr>"
                                              , mconcat ls
-                                             , "</table></form></body></html>"
+                                             , "</table>"
+                                             , "<input type=\"radio\" name=\"v\" value=\"Eq2\" style=\"visibility: hidden;\" checked><br>"
+                                             , "<input type=\"text\" name=\"u\" value=\"",t,"\" style=\"visibility: hidden;\"><br>"
+                                             , "<input type=\"text\" name=\"i\" value=\"",s,"\" style=\"visibility: hidden;\"><br>"
+                                             , "</form></body></html>"
                                              ]
 
                   Web.post "/save" $ do
-                           ret <- Web.param "s"
-                           b   <- Web.body
-                           Web.text $ case (ret :: String) of
-                                "Export" -> Lazy.fromStrict . toCSV $ blankAssessment Eq2 "test" "test"
-                                "Save"   -> decodeUtf8 b
+                           p       <- Web.params
+                           ret     <- Web.param "s"
+                           version <- Web.param "v"
+                           teacher <- Web.param "u"
+                           student <- Web.param "i"
+                           let v   = (read version) :: EqVersion
+                               t   = teacher :: String
+                               s   = student :: String
+                               as  = blankAssessment v student teacher
+                               scs = drop 1 $ take (length p - 3) p
+                               nls = (read . Lazy.unpack . fst <$> scs) :: [(Int,Char,Int)]
+                               nss = (read . Lazy.unpack . snd <$> scs) :: [(Maybe Int,Maybe Bool)]
+                               nas = foldl' (\x (y,z) -> updateLesson x y z) as $ zip nls nss
+                           na      <- liftIO $ saveAssessment "EqDB" nas
+                           case (ret :: String) of
+                                "Export" -> Web.text . Lazy.fromStrict $ toCSV nas
+                                "Save"   -> Web.redirect . Lazy.pack $ concat ["/assess?u=",teacher,"&i=",student,"&v=",version,"&c=Load"]
