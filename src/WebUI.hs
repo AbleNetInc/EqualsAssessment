@@ -5,16 +5,17 @@ module WebUI where
 import           EqCommon
 import           EqLessons
 import           EqSQL
-import           System.Exit       (exitWith, ExitCode(ExitFailure, ExitSuccess))
-import qualified Web.Scotty     as Web
-import           Data.Monoid       (mconcat)
-import qualified Data.Text      as Text
-import           Data.Text         (Text)
-import qualified Data.Text.Lazy as Lazy
-import           Data.Text.Lazy.Encoding    (decodeUtf8)
-import           Data.Foldable     (toList)
-import           Data.List         (intercalate, nub, foldl')
-import           Control.Monad.IO.Class    (liftIO)
+import           System.Exit                              (exitWith, ExitCode(ExitFailure, ExitSuccess))
+import qualified Web.Scotty                            as Web
+import           Data.Monoid                              (mconcat)
+import qualified Data.Text                             as Text
+import           Data.Text                                (Text)
+import qualified Data.Text.Lazy                        as Lazy
+import           Data.Text.Lazy.Encoding                  (decodeUtf8)
+import           Data.Foldable                            (toList)
+import           Data.List                                (intercalate, nub, foldl')
+import           Control.Monad.IO.Class                   (liftIO)
+import           Network.Wai.Middleware.RequestLogger     (logStdoutDev)
 
 tbLesson :: Lesson -> Text
 tbLesson l = Text.pack $ concat ["<tr class=\"",c,"\">","<td>",s,"</td>"
@@ -54,6 +55,8 @@ headers = mconcat [ "<!DOCTYPE html><html><head>"
 
 runWebServer :: Int -> IO ()
 runWebServer pnum = Web.scotty pnum $ do
+                  Web.middleware logStdoutDev
+
                   Web.get "/" $ do
                           Web.html $ mconcat [ headers
                                              , "<form method=\"GET\" action=\"/assess\">"
