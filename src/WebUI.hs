@@ -17,7 +17,7 @@ import           Data.List         (intercalate, nub)
 import           Control.Monad.IO.Class    (liftIO)
 
 tbLesson :: Lesson -> Text
-tbLesson l = Text.pack $ concat ["<tr class=\"",c,"\" style=\"display: none;\">","<td>",s,"</td><td style=\"text-align: center;\">",a,"</td><td>",n,"</td>","</tr>"]
+tbLesson l = Text.pack $ concat ["<tr class=\"",c,"\">","<td>",s,"</td><td style=\"text-align: center;\">",a,"</td><td>",n,"</td>","</tr>"]
        where n = Text.unpack $ lName l
              c = Text.unpack . head . toList $ tags l
              r = score l
