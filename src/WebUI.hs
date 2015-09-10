@@ -41,6 +41,7 @@ headers = mconcat [ "<!DOCTYPE html><html><head>"
                   , "<link rel='icon' href='",ico,"' type='image/x-icon' />"
                   , "<link rel='shortcut icon' href='",ico,"' type='image/x-icon' />"
                   , "</head>"
+                  , "<body><img src=\"https://www.ablenetinc.com/Portals/0/images/Equals-Online-Assessment-LogIn.jpg\">"
                   ] where ico = "https://www.ablenetinc.com/media/favicon/default/favicon.ico"
                           css = Lazy.intercalate " " [ "<style>"
                                                      , "table, th, td {"
@@ -55,7 +56,6 @@ runWebServer :: Int -> IO ()
 runWebServer pnum = Web.scotty pnum $ do
                   Web.get "/" $ do
                           Web.html $ mconcat [ headers
-                                             , "<body><h1>Load or Start an Assessment:</h1>"
                                              , "<form method=\"GET\" action=\"/assess\">"
                                              , "Username: <input type=\"text\" name=\"u\"><br>"
                                              , "Student ID: <input type=\"text\" name=\"i\"><br>"
@@ -97,11 +97,11 @@ runWebServer pnum = Web.scotty pnum $ do
                                                          , "};</script>"
                                                          ]
                           Web.html $ mconcat [ headers
-                                             , "<body><h1>Assessment by ",t," for ",s,":</h1>"
                                              , js
                                              , "<form method=\"POST\" action=\"/save\" enctype=\"multipart/form-data\">"
-                                             , "<input type=\"submit\" name=\"s\" value=\"Export\">"
-                                             , "<input type=\"submit\" name=\"s\" value=\"Save\"><br><br>"
+                                             , "<p>Assessment by ",t," for ",s,": "
+                                             , "<input type=\"submit\" name=\"s\" value=\"Export\"> "
+                                             , "<input type=\"submit\" name=\"s\" value=\"Save\"></p><br>"
                                              , tbs
                                              , "<br><table>"
                                              , "<tr id=\"heading\"><th>Score</th><th>Adapted</th><th>Test Name</th></tr>"
