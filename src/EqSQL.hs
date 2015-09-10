@@ -24,10 +24,10 @@ initDB d v = do let vSet = Map.lookup v lessonSets
                 closeConnection h
                 return e
 
--- Needs to make sure we only overwrite where the id and the teacher match
 saveAssessment :: String -> Assessment -> IO (Maybe String)
 saveAssessment d (Assessment s v t l)
-             = do let cols = "id" : "teacher" : ((show . show) <$> [0..(Seq.length l)-1])
+             = do deleteAssessment v d (Text.unpack s) $ Text.unpack t
+                  let cols = "\"id\"" : "\"teacher\"" : ((show . show) <$> [0..(Seq.length l)-1])
                       vals = (Text.unpack <$> [s,t]) ++ (toList $ show <$> l)
                       row  = zip cols vals
                   h <- openConnection d
@@ -52,10 +52,10 @@ rowToAssessment v r = Assessment id v t $ Seq.fromList ls
                           ls = [(read . fromJust $ lookup x r) :: Lesson| x <- show <$> [0..((l vS)-1)]]
 
 retrieveAssessment :: String -> EqVersion -> String -> String -> IO Assessment
-retrieveAssessment d v s t = do let query = concat ["select * from ",show v," where id=\"",s,"\" and teacher=\"",t,"\";"]
+retrieveAssessment d v s t = do let query = concat ["select * from ",show v," where id=",s," and teacher=\"",t,"\";"]
                                 h <- openReadonlyConnection d
                                 e <- execStatement h query
                                 closeConnection h
                                 case e of
                                      Right (r:_) -> return . rowToAssessment v $ head r
-                                     _           -> return $ blankAssessment v s t
+                                     Left s      -> error s
