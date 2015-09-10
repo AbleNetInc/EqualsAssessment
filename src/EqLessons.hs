@@ -13,11 +13,14 @@ blankAssessment v s t = Assessment (Text.pack s) v (Text.pack t) . ls $ Map.look
                       where ls (Just s) = s
                             ls Nothing  = Seq.empty
 
-updateScore :: Lesson -> Score -> Bool -> Lesson
-updateScore (Lesson c s o n t _ _) r a = (Lesson c s o n t r a)
+updateScore :: Lesson -> Maybe Score -> Maybe Bool -> Lesson
+updateScore (Lesson c s o n t _ _) (Just r') (Just a') = (Lesson c s o n t r' a')
+updateScore (Lesson c s o n t r _) Nothing   (Just a') = (Lesson c s o n t r a')
+updateScore (Lesson c s o n t _ a) (Just r') Nothing   = (Lesson c s o n t r' a)
+updateScore (Lesson c s o n t r a) Nothing   Nothing   = (Lesson c s o n t r a)
 
-updateLesson :: Assessment -> Int -> Char -> Int -> Score -> Bool -> Assessment
-updateLesson a@(Assessment n v t ls) c s o r b = Assessment n v t $ newLs idx
+updateLesson :: Assessment -> (Int,Char,Int) -> (Maybe Score,Maybe Bool) -> Assessment
+updateLesson a@(Assessment n v t ls) (c,s,o) (r,b) = Assessment n v t $ newLs idx
            where l    = newLesson v (c,s,o,Text.pack "") Seq.empty 0 False
                  idx  = Seq.elemIndexL l ls
                  newL i         = updateScore (Seq.index ls i) r b
