@@ -42,9 +42,13 @@ headers = mconcat [ "<!DOCTYPE html><html><head>"
                   , "<link rel='icon' href='",ico,"' type='image/x-icon' />"
                   , "<link rel='shortcut icon' href='",ico,"' type='image/x-icon' />"
                   , "</head>"
-                  , "<body><img src=\"https://www.ablenetinc.com/Portals/0/images/Equals-Online-Assessment-LogIn.jpg\">"
+                  , "<body><div style=\"width: 735px; margin: auto;\"><img src=\"https://www.ablenetinc.com/Portals/0/images/Equals-Online-Assessment-LogIn.jpg\">"
                   ] where ico = "https://www.ablenetinc.com/media/favicon/default/favicon.ico"
                           css = Lazy.intercalate " " [ "<style>"
+                                                     , "body {"
+                                                     ,    "margin: 0;"
+                                                     ,    "padding: 0;"
+                                                     , "}"
                                                      , "table, th, td {"
                                                      ,    "border: 1px solid black;"
                                                      ,    "border-collapse: collapse;"
@@ -65,7 +69,7 @@ runWebServer pnum = Web.scotty pnum $ do
                                              , "<input type=\"radio\" name=\"v\" value=\"Eq2\" style=\"visibility: hidden;\" checked><br>"
                                              , "<input type=\"submit\" name=\"c\" value=\"Load\">"
                                              , "<input type=\"submit\" name=\"c\" value=\"New\">"
-                                             , "</body></html>"
+                                             , "</div></body></html>"
                                              ]
 
                   Web.get "/assess" $ do
@@ -106,14 +110,14 @@ runWebServer pnum = Web.scotty pnum $ do
                                              , "<input type=\"submit\" name=\"s\" value=\"Export\"> "
                                              , "<input type=\"submit\" name=\"s\" value=\"Save\"></p><br>"
                                              , tbs
-                                             , "<br><table>"
+                                             , "<br><table style=\"width: 735px;\">"
                                              , "<tr id=\"heading\"><th>Score</th><th>Adapted</th><th>Test Name</th></tr>"
                                              , mconcat ls
                                              , "</table>"
                                              , "<input type=\"radio\" name=\"v\" value=\"Eq2\" style=\"visibility: hidden;\" checked><br>"
                                              , "<input type=\"text\" name=\"u\" value=\"",t,"\" style=\"visibility: hidden;\"><br>"
                                              , "<input type=\"text\" name=\"i\" value=\"",s,"\" style=\"visibility: hidden;\"><br>"
-                                             , "</form></body></html>"
+                                             , "</form></div></body></html>"
                                              ]
 
                   Web.post "/save" $ do
