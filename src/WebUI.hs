@@ -24,10 +24,10 @@ tbLesson l = Text.pack $ concat ["<tr class=\"",c,"\">","<td>",s,"</td>"
        where n = Text.unpack $ lName l
              c = Text.unpack . head . toList $ tags l
              r = score l
-             i = show (chapter l, section l, count l)
+             sp = (chapter l, section l, count l)
              ch = [if r == x then " checked" else "" | x <- [(-1)..1]]
              t = "<input type=\""
-             m = concat ["\" name=\"",show (chapter l, section l, count l)]
+             m = concat ["\" name=\"",show sp]
              s = concat [t,"radio",m,"\" value=\"(Just (-1),Nothing)\"",ch !! 0,"> blank"
                         ,t,"radio",m,"\" value=\"(Just 0,Nothing)\"", ch !! 1,"> 0"
                         ,t,"radio",m,"\" value=\"(Just 1,Nothing)\"", ch !! 2,"> 1"]
