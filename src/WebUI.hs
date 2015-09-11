@@ -159,5 +159,7 @@ runWebServer pnum = Web.scotty pnum $ do
                                nas = foldl' (\x (y,z) -> updateLesson x y z) as $ zip nls nss
                            na      <- liftIO $ saveAssessment "EqDB" nas
                            case (ret :: String) of
-                                "Export" -> Web.text . Lazy.fromStrict $ toCSV nas
+                                "Export" -> do sf <- liftIO $ saveFile nas
+                                               Web.setHeader (Lazy.pack "Content-Type") (Lazy.pack "text/csv")
+                                               Web.file $ t ++ "_" ++ s ++ ".csv"
                                 "Save"   -> Web.redirect . Lazy.pack $ concat ["/assess?u=",teacher,"&i=",student,"&v=",version,"&c=Load"]

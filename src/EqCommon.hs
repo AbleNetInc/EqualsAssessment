@@ -62,6 +62,11 @@ toCSV a@(Assessment i v t ls) = Text.pack $ concat [ "Teacher:,",n, "\nStudent:,
                                     hdr = "Chapter,Section,Number,Lesson,Score,Adapted\n"
                                     bdy = concat . toList $ ((++ "\n") . Text.unpack . csLesson) <$> ls
 
+saveFile :: Assessment -> IO ()
+saveFile a = writeFile (t ++ "_" ++ s ++ ".csv") . Text.unpack $ toCSV a
+           where t = Text.unpack $ teacher a
+                 s = Text.unpack $ student a
+
 type Specifier  = (Chapter, Section, Int, Name)
 
 newLesson :: EqVersion -> Specifier -> (Seq Tag) -> Score -> Bool -> Lesson
