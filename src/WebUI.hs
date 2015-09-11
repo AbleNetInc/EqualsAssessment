@@ -42,7 +42,7 @@ headers = mconcat [ "<!DOCTYPE html><html><head>"
                   , "<link rel='icon' href='",ico,"' type='image/x-icon' />"
                   , "<link rel='shortcut icon' href='",ico,"' type='image/x-icon' />"
                   , "</head>"
-                  , "<body><div style=\"width: 735px; margin: auto;\"><img src=\"https://www.ablenetinc.com/Portals/0/images/Equals-Online-Assessment-LogIn.jpg\">"
+                  , "<body><div style=\"width: 770px; margin: auto;\"><img style=\"margin-left: 11.5%;\" src=\"https://www.ablenetinc.com/Portals/0/images/Equals-Online-Assessment-LogIn.jpg\">"
                   ] where ico = "https://www.ablenetinc.com/media/favicon/default/favicon.ico"
                           css = Lazy.intercalate " " [ "<style>"
                                                      , "body {"
@@ -53,6 +53,20 @@ headers = mconcat [ "<!DOCTYPE html><html><head>"
                                                      ,    "border: 1px solid black;"
                                                      ,    "border-collapse: collapse;"
                                                      ,    "padding: 5px;"
+                                                     , "}"
+                                                     , ".tab {"
+                                                     ,    "background: #eee;"
+                                                     ,    "padding: 2px;"
+                                                     ,    "border: 1px solid #bbb;"
+                                                     ,    "text-decoration: none;"
+                                                     ,    "font-size: 13px;"
+                                                     , "}"
+                                                     , ".selected {"
+                                                     ,    "background: #fff;"
+                                                     ,    "padding: 2px;"
+                                                     ,    "border: 1px solid #bbb;"
+                                                     ,    "text-decoration: none;"
+                                                     ,    "font-size: 13px;"
                                                      , "}"
                                                      , "</style>"
                                                      ]
@@ -87,8 +101,8 @@ runWebServer pnum = Web.scotty pnum $ do
                                                    "Load" -> a
                               ls  = toList $ (Lazy.fromStrict . tbLesson) <$> ll
                               tgs = Lazy.fromStrict <$> (concat $ (toList . tags) <$> ll)
-                              nav n = mconcat [" <a href=\"#\" onclick=\"showRows('",n,"')\">",n,"</a> |"]
-                              tbs = mconcat ["<nav>| ", (mconcat $ nav <$> (nub tgs)), "</nav>"]
+                              nav n = mconcat ["<a class=\"tab\" id=\"",n,"\" href=\"#\" onclick=\"showRows('",n,"')\">",n,"</a>"]
+                              tbs = mconcat ["<nav>", (mconcat $ nav <$> (nub tgs)), "</nav>"]
                               js  = Lazy.intercalate " " [ "<script>function showRows(id) {"
                                                          ,   "var trs = document.getElementsByTagName(\"tr\");"
                                                          ,   "for (i = 0; i < trs.length; i++) {"
@@ -99,6 +113,11 @@ runWebServer pnum = Web.scotty pnum $ do
                                                          ,     "ls[i].style.display = \"table-row\";"
                                                          ,   "}"
                                                          ,   "document.getElementById(\"heading\").style.display = \"table-row\";"
+                                                         ,   "var as = document.getElementsByTagName(\"a\");"
+                                                         ,   "for (i = 0; i < as.length; i++) {"
+                                                         ,     "as[i].className = \"tab\";"
+                                                         ,   "}"
+                                                         ,   "document.getElementById(id).className = \"selected\";"
                                                          , "}"
                                                          , mconcat ["window.onload = function () { showRows('",head (nub tgs),"');"]
                                                          , "};</script>"
@@ -110,7 +129,7 @@ runWebServer pnum = Web.scotty pnum $ do
                                              , "<input type=\"submit\" name=\"s\" value=\"Export\"> "
                                              , "<input type=\"submit\" name=\"s\" value=\"Save\"></p><br>"
                                              , tbs
-                                             , "<br><table style=\"width: 735px;\">"
+                                             , "<table style=\"width: 770px;\">"
                                              , "<tr id=\"heading\"><th>Score</th><th>Adapted</th><th>Test Name</th></tr>"
                                              , mconcat ls
                                              , "</table>"
