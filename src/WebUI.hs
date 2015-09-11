@@ -130,9 +130,9 @@ runWebServer pnum = Web.scotty pnum $ do
                                              , js
                                              , "<form method=\"POST\" action=\"/save.csv\" enctype=\"multipart/form-data\">"
                                              , "<p>", if a == as && (score <$> ll) == (score <$> (lessons as)) then "New " else ""
-                                             , "Assessment by ",t," for ",s,": "
+                                             , "Assessment by ",t," for ",s,": <p>"
                                              , "<input type=\"submit\" name=\"s\" value=\"Export\"> "
-                                             , "<input type=\"submit\" name=\"s\" value=\"Save\"></p><br>"
+                                             , "<input type=\"submit\" name=\"s\" value=\"Save\"><br>"
                                              , tbs
                                              , "<table style=\"margin-top: 1px; width: 770px;\">"
                                              , "<tr id=\"heading\"><th>Score</th><th>Adapted</th><th>Test Name</th></tr>"
