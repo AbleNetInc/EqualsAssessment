@@ -49,7 +49,7 @@ data Assessment = Assessment { student :: Name
                              , ver     :: EqVersion
                              , teacher :: Name
                              , lessons :: Seq Lesson
-                             }
+                             } deriving (Eq)
 
 toCSV :: Assessment -> Text
 toCSV a@(Assessment i v t ls) = Text.pack $ concat [ "Teacher:,",n, "\nStudent:,", id

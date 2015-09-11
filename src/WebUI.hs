@@ -128,8 +128,9 @@ runWebServer pnum = Web.scotty pnum $ do
                                                          ]
                           Web.html $ mconcat [ headers
                                              , js
-                                             , "<form method=\"POST\" action=\"/save\" enctype=\"multipart/form-data\">"
-                                             , "<p>Assessment by ",t," for ",s,": "
+                                             , "<form method=\"POST\" action=\"/save.csv\" enctype=\"multipart/form-data\">"
+                                             , "<p>", if a == as && (score <$> ll) == (score <$> (lessons as)) then "New " else ""
+                                             , "Assessment by ",t," for ",s,": "
                                              , "<input type=\"submit\" name=\"s\" value=\"Export\"> "
                                              , "<input type=\"submit\" name=\"s\" value=\"Save\"></p><br>"
                                              , tbs
@@ -143,7 +144,7 @@ runWebServer pnum = Web.scotty pnum $ do
                                              , "</form></div></body></html>"
                                              ]
 
-                  Web.post "/save" $ do
+                  Web.post "/save.csv" $ do
                            p       <- Web.params
                            ret     <- Web.param "s"
                            version <- Web.param "v"
