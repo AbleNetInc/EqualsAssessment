@@ -21,8 +21,9 @@ tbLesson :: Lesson -> Text
 tbLesson l = Text.pack $ concat ["<tr class=\"",c,"\">","<td>",s,"</td>"
                                 ,"<td style=\"text-align: center;\">",a,"</td>"
                                 ,"<td>",n,"</td>","</tr>"]
-       where n = Text.unpack $ lName l
-             c = Text.unpack . head . toList $ tags l
+       where n = if sp == (1,'C',4) then adj else Text.unpack $ lName l
+             adj = "identify primary and secondary colors"
+             c = if hidden then "hidden" else Text.unpack . head . toList $ tags l
              r = score l
              sp = (chapter l, section l, count l)
              ch = [if r == x then " checked" else "" | x <- [(-1)..1]]
@@ -33,6 +34,7 @@ tbLesson l = Text.pack $ concat ["<tr class=\"",c,"\">","<td>",s,"</td>"
                         ,t,"radio",m,"\" value=\"(Just 1,Nothing)\"", ch !! 2,"> 1"]
              a = concat [t,"checkbox",m,"\" value=\"(Nothing,Just True)\"",b,">"]
              b = if adapted l then " checked" else ""
+             hidden = sp == (1,'C',5) || sp == (9,'A',4)
 
 headers :: Lazy.Text
 headers = mconcat [ "<!DOCTYPE html><html><head>"
@@ -44,7 +46,9 @@ headers = mconcat [ "<!DOCTYPE html><html><head>"
                   , "</head>"
                   , "<body><div style=\"width: 770px; margin: auto;\">"
                   , "<img style=\"margin-left: 11.5%;\" src=\"",hme,img,"\">"
-                  , "<p style=\"color: red;\"> Note: <span style=\"font-style: italic;\">All</span> Assessment Data is deleted each night at midnight (Central Time)</p>"
+                  , "<p style=\"color: red;\"> Note:"
+                  , "<span style=\"font-style: italic;\">All</span> "
+                  , "Assessment Data is deleted each night at midnight (Central Time)</p>"
                   ] where hme = "https://www.ablenetinc.com/"
                           ico = "media/favicon/default/favicon.ico"
                           img = "Portals/0/images/Equals-Online-Assessment-LogIn.jpg"
@@ -71,6 +75,9 @@ headers = mconcat [ "<!DOCTYPE html><html><head>"
                                                      ,    "border: 1px solid #bbb;"
                                                      ,    "text-decoration: none;"
                                                      ,    "font-size: 13px;"
+                                                     , "}"
+                                                     , ".hidden {"
+                                                     ,    "display: none;"
                                                      , "}"
                                                      , "</style>"
                                                      ]
