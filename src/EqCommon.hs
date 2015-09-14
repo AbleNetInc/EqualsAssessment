@@ -51,16 +51,42 @@ data Assessment = Assessment { student :: Name
                              , lessons :: Seq Lesson
                              } deriving (Eq)
 
+bottomScore :: Maybe Lesson -> Maybe Lesson -> (Score, Bool)
+bottomScore Nothing  Nothing   = (0, False)
+bottomScore Nothing  (Just l') = (score l', adapted l')
+bottomScore (Just l) Nothing   = (score l,  adapted l)
+bottomScore (Just l) (Just l') | al < al'  = (score l,  adapted l)
+                               | otherwise = (score l', adapted l')
+                               where al  = adaptedScore l
+                                     al' = adaptedScore l'
+
+retrieveLesson :: Seq Lesson -> (Chapter, Section, Int) -> Maybe Lesson
+retrieveLesson ls (c,s,o) | found     = Just l
+                          | otherwise = Nothing
+                          where l'    = Lesson c s o Text.empty Seq.empty 0 False
+                                idx   = Seq.elemIndexL l' ls
+                                found = idx /= Nothing
+                                l     = Seq.index ls $ fromJust idx
+
 toCSV :: Assessment -> Text
 toCSV a@(Assessment i v t ls) = Text.pack $ concat [ "Teacher:,",n, "\nStudent:,", id
                                        , "\nStart at:,Chapter ",st,",(",s,")\n\n"
                                        , hdr, bdy]
                               where n   = Text.unpack t
                                     id  = Text.unpack i
-                                    st  = show $ suggestedStart a
-                                    s   = show $ adaptedTotal a
+                                    l   = retrieveLesson ls (11,'E',5)
+                                    l'  = retrieveLesson ls (11,'E',6)
+                                    (ns,na) = bottomScore l l'
+                                    a'  = updateLesson a (11,'E',5) (Just ns,Just na)
+                                    a'' = updateLesson a' (11,'E',6) (Just 0,Just False)
+                                    st  = show $ suggestedStart a''
+                                    s   = show $ adaptedTotal a''
+                                    lls = toList $ lessons a'
+                                    fls Nothing    = lls
+                                    fls (Just lsn) = filter (/= lsn) lls
+                                    cls = csLesson <$> (fls l')
                                     hdr = "Chapter,Section,Number,Lesson,Score,Adapted\n"
-                                    bdy = concat . toList $ ((++ "\n") . Text.unpack . csLesson) <$> ls
+                                    bdy = concat $ ((++ "\n") . Text.unpack) <$> cls
 
 saveFile :: Assessment -> IO ()
 saveFile a = writeFile (t ++ "_" ++ s ++ ".csv") . Text.unpack $ toCSV a
@@ -110,3 +136,17 @@ scoreBounds :: EqVersion -> (Seq Double)
 scoreBounds Eq2 = Seq.fromList $ zipWith (+) ((27.5 *) <$> [1..12]) adj
                 where adj = [0,0.5..] >>= replicate 5
 scoreBounds _   = Seq.empty
+
+updateScore :: Lesson -> Maybe Score -> Maybe Bool -> Lesson
+updateScore (Lesson c s o n t _ _) (Just r') (Just a') = (Lesson c s o n t r' a')
+updateScore (Lesson c s o n t r _) Nothing   (Just a') = (Lesson c s o n t r a')
+updateScore (Lesson c s o n t _ a) (Just r') Nothing   = (Lesson c s o n t r' a)
+updateScore (Lesson c s o n t r a) Nothing   Nothing   = (Lesson c s o n t r a)
+
+updateLesson :: Assessment -> (Int,Char,Int) -> (Maybe Score,Maybe Bool) -> Assessment
+updateLesson a@(Assessment n v t ls) (c,s,o) (r,b) = Assessment n v t $ newLs idx
+           where l    = newLesson v (c,s,o,Text.pack "") Seq.empty 0 False
+                 idx  = Seq.elemIndexL l ls
+                 newL i         = updateScore (Seq.index ls i) r b
+                 newLs Nothing  = ls
+                 newLs (Just i) = Seq.update i (newL i) ls
