@@ -37,13 +37,10 @@ adaptedScore l | score l /= 1 = 0
                | otherwise    = 1
 
 csLesson :: Lesson -> Text
-csLesson l = Text.pack $ intercalate "," [c,s,o,n,a,r]
-       where c = show $ chapter l
-             s = [section l]
-             o = show $ count l
+csLesson l = Text.pack $ intercalate "," [s,n,c]
+       where s = intercalate "." [show $ chapter l,[section l],show $ count l]
              n = Text.unpack $ lName l
-             a = if (score l) == (-1) then "" else show $ score l
-             r = show $ adaptedScore l
+             c = show $ adaptedScore l
 
 data Assessment = Assessment { student :: Name
                              , ver     :: EqVersion
@@ -70,7 +67,7 @@ retrieveLesson ls (c,s,o) | found     = Just l
 
 toCSV :: Assessment -> Text
 toCSV a@(Assessment i v t ls) = Text.pack $ concat [ "Teacher:,",n, "\nStudent:,", id
-                                       , "\nStart at:,Chapter ",st,",(",s,")\n\n"
+                                       , "\nStart at:,Chapter ",st,",(scored ",s,")\n\n"
                                        , hdr, bdy]
                               where n   = Text.unpack t
                                     id  = Text.unpack i
@@ -85,7 +82,7 @@ toCSV a@(Assessment i v t ls) = Text.pack $ concat [ "Teacher:,",n, "\nStudent:,
                                     fls Nothing    = lls
                                     fls (Just lsn) = filter (/= lsn) lls
                                     cls = csLesson <$> (fls l')
-                                    hdr = "Chapter,Section,Number,Lesson,Score,Adapted\n"
+                                    hdr = "Lesson,Description,Score\n"
                                     bdy = concat $ ((++ "\n") . Text.unpack) <$> cls
 
 saveFile :: Assessment -> IO ()
