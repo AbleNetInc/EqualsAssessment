@@ -284,7 +284,7 @@ lessonSets = Map.fromList
                        , "locate numbers 1-10 on number line"
                        , "place numerals 1-10 in order"
                        , "identify relative position numerals 1-10"
-                       , "compare 1-10 with &lt; and &gt; and = and language"
+                       , "compare 1-10 with < and > and = and language"
                        , "identify number words six through ten"
                        , "state one more than given number 1-10"
                        , "state one less than given number 1-10"
@@ -322,7 +322,7 @@ lessonSets = Map.fromList
                        , "construct a set to match numerals 16-20"
                        , "write numerals 16-20 to match sets"
                        ]
-                 cn2 = [ "compare 11-20 with &lt; and &gt; and = and language"
+                 cn2 = [ "compare 11-20 with < and > and = and language"
                        , "locate numbers 11-20 on number line"
                        , "count backwards from any number 11-20"
                        , "place numerals 11-20 in order"
@@ -394,7 +394,7 @@ lessonSets = Map.fromList
                        , "+/- 4-digit numerals with a calculator"
                        , "identify 5- and 6-digit numerals"
                        , "write 5- and 6-digit numbers"
-                       , "use &lt; and &gt; and = to compare numbers to 6-digits"
+                       , "use < and > and = to compare numbers to 6-digits"
                        ]
                  md2 = [ "use = sets to show understand multiplication"
                        , "use objects to multiply (factors 1-5 and 0)"
@@ -431,9 +431,9 @@ lessonSets = Map.fromList
                        , "write fraction name to match model (1/2- 1/8)"
                        , "identify 1/2 and 1/3 and 1/4 of a set"
                        ]
-                 cf2 = [ "use fraction models; numerator &gt; 1"
+                 cf2 = [ "use fraction models; numerator > 1"
                        , "use fraction models to match equivalents"
-                       , "identify fractions in a set; numerator &gt; 1"
+                       , "identify fractions in a set; numerator > 1"
                        , "order common fraction with measuring cups"
                        , "compare fractions 0 1/2 1\""
                        , "identify linear measurement 1/2\" 1/4\""
