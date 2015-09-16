@@ -161,7 +161,8 @@ runWebServer pnum = Web.scotty pnum $ do
                                                   p_ $ do if a == as && (score <$> ll) == (score <$> (lessons as)) then "New " else ""
                                                           "Assessment by ";t;" for ";s;":"
                                                   input_ [type_ "submit", name_ "s", value_ "Export"]; " "
-                                                  input_ [type_ "submit", name_ "s", value_ "Save"]
+                                                  input_ [type_ "submit", name_ "s", value_ "Save"]; " "
+                                                  input_ [type_ "submit", name_ "s", value_ "New"]
                                                   br_ []; br_ []
                                                   tbs
                                                   table_ [style_ "margin-top: 1px; width: 770px;"] $ do
@@ -193,3 +194,4 @@ runWebServer pnum = Web.scotty pnum $ do
                                                Web.setHeader (Lazy.pack "Content-Type") (Lazy.pack "text/csv")
                                                Web.file $ t ++ "_" ++ s ++ ".csv"
                                 "Save"   -> Web.redirect . Lazy.pack $ concat ["/assess?u=",teacher,"&i=",student,"&v=",version,"&c=Load"]
+                                "New"    -> Web.redirect "/"
