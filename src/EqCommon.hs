@@ -31,6 +31,14 @@ instance Eq Lesson where
                   sameSc = section l == section l'
                   sameCo = count   l == count   l'
 
+instance Ord Lesson where
+    compare l@(Lesson c s o _ _ _ _) l'@(Lesson c' s' o' _ _ _ _)
+          | c > c'                       = GT
+          | c == c' && s > s'            = GT
+          | c == c' && s == s' && o > o' = GT
+          | l == l'                      = EQ
+          | otherwise                    = LT
+
 adaptedScore :: Lesson -> Double
 adaptedScore l | score l /= 1 = 0
                | adapted l    = 0.5
@@ -78,7 +86,7 @@ toCSV a@(Assessment i v t ls) = Text.pack $ concat [ "Teacher:,",n, "\nStudent:,
                                     a'' = updateLesson a' (11,'E',6) (Just 0,Just False)
                                     st  = show $ suggestedStart a''
                                     s   = show $ adaptedTotal a''
-                                    lls = toList $ lessons a'
+                                    lls = toList . Seq.sort $ lessons a'
                                     fls Nothing    = lls
                                     fls (Just lsn) = filter (/= lsn) lls
                                     cls = csLesson <$> (fls l')
