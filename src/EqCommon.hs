@@ -82,7 +82,7 @@ toCSV a@(Assessment i v t ls) = Text.pack $ concat [ "Teacher:,",n, "\nStudent:,
                                     fls Nothing    = lls
                                     fls (Just lsn) = filter (/= lsn) lls
                                     cls = csLesson <$> (fls l')
-                                    hdr = "Lesson,Description,Score\n"
+                                    hdr = "Lesson,Description,Adjusted Raw Score\n"
                                     bdy = concat $ ((++ "\n") . Text.unpack) <$> cls
 
 saveFile :: Assessment -> IO ()
