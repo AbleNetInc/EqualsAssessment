@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE FlexibleContexts  #-}
 
 module WebUI where
 
@@ -6,6 +7,8 @@ import           EqCommon
 import           EqLessons
 import           EqSQL
 import qualified Web.Scotty                            as Web
+import           Lucid.Base
+import           Lucid.Html5
 import           Data.Monoid                              (mconcat)
 import qualified Data.Text                             as Text
 import           Data.Text                                (Text)
@@ -15,88 +18,90 @@ import           Data.List                                (intercalate, nub, fol
 import           Control.Monad.IO.Class                   (liftIO)
 import           Network.Wai.Middleware.RequestLogger     (logStdoutDev)
 
-tbLesson :: Lesson -> Text
-tbLesson l = Text.pack $ concat ["<tr class=\"",c,"\">","<td>",s,"</td>"
-                                ,"<td style=\"text-align: center;\">",a,"</td>"
-                                ,"<td>",n,"</td>","</tr>"]
-       where n = if m == "(1,'C',4)" then adj else Text.unpack $ lName l
+tbLesson :: Lesson -> Html ()
+tbLesson l = tr_ [class_ c] $ do td_ s; td_ [style_ "text-align: center;"] a; td_ n
+       where n = if m == "(1,'C',4)" then adj else toHtml $ lName l
              adj = "identify primary and secondary colors"
-             c = if hidden then "hidden" else Text.unpack . head . toList $ tags l
+             c = if hidden then "hidden" else head . toList $ tags l
              r = score l
-             m = show (chapter l, section l, count l)
-             o = concat ["(",show $ chapter l,",\\'",[section l],"\\',",show $ count l + 1,")"]
-             ch = [if r == x then " checked" else "" | x <- [(-1)..1]]
-             t = "<input type=\""
-             oc = [ if m == "(1,'C',4)" || m == "(9,'A',3)" then concat ["onchange=\"copyScore('",o,"','",val,"');\" "] else ""
+             m = Text.pack $ show (chapter l, section l, count l)
+             o = Text.pack $ concat ["(",show $ chapter l,",\\'",[section l],"\\',",show $ count l + 1,")"]
+             ch = [if r == x then checked_ else alt_ "" | x <- [(-1)..1]]
+             oc = [if m == "(1,'C',4)" || m == "(9,'A',3)" then onchange_ (mconcat ["copyScore('",o,"','",val,"')"]) else alt_ ""
                   | val <- ["(Just (-1),Nothing)","(Just 0,Nothing)","(Just 1,Nothing)"]]
-             cc = if m == "(1,'C',4)" || m == "(9,'A',3)" then concat ["onchange=\"copyAdapt(this,'",o,"');\" "] else ""
-             s = concat [t,"radio\" name=\"",m,"\" ",oc !! 0,"value=\"(Just (-1),Nothing)\"",ch !! 0,"> blank"
-                        ,t,"radio\" name=\"",m,"\" ",oc !! 1,"value=\"(Just 0,Nothing)\"", ch !! 1,"> 0"
-                        ,t,"radio\" name=\"",m,"\" ",oc !! 2,"value=\"(Just 1,Nothing)\"", ch !! 2,"> 1"]
-             a = concat [t,"checkbox\" name=\"",m,"\" ",cc,"value=\"(Nothing,Just True)\"",b,">"]
-             b = if adapted l then " checked" else ""
+             cc = if m == "(1,'C',4)" || m == "(9,'A',3)" then onchange_ (mconcat ["copyAdapt(this,'",o,"')"]) else alt_ ""
+             s = do input_ [type_ "radio", name_ m, oc !! 0, value_ "(Just (-1),Nothing)", ch !! 0]; "blank"
+                    input_ [type_ "radio", name_ m, oc !! 1, value_ "(Just 0,Nothing)",    ch !! 1]; "0"
+                    input_ [type_ "radio", name_ m, oc !! 2, value_ "(Just 1,Nothing)",    ch !! 2]; "1"
+             a = input_ [type_ "checkbox", name_ m, cc, value_ "(Nothing,Just True)",  b]
+             b = if adapted l then checked_ else alt_ ""
              hidden = m == "(1,'C',5)" || m == "(9,'A',4)"
 
-headers :: Lazy.Text
-headers = mconcat [ "<!DOCTYPE html><html><head>"
-                  , "<meta charset=\"UTF-8\">"
-                  , css
-                  , "<title>Equals Assessment</title>"
-                  , "<link rel='icon' href='",hme,ico,"' type='image/x-icon' />"
-                  , "<link rel='shortcut icon' href='",hme,ico,"' type='image/x-icon' />"
-                  , "</head>"
-                  , "<body><div style=\"width: 770px; margin: auto;\">"
-                  , "<img style=\"margin-left: 11.5%;\" src=\"",hme,img,"\">"
-                  , "<p style=\"color: red;\"> Note: "
-                  , "<span style=\"font-style: italic;\">All</span> "
-                  , "Assessment Data is deleted each night at midnight (Central Time)</p>"
-                  ] where hme = "https://www.ablenetinc.com/"
-                          ico = "media/favicon/default/favicon.ico"
-                          img = "Portals/0/images/Equals-Online-Assessment-LogIn.jpg"
-                          css = Lazy.intercalate " " [ "<style>"
-                                                     , "body {"
-                                                     ,    "margin: 0;"
-                                                     ,    "padding: 0;"
-                                                     , "}"
-                                                     , "table, th, td {"
-                                                     ,    "border: 1px solid black;"
-                                                     ,    "border-collapse: collapse;"
-                                                     ,    "padding: 5px;"
-                                                     , "}"
-                                                     , ".tab {"
-                                                     ,    "background: #eee;"
-                                                     ,    "padding: 2px;"
-                                                     ,    "border: 1px solid #bbb;"
-                                                     ,    "text-decoration: none;"
-                                                     ,    "font-size: 13px;"
-                                                     , "}"
-                                                     , ".selected {"
-                                                     ,    "background: #fff;"
-                                                     ,    "padding: 2px;"
-                                                     ,    "border: 1px solid #bbb;"
-                                                     ,    "text-decoration: none;"
-                                                     ,    "font-size: 13px;"
-                                                     , "}"
-                                                     , ".hidden {"
-                                                     ,    "display: none;"
-                                                     , "}"
-                                                     , "</style>"
-                                                     ]
+css :: Text
+css = Text.intercalate " "
+    [ "body {"
+    ,    "margin: 0;"
+    ,    "padding: 0;"
+    , "}"
+    , "table, th, td {"
+    ,    "border: 1px solid black;"
+    ,    "border-collapse: collapse;"
+    ,    "padding: 5px;"
+    , "}"
+    , ".tab {"
+    ,    "background: #eee;"
+    ,    "padding: 2px;"
+    ,    "border: 1px solid #bbb;"
+    ,    "text-decoration: none;"
+    ,    "font-size: 13px;"
+    , "}"
+    , ".selected {"
+    ,    "background: #fff;"
+    ,    "padding: 2px;"
+    ,    "border: 1px solid #bbb;"
+    ,    "text-decoration: none;"
+    ,    "font-size: 13px;"
+    , "}"
+    , ".hidden {"
+    ,    "display: none;"
+    , "}"
+    ]
+
+home, ico, bnr :: Text
+home = "https://www.ablenetinc.com/"
+ico  = mconcat [home, "media/favicon/default/favicon.ico"]
+bnr  = mconcat [home, "Portals/0/images/Equals-Online-Assessment-LogIn.jpg"]
+
+header :: Html ()
+header = head_ $ do
+     meta_ [charset_ "UTF-8"]
+     style_ css
+     title_ "Equals Assessment"
+     link_ [rel_ "icon", href_ ico, type_ "image/x-icon"]
+     link_ [rel_ "shortcut icon", href_ ico, type_ "image/x-icon"]
+
+banner :: Html ()
+banner = do img_ [style_ "margin-left: 11.5%", src_ bnr]
+            p_ [style_ "color: red;"] $
+               mconcat ["Note: ",all," assessment data is deleted each night at midnight (Central Time)"]
+               where all = span_ [style_ "font-style: italic;"] "All"
 
 runWebServer :: Int -> IO ()
 runWebServer pnum = Web.scotty pnum $ do
                   Web.middleware logStdoutDev
 
                   Web.get "/" $ do
-                          Web.html $ mconcat [ headers
-                                             , "<form method=\"GET\" action=\"/assess\">"
-                                             , "Username: <input type=\"text\" name=\"u\"><br>"
-                                             , "Student ID: <input type=\"number\" min=\"0\" name=\"i\"><br>"
-                                             , "<input class=\"hidden\" type=\"radio\" name=\"v\" value=\"Eq2\" checked><br>"
-                                             , "<input type=\"submit\" name=\"c\" value=\"Load\">"
-                                             , "<input type=\"submit\" name=\"c\" value=\"New\">"
-                                             , "</div></body></html>"
-                                             ]
+                          Web.html . renderText $ do doctypehtml_
+                                 $ do header
+                                      body_ $ div_ [style_ "width: 770px; margin: auto;"] $ do
+                                          banner
+                                          with form_ [method_ "GET", action_ "/assess"] $ do
+                                             p_ $ do "Username: "; input_ [type_ "text", name_ "u"]
+                                                     br_ []
+                                                     "Student ID: "; input_ [type_ "number", min_ "0", name_ "i"]
+                                             input_ [class_ "hidden", type_ "radio", name_ "v", value_ "Eq2", checked_]
+                                             input_ [type_ "submit", name_ "c", value_ "Load"]
+                                             input_ [type_ "submit", name_ "c", value_ "New"]
 
                   Web.get "/assess" $ do
                           teacher <- Web.param "u"
@@ -106,17 +111,16 @@ runWebServer pnum = Web.scotty pnum $ do
                           let v   = (read version) :: EqVersion
                           a       <- liftIO $ retrieveAssessment "EqDB" v student teacher
                           let as  = blankAssessment v student teacher
-                              t   = Lazy.pack teacher
-                              s   = Lazy.pack student
+                              t   = toHtml teacher
+                              s   = toHtml student
                               ll  = lessons $ case (clobber :: String) of
                                                    "New"  -> as
                                                    "Load" -> a
-                              ls  = toList $ (Lazy.fromStrict . tbLesson) <$> ll
-                              tgs = Lazy.fromStrict <$> (concat $ (toList . tags) <$> ll)
-                              nav n = mconcat ["<a class=\"tab\" id=\"",n,"\" href=\"#\" onclick=\"showRows('",n,"')\">",n,"</a>"]
-                              tbs = mconcat ["<nav>", (mconcat $ nav <$> (nub tgs)), "</nav>"]
-                              js  = Lazy.intercalate " " [ "<script>"
-                                                         , "function showRows(id) {"
+                              ls  = tbLesson <$> ll
+                              tgs = nub . concat $ (toList . tags) <$> ll
+                              nav n = a_ [class_ "tab", id_ n, href_ "#", onclick_ $ mconcat ["showRows('",n,"')"]]
+                              tbs = nav_ . mconcat $ zipWith ($) (nav <$> tgs) (toHtml <$> tgs)
+                              js  = Text.intercalate " " [ "function showRows(id) {"
                                                          ,   "var trs = document.getElementsByTagName(\"tr\");"
                                                          ,   "for (i = 0; i < trs.length; i++) {"
                                                          ,     "trs[i].style.display = \"none\";"
@@ -145,27 +149,29 @@ runWebServer pnum = Web.scotty pnum $ do
                                                          ,     "exs[i].value = self.checked == true ? \"(Nothing,Just True)\" : \"(Nothing,Just False)\";"
                                                          ,   "}"
                                                          , "}"
-                                                         , mconcat ["window.onload = function () { showRows('",head (nub tgs),"');"]
+                                                         , mconcat ["window.onload = function () { showRows('",head tgs,"');"]
                                                          , "};"
-                                                         , "</script>"
                                                          ]
-                          Web.html $ mconcat [ headers
-                                             , js
-                                             , "<form method=\"POST\" action=\"/save.csv\" enctype=\"multipart/form-data\">"
-                                             , "<p>", if a == as && (score <$> ll) == (score <$> (lessons as)) then "New " else ""
-                                             , "Assessment by ",t," for ",s,": <p>"
-                                             , "<input type=\"submit\" name=\"s\" value=\"Export\"> "
-                                             , "<input type=\"submit\" name=\"s\" value=\"Save\"><br>"
-                                             , tbs
-                                             , "<table style=\"margin-top: 1px; width: 770px;\">"
-                                             , "<tr id=\"heading\"><th>Score</th><th>Adapted</th><th>Test Name</th></tr>"
-                                             , mconcat ls
-                                             , "</table>"
-                                             , "<input class=\"hidden\" type=\"radio\" name=\"v\" value=\"Eq2\" checked><br>"
-                                             , "<input class=\"hidden\" type=\"text\" name=\"u\" value=\"",t,"\"><br>"
-                                             , "<input class=\"hidden\" type=\"text\" name=\"i\" value=\"",s,"\"><br>"
-                                             , "</form></div></body></html>"
-                                             ]
+                          Web.html . renderText $ do doctypehtml_
+                                 $ do header
+                                      body_ $ div_ [style_ "width: 770px; margin: auto;"]
+                                          $ do banner
+                                               script_ js
+                                               with form_ [method_ "POST", action_ "/save.csv", enctype_ "multipart/form-data"] $ do
+                                                  p_ $ do if a == as && (score <$> ll) == (score <$> (lessons as)) then "New " else ""
+                                                          "Assessment by ";t;" for ";s;":"
+                                                  input_ [type_ "submit", name_ "s", value_ "Export"]; " "
+                                                  input_ [type_ "submit", name_ "s", value_ "Save"]
+                                                  br_ []; br_ []
+                                                  tbs
+                                                  table_ [style_ "margin-top: 1px; width: 770px;"] $ do
+                                                       tr_ [id_ "heading"] $ do th_ "Score"
+                                                                                th_ "Adapted"
+                                                                                th_ "Lesson"
+                                                       mconcat $ toList ls
+                                                  input_ [class_ "hidden", type_ "radio", name_ "v", value_ "Eq2", checked_]
+                                                  input_ [class_ "hidden", type_ "text", name_ "u", value_ $ Text.pack teacher]
+                                                  input_ [class_ "hidden", type_ "text", name_ "i", value_ $ Text.pack student]
 
                   Web.post "/save.csv" $ do
                            p       <- Web.params
