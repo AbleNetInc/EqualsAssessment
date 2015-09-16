@@ -96,9 +96,9 @@ runWebServer pnum = Web.scotty pnum $ do
                                       body_ $ div_ [style_ "width: 770px; margin: auto;"] $ do
                                           banner
                                           with form_ [method_ "GET", action_ "/assess"] $ do
-                                             p_ $ do "Username: "; input_ [type_ "text", name_ "u"]
+                                             p_ $ do "Username: "; input_ [type_ "text", name_ "u", required_ ""]
                                                      br_ []
-                                                     "Student ID: "; input_ [type_ "number", min_ "0", name_ "i"]
+                                                     "Student ID: "; input_ [type_ "number", min_ "0", name_ "i", required_ ""]
                                              input_ [class_ "hidden", type_ "radio", name_ "v", value_ "Eq2", checked_]
                                              input_ [type_ "submit", name_ "c", value_ "Load"]
                                              input_ [type_ "submit", name_ "c", value_ "New"]
