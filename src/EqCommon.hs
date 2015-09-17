@@ -33,11 +33,11 @@ instance Eq Lesson where
 
 instance Ord Lesson where
     compare l@(Lesson c s o _ _ _ _) l'@(Lesson c' s' o' _ _ _ _)
-          | c > c'                       = GT
-          | c == c' && s > s'            = GT
-          | c == c' && s == s' && o > o' = GT
+          | c < c'                       = LT
+          | c == c' && s < s'            = LT
+          | c == c' && s == s' && o < o' = LT
           | l == l'                      = EQ
-          | otherwise                    = LT
+          | otherwise                    = GT
 
 adaptedScore :: Lesson -> Double
 adaptedScore l | score l /= 1 = 0
