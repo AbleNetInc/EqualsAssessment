@@ -19,7 +19,7 @@ import           Control.Monad.IO.Class                   (liftIO)
 import           Network.Wai.Middleware.RequestLogger     (logStdoutDev)
 
 tbLesson :: Lesson -> Html ()
-tbLesson l = tr_ [class_ c] $ do td_ s; td_ [style_ "text-align: center;"] a; td_ n
+tbLesson l = tr_ [class_ c] $ do td_ ""; td_ s; td_ [style_ "text-align: center;"] a; td_ n
        where n = if m == "(1,'C',4)" then adj else toHtml $ lName l
              adj = "identify primary and secondary colors"
              c = if hidden then "hidden" else head . toList $ tags l
@@ -135,6 +135,7 @@ runWebServer pnum = Web.scotty pnum $ do
                                                          ,     "as[i].className = \"tab\";"
                                                          ,   "}"
                                                          ,   "document.getElementById(id).className = \"selected\";"
+                                                         ,   "numberRows();"
                                                          , "}"
                                                          , "function copyScore(id,val) {"
                                                          ,   "var exs = document.getElementsByName(id);"
@@ -147,6 +148,16 @@ runWebServer pnum = Web.scotty pnum $ do
                                                          ,   "for (i = 0; i < exs.length; i++) {"
                                                          ,     "if (exs[i].type != \"checkbox\") { continue; };"
                                                          ,     "exs[i].value = self.checked == true ? \"(Nothing,Just True)\" : \"(Nothing,Just False)\";"
+                                                         ,   "}"
+                                                         , "}"
+                                                         , "function numberRows() {"
+                                                         ,   "var trs = document.getElementsByTagName(\"tr\");"
+                                                         ,   "var c = 1;"
+                                                         ,   "for (i = 0; i < trs.length; i++) {"
+                                                         ,     "if (trs[i].style.display == \"table-row\" && trs[i].id != \"heading\") {"
+                                                         ,       "trs[i].cells[0].innerHTML = c;"
+                                                         ,       "c++;"
+                                                         ,     "}"
                                                          ,   "}"
                                                          , "}"
                                                          , mconcat ["window.onload = function () { showRows('",head tgs,"');"]
@@ -166,7 +177,8 @@ runWebServer pnum = Web.scotty pnum $ do
                                                   br_ []; br_ []
                                                   tbs
                                                   table_ [style_ "margin-top: 1px; width: 770px;"] $ do
-                                                       tr_ [id_ "heading"] $ do th_ "Score"
+                                                       tr_ [id_ "heading"] $ do th_ "Test"
+                                                                                th_ "Score"
                                                                                 th_ "Adapted"
                                                                                 th_ "Lesson"
                                                        mconcat $ toList ls
