@@ -149,7 +149,7 @@ runWebServer pnum = Web.scotty pnum $ do
                                                          ,   "for (i = 0; i < exs.length; i++) {"
                                                          ,     "if (exs[i].type != \"checkbox\") { continue; };"
                                                          ,     "exs[i].value = self.checked == true ? \"(Nothing,Just True)\" : \"(Nothing,Just False)\";"
-                                                         ,     "exs[i].checked = \"\";"
+                                                         ,     "exs[i].checked = true;"
                                                          ,   "}"
                                                          , "}"
                                                          , "function numberRows() {"
