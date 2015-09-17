@@ -19,7 +19,7 @@ type Score      = Int
 data Lesson     = Lesson { chapter :: Chapter
                          , section :: Section
                          , count   :: Int
-                         , lName   :: Name
+                         , lName   :: (Name,Name)
                          , tags    :: (Seq Tag)
                          , score   :: Score
                          , adapted :: Bool
@@ -47,7 +47,7 @@ adaptedScore l | score l /= 1 = 0
 csLesson :: Lesson -> Text
 csLesson l = Text.pack $ intercalate "," [s,n,c]
        where s = intercalate "." [show $ chapter l,[section l],show $ count l]
-             n = Text.unpack $ lName l
+             n = Text.unpack . snd $ lName l
              c = show $ adaptedScore l
 
 data Assessment = Assessment { student :: Name
@@ -68,7 +68,7 @@ bottomScore (Just l) (Just l') | al < al'  = (score l,  adapted l)
 retrieveLesson :: Seq Lesson -> (Chapter, Section, Int) -> Maybe Lesson
 retrieveLesson ls (c,s,o) | found     = Just l
                           | otherwise = Nothing
-                          where l'    = Lesson c s o Text.empty Seq.empty 0 False
+                          where l'    = Lesson c s o (Text.empty,Text.empty) Seq.empty 0 False
                                 idx   = Seq.elemIndexL l' ls
                                 found = idx /= Nothing
                                 l     = Seq.index ls $ fromJust idx
@@ -98,16 +98,16 @@ saveFile a = writeFile (t ++ "_" ++ s ++ ".csv") . Text.unpack $ toCSV a
            where t = Text.unpack $ teacher a
                  s = Text.unpack $ student a
 
-type Specifier  = (Chapter, Section, Int, Name)
+type Specifier  = (Chapter, Section, Int, (Name,Name))
 
 newLesson :: EqVersion -> Specifier -> (Seq Tag) -> Score -> Bool -> Lesson
 newLesson v (c,s,o,n) t r a | not vCh   = error "Invalid Chapter"
-                            | not vSec  = error "Invalid Section"
-                            | not vScr  = error "Invalid Score"
-                            | otherwise = (Lesson c s o n t r a)
-                            where vCh  = c `validChapterIn` v
-                                  vSec = s `validSectionIn` v
-                                  vScr = r `elem` [(-1)..1]
+                                | not vSec  = error "Invalid Section"
+                                | not vScr  = error "Invalid Score"
+                                | otherwise = (Lesson c s o n t r a)
+                                where vCh  = c `validChapterIn` v
+                                      vSec = s `validSectionIn` v
+                                      vScr = r `elem` [(-1)..1]
 
 validChapterIn :: Chapter -> EqVersion -> Bool
 validChapterIn c v = (Seq.elemIndexL c cList) /= Nothing
@@ -150,7 +150,7 @@ updateScore (Lesson c s o n t r a) Nothing   Nothing   = (Lesson c s o n t r a)
 
 updateLesson :: Assessment -> (Int,Char,Int) -> (Maybe Score,Maybe Bool) -> Assessment
 updateLesson a@(Assessment n v t ls) (c,s,o) (r,b) = Assessment n v t $ newLs idx
-           where l    = newLesson v (c,s,o,Text.pack "") Seq.empty 0 False
+           where l    = newLesson v (c,s,o,(Text.pack "",Text.pack "")) Seq.empty 0 False
                  idx  = Seq.elemIndexL l ls
                  newL i         = updateScore (Seq.index ls i) r b
                  newLs Nothing  = ls

@@ -20,7 +20,7 @@ import           Network.Wai.Middleware.RequestLogger     (logStdoutDev)
 
 tbLesson :: Lesson -> Html ()
 tbLesson l = tr_ [class_ c] $ do td_ ""; td_ s; td_ [style_ "text-align: center;"] a; td_ n
-       where n = if m == "(1,'C',4)" then adj else toHtml $ lName l
+       where n = if m == "(1,'C',4)" then adj else toHtml . fst $ lName l
              adj = "identify primary and secondary colors"
              c = if hidden then "hidden" else head . toList $ tags l
              r = score l

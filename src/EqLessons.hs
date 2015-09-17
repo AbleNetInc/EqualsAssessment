@@ -13,13 +13,13 @@ blankAssessment v s t = Assessment (Text.pack s) v (Text.pack t) . ls $ Map.look
                       where ls (Just s) = s
                             ls Nothing  = Seq.empty
 
-taggedBlankLessons :: EqVersion -> Chapter -> Section -> [(Int,Name)] -> [Tag] -> [Lesson]
+taggedBlankLessons :: EqVersion -> Chapter -> Section -> [(Int,(Name,Name))] -> [Tag] -> [Lesson]
 taggedBlankLessons v c s ns t = [newLesson v (c,s,o,n) (Seq.fromList t) (-1) False | (o,n) <- ns]
 
 lessonSets :: Map EqVersion (Seq Lesson)
 lessonSets = Map.fromList
            [(Eq2, Seq.fromList $ concat
-             [ taggedBlankLessons Eq2 c s (zip [n..] (Text.pack <$> l)) (Text.pack <$> t)
+             [ taggedBlankLessons Eq2 c s (zip [n..] $ zip ((Text.pack . fst) <$> l) $ (Text.pack . snd) <$> l) (Text.pack <$> t)
              | (c,s,n,l,t) <- [( 1,'A',1,ae2,["Attending & Exploring"])
                               ,( 1,'B',1,pt2,["Patterns & Algebra"])
                               ,( 3,'B',1,pu2,["Patterns & Algebra"])
@@ -72,383 +72,383 @@ lessonSets = Map.fromList
                               ,(12,'D',1,fd2,["Numbers & Operations"])
              ]])
            , (Eq3, Seq.empty)]
-           where ae2 = [ "attend to math materials and instruction"
-                       , "touch math manipulatives"
-                       , "explore math manipulatives"
-                       , "choose a song or book for enjoyment"
-                       , "understand cause and effect"
-                       , "imitate simple problem solving activities"
+           where ae2 = [("attend to math materials and instruction","visually attend")
+                       ,("touch math manipulatives","attempt to touch or tolerate math manipulatives")
+                       ,("explore math manipulatives","explore math manipulatives")
+                       ,("choose a song or book for enjoyment","choose a number song or book")
+                       ,("understand cause and effect","demonstrate understanding of cause and effect")
+                       ,("imitate simple problem solving activities","participate in simple problem solving activities")
                        ]
-                 pt2 = [ "tolerance of kinesthetic/sound patterns"
-                       , "imitate kinesthetic/sound pattern"
-                       , "repeat a daily routine"
-                       , "knowledge of a seasonal event"
-                       , "anticipate scheduled event"
+                 pt2 = [("tolerance of kinesthetic/sound patterns","enjoy or tolerate clapping patterns: actions rhymes songs or raps")
+                       ,("imitate kinesthetic/sound pattern","attempt to imitate or join in clapping patterns: actions rhymes songs or raps")
+                       ,("repeat a daily routine","follow routine")
+                       ,("knowledge of a seasonal event","anticipate holiday or event based on season")
+                       ,("anticipate scheduled event","follow as schedule is read and anticipate favorites")
                        ]
-                 pu2 = [ "match ABAB patterns"
-                       , "duplicate ABAB patterns in 2 ways"
-                       , "extend ABAB patterns"
-                       , "describe ABAB patterns"
-                       , "record ABAB patterns"
-                       , "count number of units in a pattern"
-                       , "compare equivalent patterns"
+                 pu2 = [("match ABAB patterns","match AB patterns")
+                       ,("duplicate ABAB patterns in 2 ways","duplicate AB patterns")
+                       ,("extend ABAB patterns","extend AB patterns")
+                       ,("describe ABAB patterns","describe AB patterns")
+                       ,("record ABAB patterns","record AB patterns")
+                       ,("count number of units in a pattern","count units in a pattern")
+                       ,("compare equivalent patterns","compare equivalent patterns")
                        ]
-                 np2 = [ "duplicate an ABBABB pattern"
-                       , "extend an ABBABB pattern"
-                       , "skip count by 5's"
-                       , "skip count by 2's"
-                       , "identify odd and even numbers"
-                       , "determine missing unit in a pattern"
-                       , "use number patterns - missing number"
+                 np2 = [("duplicate an ABBABB pattern","duplicate ABB pattern")
+                       ,("extend an ABBABB pattern","extend ABB pattern")
+                       ,("skip count by 5's","skip count by 5s")
+                       ,("skip count by 2's","skip count by 2s")
+                       ,("identify odd and even numbers","identify odd and even numbers")
+                       ,("determine missing unit in a pattern","determine missing unit in pattern")
+                       ,("use number patterns - missing number","determine missing unit in number pattern")
                        ]
-                 ma2 = [ "use notation for an equivalent expression"
-                       , "solve an equation with a missing addend"
-                       , "solve an equation with a variable"
-                       , "identify equivalent and equal sets"
-                       , "extend number pattern with constant increment"
-                       , "use a table to determine missing cost"
-                       , "describe number pattern in a table"
+                 ma2 = [("use notation for an equivalent expression","use notation for equivalent expression")
+                       ,("solve an equation with a missing addend","complete problem with missing addend")
+                       ,("solve an equation with a variable","solve addition equation with a variable")
+                       ,("identify equivalent and equal sets","identify equal and equivalent sets")
+                       ,("extend number pattern with constant increment","extend number pattern with constant increment")
+                       ,("use a table to determine missing cost","use a table representing constant rate of change")
+                       ,("describe number pattern in a table","describe number pattern in table with constant rate of change")
                        ]
-                 ms2 = [ "match duplicate objects"
-                       , "match objects by color attribute"
-                       , "sort objects by color attribute"
-                       , "identify primary colors"
-                       , "identify secondary colors" -- Exception!
-                       , "sort objects by size attribute"
-                       , "find object with size or color attribute"
+                 ms2 = [("match duplicate objects","match objects to duplicates")
+                       ,("match objects by color attribute","match objects by color")
+                       ,("sort objects by color attribute","sort objects by color")
+{- Exception! -}       ,("identify primary colors","identify primary colors")
+{- Exception! -}       ,("identify secondary colors","identify secondary colors")
+                       ,("sort objects by size attribute","sort objects by size")
+                       ,("find object with size or color attribute","find objects that share 1 attribute")
                        ]
-                 gp2 = [ "describe attributes of two sets"
-                       , "use a Venn diagram to sort objects"
-                       , "2D shape does not belong in set"
-                       , "build bars in an object bar graph"
-                       , "build bars in a pictograph"
-                       , "compare data in a bar graph"
+                 gp2 = [("describe attributes of two sets","use words same and different to describe attributes")
+                       ,("use a Venn diagram to sort objects","use a Venn diagram to sort objects")
+                       ,("2D shape does not belong in set","find object that does not belong")
+                       ,("build bars in an object bar graph","construct bars in an object bar graph")
+                       ,("build bars in a pictograph","construct pictograph bars")
+                       ,("compare data in a bar graph","interpret a bar graph by comparison")
                        ]
-                 pb2 = [ "make simple prediction about amounts"
-                       , "tally data based on 1 attribute"
-                       , "organize data about objects in bar graph"
-                       , "compare on graph-\"more less equal\""
-                       , "use graph data to solve simple problem"
+                 pb2 = [("make simple prediction about amounts","make a simple prediction about amounts in a set")
+                       ,("tally data based on 1 attribute","tally data of amounts in a set")
+                       ,("organize data about objects in bar graph","place data in simple bar graph with symbolic representation")
+                       ,("compare on graph-\"more less equal\"","compare amounts on bar graph with symbolic representation")
+                       ,("use graph data to solve simple problem","use data from bar graph to solve simple problem")
                        ]
-                 cd2 = [ "choose survey question-2 possible responses"
-                       , "make prediction-opinion-based data"
-                       , "tally data taken from others"
-                       , "use categorical data chart-organize answers"
-                       , "use symbolic representation-bar graph"
-                       , "communicate conclusions-graphs"
+                 cd2 = [("choose survey question-2 possible responses","choose a survey question")
+                       ,("make prediction-opinion-based data","make a prediction about opinion-based data")
+                       ,("tally data taken from others","tally categorical data from opinion survey")
+                       ,("use categorical data chart-organize answers","use categorical data chart to organize answers")
+                       ,("use symbolic representation-bar graph","make a bar graph with categorical data")
+                       ,("communicate conclusions-graphs","communicate conclusions drawn from bar graph")
                        ]
-                 lp2 = [ "collect data to nearest inch"
-                       , "order numerical data-smallest to largest"
-                       , "plot data on a line plot graph"
-                       , "identify measrements-determine range"
-                       , "determine the median of the data"
-                       , "use the median to compare"
-                       , "describe the shape of the graph (mode)"
+                 lp2 = [("collect data to nearest inch","collect data on hand size to nearest inch")
+                       ,("order numerical data-smallest to largest","order numerical data")
+                       ,("plot data on a line plot graph","plot data on line plot graph")
+                       ,("identify measrements-determine range","determine range")
+                       ,("determine the median of the data","determine median")
+                       ,("use the median to compare","compare median of 2 data sets")
+                       ,("describe the shape of the graph (mode)","describe graph shape, including mode and least values")
                        ]
-                 pc2 = [ "predict the probability of outcome"
-                       , "describe the outcome of an experiment"
-                       , "describe the outcome of applying variable"
-                       , "use x axis first and then y-axis on a line graph"
-                       , "interpret line graph-change over time"
-                       , "make a prediction-change over time"
-                       , "collect data on table-change over time"
-                       , "plot data-line graph-change over time"
-                       , "talk/write about conclusions (comparisons)"
+                 pc2 = [("predict the probability of outcome","predict probability of outcomes")
+                       ,("describe the outcome of an experiment","describe outcome of experiment")
+                       ,("describe the outcome of applying variable","describe variable and result")
+                       ,("use x axis first and then y-axis on a line graph","find coordinate points on a graph")
+                       ,("interpret line graph-change over time","interpret line graph")
+                       ,("make a prediction-change over time","predict probability regarding change over time")
+                       ,("collect data on table-change over time","collect data from experiment")
+                       ,("plot data-line graph-change over time","plot data on line graph")
+                       ,("talk/write about conclusions (comparisons)","communicate conclusions drawn from line graph")
                        ]
-                 aa2 = [ "match duplicate 2D shapes"
-                       , "sort duplicate 2D shapes"
-                       , "sort 2D shapes-varying sizes/orientation"
-                       , "choose one attribute to sort shapes"
-                       , "identify triangle and circle and square and rectangle"
-                       , "locate 2D shapes in the environment"
+                 aa2 = [("match duplicate 2D shapes","match two-dimensional shape")
+                       ,("sort duplicate 2D shapes","sort duplicate two-dimensional shapes")
+                       ,("sort 2D shapes-varying sizes/orientation","sort similar two-dimensional shapes")
+                       ,("choose one attribute to sort shapes","choose one attribute to sort shapes")
+                       ,("identify triangle and circle and square and rectangle","identify two-dimensional shapes")
+                       ,("locate 2D shapes in the environment","locate two-dimensional shapes in environment")
                        ]
-                 gs2 = [ "identify a line and side and angle and vertex"
-                       , "draw a rectangle"
-                       , "place 2D shapes to fill an area"
-                       , "use attribute blocks to create a shape"
-                       , "locate 3D shapes in the environment"
-                       , "identify 3D shapes"
+                 gs2 = [("identify a line and side and angle and vertex","identify a line, side, angle, and vertex")
+                       ,("draw a rectangle","draw a rectangle")
+                       ,("place 2D shapes to fill an area","place two-dimensional shapes to fill an area")
+                       ,("use attribute blocks to create a shape","use attribute blocks to re-create a block shape or design")
+                       ,("locate 3D shapes in the environment","find and match three-dimensional shapes in environment")
+                       ,("identify 3D shapes","identify three-dimensional shapes")
                        ]
-                 dc2 = [ "match 2-D outline to faces of a 3D object"
-                       , "identify congruent shapes"
-                       , "predict/confirm results-moving 2D shapes"
-                       , "describe a motion to prove shapes congruent"
-                       , "identify symmetrical 2D shapes"
-                       , "locate the line of symmetry in a figure"
+                 dc2 = [("match 2-D outline to faces of a 3D object","match two-dimensional shape to three-dimensional face")
+                       ,("identify congruent shapes","identify congruent shapes")
+                       ,("predict/confirm results-moving 2D shapes","predict and confirm results of transformations")
+                       ,("describe a motion to prove shapes congruent","describe motion(s) to prove congruency")
+                       ,("identify symmetrical 2D shapes","identify symmetrical shapes")
+                       ,("locate the line of symmetry in a figure","locate line of symmetry")
                        ]
-                 ap2 = [ "identify a right angle"
-                       , "identify acute and obtuse angles"
-                       , "identify polygons and quadrilateral subset"
-                       , "identify polygons: rhombus hexagon octagon"
-                       , "use a table to organize 2D shapes"
+                 ap2 = [("identify a right angle","identify right angle")
+                       ,("identify acute and obtuse angles","identify acute and obtuse angles")
+                       ,("identify polygons and quadrilateral subset","identify polygons and quadrilaterals")
+                       ,("identify polygons: rhombus hexagon octagon","identify rhombus, hexagon, and octagon")
+                       ,("use a table to organize 2D shapes","use a table to organize two-dimensional shapes")
                        ]
-                 ds2 = [ "identify 3D shape faces and vertices and edges"
-                       , "count 3D shape faces and vertices and edges"
-                       , "use a table to organize/classify 3D shapes"
-                       , "count sides and vertices on a 2D cube net"
-                       , "build/identify a cube from a 2D net"
-                       , "sort polyhedral shapes"
+                 ds2 = [("identify 3D shape faces and vertices and edges","identify three-dimensional faces, vertices, and edges")
+                       ,("count 3D shape faces and vertices and edges","count three-dimensional faces, vertices, and angles")
+                       ,("use a table to organize/classify 3D shapes","use a table to organize three-dimensional shapes")
+                       ,("count sides and vertices on a 2D cube net","count sides and vertices on two-dimensional net")
+                       ,("build/identify a cube from a 2D net","build, identify, and compare three-dimensional shape to net")
+                       ,("sort polyhedral shapes","sort polyhedral shapes from other shapes")
                        ]
-                 am2 = [ "locate holiday or birthday on calendar"
-                       , "identify the seasons"
-                       , "match clothing to hot/cold temperatures"
+                 am2 = [("locate holiday or birthday on calendar","anticipate special event on calendar")
+                       ,("identify the seasons","identify 4 seasons")
+                       ,("match clothing to hot/cold temperatures","match appropriate clothing to temperature")
                        ]
-                 ca2 = [ "name the days of the week in order"
-                       , "locate the days of the week on a calendar"
-                       , "name the 12 months in order"
-                       , "locate date 1-10 on current calendar"
-                       , "count within 10 calendar days to event"
-                       , "identify season for a given month"
+                 ca2 = [("name the days of the week in order","name days of the week")
+                       ,("locate the days of the week on a calendar","find days of the week on a calendar")
+                       ,("name the 12 months in order","name months")
+                       ,("locate date 1-10 on current calendar","find a given date on calendar")
+                       ,("count within 10 calendar days to event","use calendar to count days to event")
+                       ,("identify season for a given month","identify 4 seasons given name of month")
                        ]
-                 ti2 = [ "tell analog time to the hour"
-                       , "tell analog time to the 1/2 hour"
-                       , "tell analog time to the 1/4 hour"
-                       , "match analog/digital times on a clock"
-                       , "tell time as \"quarter to\" - \"quarter after\""
+                 ti2 = [("tell analog time to the hour","tell time to the hour")
+                       ,("tell analog time to the 1/2 hour","tell time to 1/2 hour")
+                       ,("tell analog time to the 1/4 hour","tell time to 1/4 hour")
+                       ,("match analog/digital times on a clock","match analog and digital time")
+                       ,("tell time as \"quarter to\" - \"quarter after\"","use common language to tell time")
                        ]
-                 mt2 = [ "identify commonalities in measuring tools"
-                       , "identify measurement tools given name"
-                       , "match measurement attributes to tools"
-                       , "match measurement tool to usage"
-                       , "compare measurement attributes"
-                       , "identify uses for money"
-                       , "name 4 different coins"
-                       , "name coin amounts for each coin named"
-                       , "combine set of 4 quarters to make dollar"
+                 mt2 = [("identify commonalities in measuring tools","identify common elements between measurement tools")
+                       ,("identify measurement tools given name","identify measurement tools")
+                       ,("match measurement attributes to tools","match measurement attributes to tools")
+                       ,("match measurement tool to usage","match measurement tools to everyday situations")
+                       ,("compare measurement attributes","compare measurement attributes")
+                       ,("identify uses for money","identify uses for money")
+                       ,("name 4 different coins","name coins")
+                       ,("name coin amounts for each coin named","name coin amounts")
+                       ,("combine set of 4 quarters to make dollar","combine 4 quarters to make a dollar")
                        ]
-                 tm2 = [ "tell time to 5 minutes on an analog clock"
-                       , "tell time: \"almost\" - 5 min to/after hour"
-                       , "match coin equivalencies"
-                       , "count coin combinations to $1.00"
-                       , "name dollar amounts: $1 $5 $10 $20 $50"
-                       , "round money amounts to next $1-2"
-                       , "match sample items to general prices"
-                       , "choose correct dollars to purchase item"
+                 tm2 = [("tell time to 5 minutes on an analog clock","tell time to 5 minutes")
+                       ,("tell time: \"almost\" - 5 min to/after hour","use common language to tell time at 5-minute intervals")
+                       ,("match coin equivalencies","match coin equivalencies")
+                       ,("count coin combinations to $1.00","count common coin combinations")
+                       ,("name dollar amounts: $1 $5 $10 $20 $50","name dollar amounts")
+                       ,("round money amounts to next $1-2","round up money amounts")
+                       ,("match sample items to general prices","match types of items to general prices")
+                       ,("choose correct dollars to purchase item","choose correct number of dollars to purchase item(s)")
                        ]
-                 wl2 = [ "use same objects and balance scale- make equal"
-                       , "use scale and describe object weight in oz. and lbs."
-                       , "identify two common weights"
-                       , "identify length with lines and pictured ruler" -- Exception!
-                       , "measure line length in inches (ruler)"
-                       , "measure line length in feet (ruler and yardstick)"
-                       , "measure line length in meters (meter stick)"
+                 wl2 = [("use same objects and balance scale- make equal","use balance scale to demonstrate equal")
+                       ,("use scale and describe object weight in oz. and lbs.","weigh objects in pounds and ounces")
+                       ,("identify two common weights","identify 2 common weights")
+{- Exception! -}       ,("identify length with lines and pictured ruler","identify length with lines and pictured ruler")
+{- Exception! -}       ,("measure line length in inches (ruler)","measure line in inches")
+                       ,("measure line length in feet (ruler and yardstick)","measure line in feet")
+                       ,("measure line length in meters (meter stick)","measure line in meters")
                        ]
-                 mg2 = [ "measure perimeter"
-                       , "measure area in units"
-                       , "make different rectangles from same tiles"
-                       , "determine \"cubed\" volume using cubes"
-                       , "identify measuring 1 C 1/2 C 1/4 C" -- Exception!
-                       , "identify liquid measuring 1 C 1/2 C 1/4 C" -- Exception!
-                       , "identify T and tsp abbreviations"
-                       , "measure dry ingredients with 1 C 1/2 C 1/4 C"
-                       , "measure liquid with 1 C 1/2 C 1/4 C"
-                       , "measure liquid and dry with 1 T and 1 tsp and 1/2 tsp"
+                 mg2 = [("measure perimeter","measure perimeter")
+                       ,("measure area in units","measure area")
+                       ,("make different rectangles from same tiles","make rectangular arrays")
+                       ,("determine \"cubed\" volume using cubes","determine volume of a box")
+{- Exception! -}       ,("identify measuring 1 C 1/2 C 1/4 C","identify dry and liquid cup measured amounts")
+{- Exception! -}       ,("identify liquid measuring 1 C 1/2 C 1/4 C","")
+                       ,("identify T and tsp abbreviations","identify measuring spoon amounts")
+                       ,("measure dry ingredients with 1 C 1/2 C 1/4 C","measure dry ingredients with cups")
+                       ,("measure liquid with 1 C 1/2 C 1/4 C","measure liquid ingredients with cups")
+                       ,("measure liquid and dry with 1 T and 1 tsp and 1/2 tsp","measure dry and liquid ingredients with spoons")
                        ]
-                 c12 = [ "recognize quantity of 2 is more than 1"
-                       , "match sets of 1 and 2"
-                       , "identify amounts in sets of 1 and 2"
-                       , "count to 5"
-                       , "identify numerals 0-5"
-                       , "construct a set to match numerals 1 and 2"
-                       , "write numerals 1 and 2 to match sets"
+                 c12 = [("recognize quantity of 2 is more than 1","recognize 2 is more than 1")
+                       ,("match sets of 1 and 2","match sets of 1 and 2")
+                       ,("identify amounts in sets of 1 and 2","identify amounts of 1 and 2")
+                       ,("count to 5","count to 5")
+                       ,("identify numerals 0-5","identify numerals 0-5")
+                       ,("construct a set to match numerals 1 and 2","construct a set to match 1 and 2")
+                       ,("write numerals 1 and 2 to match sets","write numerals 1 and 2 to match sets")
                        ]
-                 c32 = [ "demonstrate 1:1 correspondence"
-                       , "match sets of 3 and 4"
-                       , "identify amounts in sets of 3 and 4"
-                       , "construct set to match numerals 3 and 4"
-                       , "write numerals 3 and 4 to match sets"
-                       , "demonstrate cardinality of number"
+                 c32 = [("demonstrate 1:1 correspondence","demonstrate 1:1 correspondence")
+                       ,("match sets of 3 and 4","match sets of 3 and 4")
+                       ,("identify amounts in sets of 3 and 4","identify sets of 3 and 4")
+                       ,("construct set to match numerals 3 and 4","construct a set to match 3 and 4")
+                       ,("write numerals 3 and 4 to match sets","write numerals 3 and 4 to match sets")
+                       ,("demonstrate cardinality of number","demonstrate cardinality of number")
                        ]
-                 c52 = [ "count to 10"
-                       , "identify numerals 6-10"
-                       , "identify amounts in sets of 5 and 6"
-                       , "construct set to match numerals 5 and 6"
-                       , "write numerals 5 and 6 to match sets"
+                 c52 = [("count to 10","count to 10")
+                       ,("identify numerals 6-10","identify numerals 6-10")
+                       ,("identify amounts in sets of 5 and 6","identify sets of 5 and 6")
+                       ,("construct set to match numerals 5 and 6","construct a set to match 5 and 6")
+                       ,("write numerals 5 and 6 to match sets","write numerals 5 and 6 to match sets")
                        ]
-                 zm2 = [ "place \"0\" given numerals/sets 0-2"
-                       , "write \"0\""
-                       , "identify set that is more for sets up to 10"
-                       , "identify 2 sets aare equal for sets up to 10"
-                       , "identify 2 sets are equal for sets up to 10"
-                       , "join/separate sets and compare result"
+                 zm2 = [("place \"0\" given numerals/sets 0-2","demonstrate understanding of concept of zero")
+                       ,("write \"0\"","write 0")
+                       ,("identify set that is more for sets up to 10","identify a set that is more")
+                       ,("identify 2 sets aare equal for sets up to 10","identify 2 sets that are equal")
+                       ,("identify 2 sets are equal for sets up to 10","identify a set with less")
+                       ,("join/separate sets and compare result","join and separate sets")
                        ]
-                 c72 = [ "identify amounts in sets of 7 and 8"
-                       , "construct set to match numerals 7 and 8"
-                       , "write numerals 7 and 8 to match sets"
-                       , "identify amounts in sets of 9 and 10"
-                       , "construct set to match numerals 9 and 10"
-                       , "write numerals 9 and 10 to match sets"
-                       , "identify number words one through five"
+                 c72 = [("identify amounts in sets of 7 and 8","identify sets of 7 and 8")
+                       ,("construct set to match numerals 7 and 8","construct a set to match 7 and 8")
+                       ,("write numerals 7 and 8 to match sets","write numerals 7 and 8 to match sets")
+                       ,("identify amounts in sets of 9 and 10","identify sets of 9 and 10")
+                       ,("construct set to match numerals 9 and 10","construct a set to match numerals 9 and 10")
+                       ,("write numerals 9 and 10 to match sets","write numerals 9 and 10 to match sets")
+                       ,("identify number words one through five","identify number words one through five")
                        ]
-                 on2 = [ "use ordinal numbers 1-6 to describe line"
-                       , "locate numbers 1-10 on number line"
-                       , "place numerals 1-10 in order"
-                       , "identify relative position numerals 1-10"
-                       , "compare 1-10 with < and > and = and language"
-                       , "identify number words six through ten"
-                       , "state one more than given number 1-10"
-                       , "state one less than given number 1-10"
+                 on2 = [("use ordinal numbers 1-6 to describe line","use ordinal numbers from first to sixth")
+                       ,("locate numbers 1-10 on number line","locate numbers 1-10 on number line")
+                       ,("place numerals 1-10 in order","place numbers 1-10 in order")
+                       ,("identify relative position numerals 1-10","identify relative position of numbers 1-10")
+                       ,("compare 1-10 with < and > and = and language","compare numbers 1-10")
+                       ,("identify number words six through ten","identify number words six through ten")
+                       ,("state one more than given number 1-10","state one more than given number 1-10")
+                       ,("state one less than given number 1-10","state one less than given number 1-10")
                        ]
-                 ct2 = [ "identify dice patterns 1-6"
-                       , "play board game using 1 die to count/move"
-                       , "compose/decompose object/numeral sets 2-4"
-                       , "compose/decompose object/numeral sets 5-6"
-                       , "compose/decompose object/numeral sets 7-8"
-                       , "compose/decompose object/numeral sets 9"
-                       , "compose/decompose object/numeral sets 10"
+                 ct2 = [("identify dice patterns 1-6","identify dice patterns")
+                       ,("play board game using 1 die to count/move","play simple board game with dice")
+                       ,("compose/decompose object/numeral sets 2-4","compose and decompose sets of 2-4")
+                       ,("compose/decompose object/numeral sets 5-6","compose and decompose sets of 5-6")
+                       ,("compose/decompose object/numeral sets 7-8","compose and decompose sets of 7-8")
+                       ,("compose/decompose object/numeral sets 9","compose and decompose sets of 9")
+                       ,("compose/decompose object/numeral sets 10","compose and decompose sets of 10")
                        ]
-                 as2 = [ "solve addition problems for sums to 5"
-                       , "use counting on/number line to solve (+)"
-                       , "count backwards from any number 1-10"
-                       , "solve ( - ) problems for corresponding sums to 5"
-                       , "use counting back/number line to solve ( - )"
-                       , "solve addition problems for sums 6-9"
-                       , "solve ( - ) problems for corresponding sums 6-9"
-                       , "solve +/- problems for (corresponding) sums 10"
+                 as2 = [("solve addition problems for sums to 5","solve addition problems to sums of 5")
+                       ,("use counting on/number line to solve (+)","solve addition problems with counting on, number line")
+                       ,("count backwards from any number 1-10","count backwards from any number 1-10")
+                       ,("solve ( - ) problems for corresponding sums to 5","solve subtraction problems with corresponding sums of 5")
+                       ,("use counting back/number line to solve ( - )","solve subtraction problems with counting back, number line")
+                       ,("solve addition problems for sums 6-9","solve addition problems with sums of 6-9")
+                       ,("solve ( - ) problems for corresponding sums 6-9","solve subtraction problems with corresponding sums 6-9")
+                       ,("solve +/- problems for (corresponding) sums 10","solve addition and subtraction problems with sums of 10")
                        ]
-                 mm2 = [ "find missing addend to make quantity of 10"
-                       , "write +/- equations horizontally/vertically"
-                       , "use calculator to +/- to sums of 10"
-                       , "use doubles + to solve - problems"
-                       , "choose strategy to solve word problem"
-                       , "count to 20"
+                 mm2 = [("find missing addend to make quantity of 10","find missing addend to make 10")
+                       ,("write +/- equations horizontally/vertically","write addition and subtraction equations")
+                       ,("use calculator to +/- to sums of 10","use a calculator to add and subtract sums to 10")
+                       ,("use doubles + to solve - problems","use doubles to solve subtraction problems with corresponding sums 2-10")
+                       ,("choose strategy to solve word problem","use learned strategies to solve a simple word problem")
+                       ,("count to 20","count 1-20")
                        ]
-                 c22 = [ "identify numerals 11-15"
-                       , "identify amounts in sets of 11-15"
-                       , "construct a set to match numerals 11-15"
-                       , "write numerals 11-15 to match sets"
-                       , "identify numerals 16-20"
-                       , "identify amounts in sets of 16-20"
-                       , "construct a set to match numerals 16-20"
-                       , "write numerals 16-20 to match sets"
+                 c22 = [("identify numerals 11-15","identify numerals 11-15")
+                       ,("identify amounts in sets of 11-15","identify sets of 11-15")
+                       ,("construct a set to match numerals 11-15","construct a set to match 11-15")
+                       ,("write numerals 11-15 to match sets","write numerals 11-15 to match sets")
+                       ,("identify numerals 16-20","identify numerals 16-20")
+                       ,("identify amounts in sets of 16-20","identify sets of 16-20")
+                       ,("construct a set to match numerals 16-20","construct a set to match 16-20")
+                       ,("write numerals 16-20 to match sets","write numerals 16-20 to match sets")
                        ]
-                 cn2 = [ "compare 11-20 with < and > and = and language"
-                       , "locate numbers 11-20 on number line"
-                       , "count backwards from any number 11-20"
-                       , "place numerals 11-20 in order"
-                       , "state one more than given number for 11-20"
-                       , "state one less than given number for 11-20"
+                 cn2 = [("compare 11-20 with < and > and = and language","compare quantities 11-20")
+                       ,("locate numbers 11-20 on number line","locate numbers 11-20 on number line")
+                       ,("count backwards from any number 11-20","count backwards from any number 11-20")
+                       ,("place numerals 11-20 in order","place numbers 11-0 in order")
+                       ,("state one more than given number for 11-20","state one more than given number 11-20")
+                       ,("state one less than given number for 11-20","state one less than given number 11-20")
                        ]
-                 n52 = [ "compare sets 1-20: greater fewer most least"
-                       , "order quantities most to least/least to most"
-                       , "count to 50"
-                       , "skip count by tens to 100"
-                       , "count/group objects in tens and ones to 100"
-                       , "exchange 10 ones for 1 ten for place value to 50"
-                       , "use 10s pattern to find 21-50"
-                       , "identify 2-digit numbers 21-50"
-                       , "write numerals 21-50"
+                 n52 = [("compare sets 1-20: greater fewer most least","compare sets 11 - 20 using words: greater, fewer, most and least")
+                       ,("order quantities most to least/least to most","order quantities from most to least, least to most")
+                       ,("count to 50","count 1 - 50")
+                       ,("skip count by tens to 100","skip count by tens to 100")
+                       ,("count/group objects in tens and ones to 100","count and groups objects into tens and ones")
+                       ,("exchange 10 ones for 1 ten for place value to 50","demonstrate understanding of place value to 50")
+                       ,("use 10s pattern to find 21-50","use number patterns to locate 21 - 50 on hundreds chart")
+                       ,("identify 2-digit numbers 21-50","identify numbers 21 - 50")
+                       ,("write numerals 21-50","write numerals 21 - 50")
                        ]
-                 a72 = [ "identify 10 more than given number 20-50"
-                       , "identify 10 less than given number 20-50"
-                       , "choose method to solve ( + ) sums 11-15"
-                       , "choose method to solve ( - ) sums 11-15"
-                       , "choose method to solve ( + ) sums 16-20"
-                       , "choose method to solve ( - ) sums 16-20"
+                 a72 = [("identify 10 more than given number 20-50","identify ten more than given number 20-50")
+                       ,("identify 10 less than given number 20-50","identify ten less than given number 20-50")
+                       ,("choose method to solve ( + ) sums 11-15","choose method to solve addition problems to sums 11-15")
+                       ,("choose method to solve ( - ) sums 11-15","choose method to solve subtraction problems to corresponding sums 11-15")
+                       ,("choose method to solve ( + ) sums 16-20","choose method to solve addition problems to sums 16-20")
+                       ,("choose method to solve ( - ) sums 16-20","choose method to solve subtraction problems to corresponding sums 16-20")
                        ]
-                 sa2 = [ "( + ) word problems to join 2 groups"
-                       , "( - ) word problems - removal"
-                       , "( - ) word problems - comparison"
-                       , "( - ) word problems - missing part"
-                       , "choose operation +/- to solve word problem"
-                       , "show commutative property ( + ) equations"
+                 sa2 = [("( + ) word problems to join 2 groups","use addition to solve word problems joining 2 groups")
+                       ,("( - ) word problems - removal","use subtraction to solve word problems with removal")
+                       ,("( - ) word problems - comparison","use subtraction to solve word problems with comparison")
+                       ,("( - ) word problems - missing part","use subtraction to solve word problems with missing part of a set")
+                       ,("choose operation +/- to solve word problem","choose correct operation to solve simple word problem")
+                       ,("show commutative property ( + ) equations","demonstrate commutative property of addition")
                        ]
-                 a32 = [ "identify/solve doubles ( + ) problems sums 11-18"
-                       , "solve corresponding ( - ) problems sums of 11-18"
-                       , "add 3 or more single-digit numbers"
-                       , "show associative property + 1-digit numbers"
-                       , "use calculator to add three 1-digit numbers"
+                 a32 = [("identify/solve doubles ( + ) problems sums 11-18","identify and solve doubles addition problems to sums 11-18")
+                       ,("solve corresponding ( - ) problems sums of 11-18","solve subtraction problems with corresponding sums 11-18 using doubles")
+                       ,("add 3 or more single-digit numbers","add single digit numbers")
+                       ,("show associative property + 1-digit numbers","demonstrate associative property of addition")
+                       ,("use calculator to add three 1-digit numbers","use a calculator to add 3 single-digit numbers")
                        ]
-                 dn2 = [ "count to 100"
-                       , "group objects in 10s and 1s to build 2-digit numbers"
-                       , "exchange 10 ones for ten for place value 51-99"
-                       , "use number patterns to find 51-100 on chart"
-                       , "identify 2-digit numerals 51-99 "
-                       , "write 2-digit numerals 51-99"
-                       , "identify 10 more than given number 51-100"
-                       , "identify 10 less than given number 51-100"
-                       , "estimate reasonable 1- and 2-digit numbers for sets"
+                 dn2 = [("count to 100","count 1-100")
+                       ,("group objects in 10s and 1s to build 2-digit numbers","group objects to build numbers to 100")
+                       ,("exchange 10 ones for ten for place value 51-99","demonstrate understanding of place value from 51-99")
+                       ,("use number patterns to find 51-100 on chart","use number patterns to locate numbers 51-100 on hundreds chart")
+                       ,("identify 2-digit numerals 51-99 ","identify numbers 51-99")
+                       ,("write 2-digit numerals 51-99","write numbers 51-99")
+                       ,("identify 10 more than given number 51-100","identify ten more than given number 51-99")
+                       ,("identify 10 less than given number 51-100","identify ten less than given number 51-99")
+                       ,("estimate reasonable 1- and 2-digit numbers for sets","estimate number to represent familiar sets with 1- and 2-digit numbers")
                        ]
-                 dp2 = [ "exchange 10 tens for hundred; place value"
-                       , "identify 3-digit numbers"
-                       , "write 3-digit numbers"
-                       , "+/- 10 from a 2-digit number"
-                       , "+/- 100 from a 3-digit number"
-                       , "use multiples of making 10 to make 100"
-                       , "use calculator to +/- 2- and 3-digit numbers"
-                       , "+/- 2-digit numbers without regrouping"
-                       , "+/- 3-digit numbers without regrouping"
+                 dp2 = [("exchange 10 tens for hundred; place value","demonstrate understanding of place value to 100")
+                       ,("identify 3-digit numbers","identify 3-digit numbers")
+                       ,("write 3-digit numbers","write 3-digit numbers")
+                       ,("+/- 10 from a 2-digit number","add and subtract 10 from 2-digit number")
+                       ,("+/- 100 from a 3-digit number","add and subtract 100 from 3-digit number")
+                       ,("use multiples of making 10 to make 100","make 100 using multiples of 10")
+                       ,("use calculator to +/- 2- and 3-digit numbers","use a calculator to add and subtract 2- and 3-digit numbers")
+                       ,("+/- 2-digit numbers without regrouping","add and subtract 2-digit numbers, no re-grouping")
+                       ,("+/- 3-digit numbers without regrouping","add and subtract 3-digit numbers, no re-grouping")
                        ]
-                 re2 = [ "estimate reasonable 3-digit number for sets"
-                       , "round numbers to tens place value"
-                       , "round to estimate sums/differences: tens place"
-                       , "round numbers to hundreds place value"
-                       , "round to estimate sums/differences: hundreds place"
-                       , "+/- 2-digit numbers with regrouping"
-                       , "+/- 3-digit numbers with regrouping"
+                 re2 = [("estimate reasonable 3-digit number for sets","estimate number to represent familiar sets up to 3-digit numbers")
+                       ,("round numbers to tens place value","round numbers to tens place value")
+                       ,("round to estimate sums/differences: tens place","round numbers to estimate sums and difference to tens place value")
+                       ,("round numbers to hundreds place value","round numbers to hundreds place value")
+                       ,("round to estimate sums/differences: hundreds place","round numbers to estimate sums and difference to hundreds place value")
+                       ,("+/- 2-digit numbers with regrouping","add and subtract 2-digit numbers, with re-grouping")
+                       ,("+/- 3-digit numbers with regrouping","add and subtract 3-digit numbers, with re-grouping")
                        ]
-                 ln2 = [ "exchange 10 hundreds for thousand; place value"
-                       , "identify 4-digit numbers"
-                       , "write 4-digit numbers"
-                       , "estimate 4-digit number to represent familiar sets"
-                       , "+/- 4-digit numerals with a calculator"
-                       , "identify 5- and 6-digit numerals"
-                       , "write 5- and 6-digit numbers"
-                       , "use < and > and = to compare numbers to 6-digits"
+                 ln2 = [("exchange 10 hundreds for thousand; place value","demonstrate understanding of place value to 1000")
+                       ,("identify 4-digit numbers","identify 4-digit numerals")
+                       ,("write 4-digit numbers","write 4-digit numerals")
+                       ,("estimate 4-digit number to represent familiar sets","estimate number to represent familiar sets up to 4-digit numbers")
+                       ,("+/- 4-digit numerals with a calculator","use a calculator to add and subtract 4-digit numbers")
+                       ,("identify 5- and 6-digit numerals","identify 5- and 6-digit numerals")
+                       ,("write 5- and 6-digit numbers","write 5- and 6-digit numerals")
+                       ,("use < and > and = to compare numbers to 6-digits","compare large numbers up to 6-digits")
                        ]
-                 md2 = [ "use = sets to show understand multiplication"
-                       , "use objects to multiply (factors 1-5 and 0)"
-                       , "use 10:1 or 2:1 relationships to solve multiplication problems"
-                       , "use skip counting by 5s and 2s and 10s to multiply"
-                       , "multiplication (with dot sign) problems for factors 6-9"
+                 md2 = [("use = sets to show understand multiplication","demonstrate multiplication with repeated sets")
+                       ,("use objects to multiply (factors 1-5 and 0)","use manipulatives to solve multiplication problems")
+                       ,("use 10:1 or 2:1 relationships to solve multiplication problems","use 10:1 or 2:1 relationships to solve a multiplication problem")
+                       ,("use skip counting by 5s and 2s and 10s to multiply","skip count to solve multiplication problems")
+                       ,("multiplication (with dot sign) problems for factors 6-9","solve multiplication problems with factors 6-9")
                        ]
-                 sm2 = [ "write x problem vertically/horizontally"
-                       , "solve multiplication problems for factor of 10"
-                       , "multiply with 10 and 100"
-                       , "use multiplication to solve repeated addition problem"
-                       , "solve 2-digit x problem with calculator"
-                       , "demo commutative property x equations"
+                 sm2 = [("write x problem vertically/horizontally","write a multiplication equation")
+                       ,("solve multiplication problems for factor of 10","solve multiplication problems with factor of 10")
+                       ,("multiply with 10 and 100","multiply with 10 and 100")
+                       ,("use multiplication to solve repeated addition problem","use multiplication to solve word problem with repeated addition problem")
+                       ,("solve 2-digit x problem with calculator","solve two-digit multiplication problem with calculator")
+                       ,("demo commutative property x equations","demonstrate commutative property of multiplication")
                        ]
-                 dm2 = [ "identify number sets that can and cannot divide evenly"
-                       , "use array model/grouping to demo division"
-                       , "solve problems with divisors/quotients 1-5"
-                       , "solve problems with divisors/quotients 6-9"
-                       , "inverse ( x ) with divisors/quotients 1-9"
+                 dm2 = [("identify number sets that can and cannot divide evenly","identify sets that can be divided into equal groups")
+                       ,("use array model/grouping to demo division","demonstrate division with array and grouping")
+                       ,("solve problems with divisors/quotients 1-5","use manipulatives to solve division problems")
+                       ,("solve problems with divisors/quotients 6-9","solve division problems with corresponding factors 6-9")
+                       ,("inverse ( x ) with divisors/quotients 1-9","use inverse relationship to solve division problems")
                        ]
-                 sd2 = [ "write simple / equation using long division sign"
-                       , "solve division problems with divisor of 10"
-                       , "use division to solve word problem with equal sets"
-                       , "divide by 100s and 10s++++"
-                       , "solve problems; 2-digit divisor-calculator"
-                       , "choose multiplication or division to solve word problem"
-                       , "identify factors and multiples - relate to division"
+                 sd2 = [("write simple / equation using long division sign","write a division problem")
+                       ,("solve division problems with divisor of 10","solve division problems with divisor of 10")
+                       ,("use division to solve word problem with equal sets","use division to solve word problem  with equal sets")
+                       ,("divide by 100s and 10s++++","divide by 10s and 100s")
+                       ,("solve problems; 2-digit divisor-calculator","solve division problem with 2-digit divisor using calculator")
+                       ,("choose multiplication or division to solve word problem","choose multiplication or division to solve word problem")
+                       ,("identify factors and multiples - relate to division","identify multiples and factors")
                        ]
-                 fw2 = [ "sort equal fraction pieces to make whole"
-                       , "show 1/2 of an object and array"
-                       , "assemble name equal fraction pieces-whole"
-                       , "identify 2 ways to make square into fourths"
-                       , "define numerator and denominator"
-                       , "write fraction name to match model (1/2- 1/8)"
-                       , "identify 1/2 and 1/3 and 1/4 of a set"
+                 fw2 = [("sort equal fraction pieces to make whole","sort equal fraction pieces")
+                       ,("show 1/2 of an object and array","show half of object and array")
+                       ,("assemble name equal fraction pieces-whole","assemble and name matching fraction pieces")
+                       ,("identify 2 ways to make square into fourths","identify 2 ways to make a square into fourths")
+                       ,("define numerator and denominator","define meaning of numerator and denominator")
+                       ,("write fraction name to match model (1/2- 1/8)","write fraction name")
+                       ,("identify 1/2 and 1/3 and 1/4 of a set","identify half, third, and fourth of a set")
                        ]
-                 cf2 = [ "use fraction models; numerator > 1"
-                       , "use fraction models to match equivalents"
-                       , "identify fractions in a set; numerator > 1"
-                       , "order common fraction with measuring cups"
-                       , "compare fractions 0 1/2 1\""
-                       , "identify linear measurement 1/2\" 1/4\""
+                 cf2 = [("use fraction models; numerator > 1","identify fractions with numerator greater than 1")
+                       ,("use fraction models to match equivalents","match equivalent fractions with models")
+                       ,("identify fractions in a set; numerator > 1","identify fractions of set with numerator greater    than 1")
+                       ,("order common fraction with measuring cups","order common fractions")
+                       ,("compare fractions 0 1/2 1\"","compare common fractions")
+                       ,("identify linear measurement 1/2\" 1/4\"","identify fractions of linear measurement")
                        ]
-                 af2 = [ "identify common denominator fractions"
-                       , "add/subtract common denominator fractions"
-                       , "add common denominator fractions to total 1 whole"
-                       , "identify mixed number amount in recipe"
-                       , "solve fraction addition problem for a mixed number"
+                 af2 = [("identify common denominator fractions","identify fractions with common denominator")
+                       ,("add/subtract common denominator fractions","add and subtract fractions with common denominator")
+                       ,("add common denominator fractions to total 1 whole","add fractions to total of 1")
+                       ,("identify mixed number amount in recipe","identify mixed numbers in recipe")
+                       ,("solve fraction addition problem for a mixed number","solve addition problem with models that results in mixed number")
                        ]
-                 fd2 = [ "use fraction models to read amounts"
-                       , "divide fractions 1/10 - 9/10 to decimals"
-                       , "read decimals in the tenths place"
-                       , "read decimals from .01 to .99 - money terms"
-                       , "add/subtract decimals as money"
-                       , "match decimals to fractions"
-                       , "match fractions to percentages"
+                 fd2 = [("use fraction models to read amounts","use models to identify fractions in tenths")
+                       ,("divide fractions 1/10 - 9/10 to decimals","convert fractions to decimals")
+                       ,("read decimals in the tenths place","read decimals to tenths place")
+                       ,("read decimals from .01 to .99 - money terms","read decimals in money terms")
+                       ,("add/subtract decimals as money","add and subtract decimals in money terms")
+                       ,("match decimals to fractions","match decimals and fractions and relate to time and money")
+                       ,("match fractions to percentages","match fractions to percentages")
                        ]
