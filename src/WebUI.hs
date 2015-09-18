@@ -85,8 +85,8 @@ header = head_ $ do
 banner :: Html ()
 banner = do img_ [style_ "margin-left: 11.5%", src_ bnr]
             p_ [style_ "color: red;"] $
-               mconcat ["Note: ",all," assessment data is deleted each night at midnight (Central Time)"]
-               where all = span_ [style_ "font-style: italic;"] "All"
+               mconcat ["Note: While you may save your progress, ",all," assessment data is deleted each night at midnight (Central Time)"]
+            where all = span_ [style_ "font-style: italic;"] "all"
 
 runWebServer :: Int -> IO ()
 runWebServer pnum = Web.scotty pnum $ do
@@ -97,6 +97,11 @@ runWebServer pnum = Web.scotty pnum $ do
                                  $ do header
                                       body_ $ div_ [style_ "width: 770px; margin: auto;"] $ do
                                           banner
+                                          p_ "To get started, complete the assessment and fill out the paper copy of the student response booklet (protocol). Then:"
+                                          ol_ $ do li_ "Fill out the \"Username\" field with your name."
+                                                   li_ "Enter a \"Student ID\" number in case you need to leave and return to finish scoring later in the day. Only numbers are valid."
+                                                   li_ "Click \"New\" to enter data for the student."
+                                          p_ "To retrieve data saved earlier in the day, enter the \"Username\" and \"Student ID\" and click \"Load\"."
                                           with form_ [method_ "GET", action_ "/assess"] $ do
                                              p_ $ do "Username: "; input_ [type_ "text", name_ "u", required_ ""]
                                                      br_ []
@@ -171,6 +176,13 @@ runWebServer pnum = Web.scotty pnum $ do
                                  $ do header
                                       body_ $ div_ [style_ "width: 770px; margin: auto;"]
                                           $ do banner
+                                               ol_ $ do li_ "Click on a tab to select the appropriate subtest."
+                                                        li_ "Using the buttons, select \"1\" or \"0\" to record the scores for each item in the student response booklet (protocol)."
+                                                        li_ "Check the boxes for all adapted items given. The electronic scoring will automatically eliminate checks for scores of \"0\"."
+                                                        li_ "Click on each tab to enter scores for each subtest. You will not need to save between tabs."
+                                                        li_ "When finished, you may click \"Save\" to temporarily save the data (optional)."
+                                                        li_ "Click \"Export\" to generate the report to an Excel-compatible spreadsheet. \"Save as\" to your computer and rename the file to your liking. You may need to adjust column and row widths inside Excel to your preference."
+                                                        li_ "When finished, click \"New\" to begin another assessment."
                                                script_ js
                                                with form_ [method_ "POST", action_ "/save.csv", enctype_ "multipart/form-data"] $ do
                                                   p_ $ do if a == as && (score <$> ll) == (score <$> (lessons as)) then "New " else ""
