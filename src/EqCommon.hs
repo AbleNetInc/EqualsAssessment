@@ -46,9 +46,14 @@ adaptedScore l | score l /= 1 = 0
 
 csLesson :: Lesson -> Text
 csLesson l = Text.pack $ intercalate "," [s,n,c]
-       where s = intercalate "." [show $ chapter l,[section l],show $ count l]
+       where s = intercalate "." [show $ ch,[sc],show $ cnt]
+             ch = chapter l
+             sc = section l
+             cn = count l
              n = Text.unpack . snd $ lName l
              c = show $ adaptedScore l
+             cnt | ch == 11 && sc == 'E' && cn > 6 = cn - 1
+                 | otherwise                       = cn
 
 data Assessment = Assessment { student :: Name
                              , ver     :: EqVersion
