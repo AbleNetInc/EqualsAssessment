@@ -25,11 +25,13 @@ tbLesson l = tr_ [class_ c] $ do td_ ""; td_ s; td_ [style_ "text-align: center;
              c = if hidden then "hidden" else head . toList $ tags l
              r = score l
              m = Text.pack $ show (chapter l, section l, count l)
-             o = Text.pack $ concat ["(",show $ chapter l,",\\'",[section l],"\\',",show $ count l + 1,")"]
+             o = Text.pack $ concat ["(",show $ chapter l,",\\'",[section l],"\\',",show $ count l + thing,")"]
+             thing | m == "(9,'A',5)" = (-1)
+                   | otherwise        = 1
              ch = [if r == x then checked_ else alt_ "" | x <- [(-1)..1]]
-             oc = [if m == "(1,'C',4)" || m == "(9,'A',3)" then onchange_ (mconcat ["copyScore('",o,"','",val,"')"]) else alt_ ""
+             oc = [if m == "(1,'C',4)" || m == "(9,'A',5)" then onchange_ (mconcat ["copyScore('",o,"','",val,"')"]) else alt_ ""
                   | val <- ["(Just (-1),Nothing)","(Just 0,Nothing)","(Just 1,Nothing)"]]
-             cc = if m == "(1,'C',4)" || m == "(9,'A',3)" then onchange_ (mconcat ["copyAdapt(this,'",o,"')"]) else alt_ ""
+             cc = if m == "(1,'C',4)" || m == "(9,'A',5)" then onchange_ (mconcat ["copyAdapt(this,'",o,"')"]) else alt_ ""
              s = do input_ [type_ "radio", name_ m, oc !! 0, value_ "(Just (-1),Nothing)", ch !! 0]; "blank"
                     input_ [type_ "radio", name_ m, oc !! 1, value_ "(Just 0,Nothing)",    ch !! 1]; "0"
                     input_ [type_ "radio", name_ m, oc !! 2, value_ "(Just 1,Nothing)",    ch !! 2]; "1"
