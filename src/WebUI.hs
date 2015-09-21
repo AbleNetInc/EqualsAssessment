@@ -186,12 +186,13 @@ runWebServer pnum = Web.scotty pnum $ do
                                                         li_ $ mconcat ["Click ",italic "Export"," to generate the report to an Excel-compatible spreadsheet. ",italic "Save as"," to your Desktop and rename the file to the student's name. You may need to adjust column and row widths inside Excel to your preference."]
                                                         li_ $ mconcat ["When finished, click ",italic "New"," to begin another assessment."]
                                                script_ js
-                                               with form_ [method_ "POST", action_ "/save.csv", enctype_ "multipart/form-data"] $ do
+                                               with form_ [method_ "POST", action_ "/save", enctype_ "multipart/form-data"] $ do
                                                   p_ $ do if a == as && (score <$> ll) == (score <$> (lessons as)) then "New " else ""
                                                           "Assessment by ";t;" for ";s;":"
-                                                  input_ [type_ "submit", name_ "s", value_ "Export"]; " "
                                                   input_ [type_ "submit", name_ "s", value_ "Save"]; " "
-                                                  input_ [type_ "submit", name_ "s", value_ "New"]
+                                                  input_ [type_ "submit", name_ "s", value_ "New"]; " "
+                                                  input_ [type_ "submit", name_ "s", value_ "Export"];
+                                                  select_ [name_ "ext", class_ "hidden"] $ do option_ [value_ "csv"] "CSV"
                                                   br_ []; br_ []
                                                   tbs
                                                   table_ [style_ "margin-top: 1px; width: 770px;"] $ do
@@ -204,9 +205,9 @@ runWebServer pnum = Web.scotty pnum $ do
                                                   input_ [class_ "hidden", type_ "text", name_ "u", value_ $ Text.pack teacher]
                                                   input_ [class_ "hidden", type_ "text", name_ "i", value_ $ Text.pack student]
 
-                  Web.post (Web.regex "^/save\\.(.*)$") $ do
+                  Web.post "/save" $ do
                            p       <- Web.params
-                           --ext     <- Web.param "1"
+                           ext     <- Web.param "ext"
                            ret     <- Web.param "s"
                            version <- Web.param "v"
                            teacher <- Web.param "u"
@@ -219,10 +220,12 @@ runWebServer pnum = Web.scotty pnum $ do
                                nls = (read . Lazy.unpack . fst <$> scs) :: [(Int,Char,Int)]
                                nss = (read . Lazy.unpack . snd <$> scs) :: [(Maybe Int,Maybe Bool)]
                                nas = foldl' (\x (y,z) -> updateLesson x y z) as $ zip nls nss
+                               fn  = mconcat [t,"_",s,".",ext]
                            na      <- liftIO $ saveAssessment "EqDB" nas
                            case (ret :: String) of
                                 "Export" -> do sf <- liftIO $ saveFile nas
-                                               Web.setHeader (Lazy.pack "Content-Type") (Lazy.pack "text/csv")
-                                               Web.file $ t ++ "_" ++ s ++ ".csv"
+                                               Web.setHeader "Content-Type" "text/csv"
+                                               Web.setHeader "Content-Disposition" $ Lazy.pack $ mconcat ["attachment; filename=",fn]
+                                               Web.file fn
                                 "Save"   -> Web.redirect . Lazy.pack $ concat ["/assess?u=",teacher,"&i=",student,"&v=",version,"&c=Load"]
                                 "New"    -> Web.redirect "/"
