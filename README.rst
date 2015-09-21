@@ -4,9 +4,19 @@ Equals Assessment
 This repo will play host to the (re)implementation of the Equals Assessment System.
 In an attempt to keep the tool small, fast and easily maintainable, the whole system (from the internal calculations, to the CSV export to the UI) will be implemented in Haskell using the lightest-weight solutions we can manage.
 
-At the moment, we have the following dependencies:
+Install Process
+---------------
 
-- `GHC (or the Haskell Platform) >= 7.10 <https://www.haskell.org/downloads>`_
-- `sqlite3 >= 0.5.2.2 <https://hackage.haskell.org/package/sqlite-0.5.2.2>`_
+First, install the `Haskell Platform <https://www.haskell.org/downloads>`_ or ``ghc`` version 7.10 (we use some prelude changes present in this version).
 
-Note that the ``sqlite3`` Haskell package includes a few other dependencies and will require that ``sqlite3`` itself be installed.
+Next, clone `this repository <https://github.com/AbleNetInc/EqualsAssessment>`_, ``cd`` into the resulting directory and run the following commands:
+
+.. code:: shell-session
+
+    cabal sandbox init
+    cabal install
+    cabal build
+
+Following this, you can run the project simply by using ``cabal run -- <arguments>``.
+
+All internal dependencies are handled by ``cabal``, but some of them rely on external dependencies to be installed as well (namely ``sqlite3``).
