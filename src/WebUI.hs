@@ -226,9 +226,12 @@ runWebServer pnum = Web.scotty pnum $ do
                            na      <- liftIO $ saveAssessment "EqDB" nas
                            case (ret :: String) of
                                 "Export" -> do sf <- liftIO $ saveFile nas ext
-                                               case ext of
-                                                   "csv" -> Web.setHeader "Content-Type" "text/csv"
-                                                   _     -> Web.setHeader "Content-Type" "text/plain"
+                                               Web.setHeader "Content-Type" $ case ext of
+                                                   "csv"  -> "text/csv"
+                                                   "pdf"  -> "application/pdf"
+                                                   "docx" -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                                                   "xlsx" -> "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                                   _      -> "text/plain"
                                                Web.setHeader "Content-Disposition" . Lazy.pack $ mconcat ["attachment; filename=",fn]
                                                Web.file fn
                                 "Save"   -> Web.redirect . Lazy.pack $ concat ["/assess?u=",teacher,"&i=",student,"&v=",version,"&c=Load"]
