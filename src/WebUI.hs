@@ -204,8 +204,9 @@ runWebServer pnum = Web.scotty pnum $ do
                                                   input_ [class_ "hidden", type_ "text", name_ "u", value_ $ Text.pack teacher]
                                                   input_ [class_ "hidden", type_ "text", name_ "i", value_ $ Text.pack student]
 
-                  Web.post "/save.csv" $ do
+                  Web.post (Web.regex "^/save\\.(.*)$") $ do
                            p       <- Web.params
+                           --ext     <- Web.param "1"
                            ret     <- Web.param "s"
                            version <- Web.param "v"
                            teacher <- Web.param "u"
@@ -214,7 +215,7 @@ runWebServer pnum = Web.scotty pnum $ do
                                t   = teacher :: String
                                s   = student :: String
                                as  = blankAssessment v student teacher
-                               scs = drop 1 $ take (length p - 3) p
+                               scs = drop 3 $ take (length p - 3) p
                                nls = (read . Lazy.unpack . fst <$> scs) :: [(Int,Char,Int)]
                                nss = (read . Lazy.unpack . snd <$> scs) :: [(Maybe Int,Maybe Bool)]
                                nas = foldl' (\x (y,z) -> updateLesson x y z) as $ zip nls nss
