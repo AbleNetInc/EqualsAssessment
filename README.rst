@@ -11,11 +11,11 @@ First, install the `Haskell Platform <https://www.haskell.org/downloads>`_ or ``
 
 Next, clone `this repository <https://github.com/AbleNetInc/EqualsAssessment>`_, ``cd`` into the resulting directory and run the following commands:
 
-.. code:: shell-session
+.. code:: console
 
-    cabal sandbox init
-    cabal install
-    cabal build
+    $ cabal sandbox init
+    $ cabal install
+    $ cabal build
 
 Following this, you can run the project simply by using ``cabal run -- <arguments>``.
 
