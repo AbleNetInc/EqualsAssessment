@@ -192,7 +192,11 @@ runWebServer pnum = Web.scotty pnum $ do
                                                   input_ [type_ "submit", name_ "s", value_ "Save"]; " "
                                                   input_ [type_ "submit", name_ "s", value_ "New"]; " "
                                                   input_ [type_ "submit", name_ "s", value_ "Export"];
-                                                  select_ [name_ "ext", class_ "hidden"] $ do option_ [value_ "csv"] "CSV"
+                                                  select_ [name_ "ext", class_ "hidden"] $ do option_ [value_ "csv" ] "to CSV"
+                                                                                              option_ [value_ "tex" ] "to LaTeX"
+                                                                                              option_ [value_ "pdf" ] "to PDF"
+                                                                                              option_ [value_ "docx"] "to Word"
+                                                                                              option_ [value_ "xlsx"] "to Excel"
                                                   br_ []; br_ []
                                                   tbs
                                                   table_ [style_ "margin-top: 1px; width: 770px;"] $ do
@@ -223,8 +227,10 @@ runWebServer pnum = Web.scotty pnum $ do
                                fn  = mconcat [t,"_",s,".",ext]
                            na      <- liftIO $ saveAssessment "EqDB" nas
                            case (ret :: String) of
-                                "Export" -> do sf <- liftIO $ saveFile nas
-                                               Web.setHeader "Content-Type" "text/csv"
+                                "Export" -> do sf <- liftIO $ saveFile nas ext
+                                               case ext of
+                                                   "csv" -> Web.setHeader "Content-Type" "text/csv"
+                                                   _     -> Web.setHeader "Content-Type" "text/plain"
                                                Web.setHeader "Content-Disposition" $ Lazy.pack $ mconcat ["attachment; filename=",fn]
                                                Web.file fn
                                 "Save"   -> Web.redirect . Lazy.pack $ concat ["/assess?u=",teacher,"&i=",student,"&v=",version,"&c=Load"]

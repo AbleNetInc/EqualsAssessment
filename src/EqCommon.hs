@@ -101,10 +101,10 @@ toCSV a@(Assessment i v t ls) = Text.pack $ concat [ "Teacher:,",n, "\nStudent:,
                                     hdr = "Lesson,Description,Adjusted Raw Score\n"
                                     bdy = concat $ ((++ "\n") . Text.unpack) <$> cls
 
-saveFile :: Assessment -> IO ()
-saveFile a = writeFile (t ++ "_" ++ s ++ ".csv") . Text.unpack $ toCSV a
-           where t = Text.unpack $ teacher a
-                 s = Text.unpack $ student a
+saveFile :: Assessment -> String -> IO ()
+saveFile a ext = writeFile (concat [t,"_",s,".",ext]) . Text.unpack $ toCSV a
+       where t = Text.unpack $ teacher a
+             s = Text.unpack $ student a
 
 type Specifier  = (Chapter, Section, Int, (Name,Name))
 
