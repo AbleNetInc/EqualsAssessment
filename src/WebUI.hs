@@ -217,14 +217,12 @@ runWebServer pnum = Web.scotty pnum $ do
                            teacher <- Web.param "u"
                            student <- Web.param "i"
                            let v   = (read version) :: EqVersion
-                               t   = teacher :: String
-                               s   = student :: String
                                as  = blankAssessment v student teacher
                                scs = drop 3 $ take (length p - 3) p
                                nls = (read . Lazy.unpack . fst <$> scs) :: [(Int,Char,Int)]
                                nss = (read . Lazy.unpack . snd <$> scs) :: [(Maybe Int,Maybe Bool)]
                                nas = foldl' (\x (y,z) -> updateLesson x y z) as $ zip nls nss
-                               fn  = mconcat [t,"_",s,".",ext]
+                               fn  = mconcat [teacher,"_",student,".",ext]
                            na      <- liftIO $ saveAssessment "EqDB" nas
                            case (ret :: String) of
                                 "Export" -> do sf <- liftIO $ saveFile nas ext
