@@ -78,6 +78,9 @@ retrieveLesson ls (c,s,o) | found     = Just l
                                 found = idx /= Nothing
                                 l     = Seq.index ls $ fromJust idx
 
+toLaTeX :: Assessment -> String
+toLaTeX a@(Assessment i v t ls) = "Skeleton"
+
 toCSV :: Assessment -> Text
 toCSV a@(Assessment i v t ls) = Text.pack $ concat [ "Teacher:,",n, "\nStudent:,", id
                                        , "\nStart at:,Chapter ",st,",(scored ",s,")\n\n"
