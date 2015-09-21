@@ -229,7 +229,7 @@ runWebServer pnum = Web.scotty pnum $ do
                                                case ext of
                                                    "csv" -> Web.setHeader "Content-Type" "text/csv"
                                                    _     -> Web.setHeader "Content-Type" "text/plain"
-                                               Web.setHeader "Content-Disposition" $ Lazy.pack $ mconcat ["attachment; filename=",fn]
+                                               Web.setHeader "Content-Disposition" . Lazy.pack $ mconcat ["attachment; filename=",fn]
                                                Web.file fn
                                 "Save"   -> Web.redirect . Lazy.pack $ concat ["/assess?u=",teacher,"&i=",student,"&v=",version,"&c=Load"]
                                 "New"    -> Web.redirect "/"
