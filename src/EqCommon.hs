@@ -78,8 +78,41 @@ retrieveLesson ls (c,s,o) | found     = Just l
                                 found = idx /= Nothing
                                 l     = Seq.index ls $ fromJust idx
 
+ltLesson :: Lesson -> String
+ltLesson l@(Lesson c s o n t r a) = intercalate " & " [i,d,ars] ++ "\\\\"
+       where i   = intercalate "." [show $ c,[s],show $ cnt]
+             d   = Text.unpack $ snd n
+             ars = show $ adaptedScore l
+             cnt | c == 11 && s == 'E' && o > 6 = o - 1
+                 | otherwise                    = o
+
 toLaTeX :: Assessment -> String
-toLaTeX a@(Assessment i v t ls) = "Skeleton"
+toLaTeX a@(Assessment i v t ls)
+      = intercalate "\n" ["\\documentclass{article}"
+                         ,"\\usepackage{longtable,tabu}"
+                         ,"\\usepackage[margin=0.5in]{geometry}"
+                         ,"\\begin{document}"
+                         ,"\\section*{Equals Assessment Results}"
+                         ,"\\noindent"
+                         ,concat ["Teacher: ",Text.unpack t,"\\\\"]
+                         ,concat ["Student: ",Text.unpack i,"\\\\"]
+                         ,concat ["Start at Chapter ",ch," (scored ",sc,")\\\\"]
+                         ,"\\begin{longtabu} [c] {|l|l|r|} \\everyrow{\\tabucline{}}"
+                         ,"\\tabucline{}"
+                         ,"Lesson & Description & Adjusted Raw Score \\\\"
+                         ,intercalate "\n" $ ltLesson <$> fls l'
+                         ,"\\end{longtabu}"
+                         ,"\\end{document}"
+                         ] where l  = retrieveLesson ls (11,'E',5)
+                                 l' = retrieveLesson ls (11,'E',6)
+                                 (ns,na) = bottomScore l l'
+                                 a' = updateLesson a (11,'E',5) (Just ns, Just na)
+                                 a'' = updateLesson a' (11,'E',6) (Just 0, Just False)
+                                 lls = toList . Seq.sort $ lessons a''
+                                 fls Nothing = lls
+                                 fls (Just lsn) = filter (/= lsn) lls
+                                 ch = show $ suggestedStart a''
+                                 sc = show $ adaptedTotal a''
 
 toCSV :: Assessment -> Text
 toCSV a@(Assessment i v t ls) = Text.pack $ concat [ "Teacher:,",n, "\nStudent:,", id
