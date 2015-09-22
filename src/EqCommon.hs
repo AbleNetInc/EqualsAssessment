@@ -88,7 +88,7 @@ ltLesson l@(Lesson c s o n t r a) = intercalate " & " [i,d,ars] ++ "\\\\"
 
 toLaTeX :: Assessment -> String
 toLaTeX a@(Assessment i v t ls)
-      = intercalate "\n" ["\\documentclass{article}"
+      = intercalate "\n" ["\\documentclass[letterpaper]{article}"
                          ,"\\usepackage{longtable,tabu}"
                          ,"\\usepackage[margin=0.5in]{geometry}"
                          ,"\\begin{document}"
