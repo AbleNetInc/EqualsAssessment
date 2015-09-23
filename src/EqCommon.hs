@@ -98,11 +98,11 @@ toLaTeX a@(Assessment i v t ls)
                          ,"\\noindent"
                          ,concat ["Teacher: ",Text.unpack t,"\\\\"]
                          ,concat ["Student: ",Text.unpack i,"\\\\"]
-                         ,concat ["Start at Chapter ",ch," (scored ",sc,")\\\\"]
+                         ,concat ["Start at Chapter ",ch," (Adjusted Raw Score: ",sc,")\\\\"]
                          ,"\\ifxetex\\let\\tabular\\longtable\\let\\endtabular\\endlongtable\\fi"
                          ,"\\begin{tabular}[c]{|l|l|r|}"
                          ,"\\hline"
-                         ,"Lesson & Description & Adjusted Raw Score \\\\\\hline"
+                         ,"Lesson & Description & Score\\\\\\hline"
                          ,intercalate "\n" $ ltLesson <$> fls l'
                          ,"\\end{tabular}"
                          ,"\\end{document}"
@@ -119,7 +119,7 @@ toLaTeX a@(Assessment i v t ls)
 
 toCSV :: Assessment -> Text
 toCSV a@(Assessment i v t ls) = Text.pack $ concat [ "Teacher:,",n, "\nStudent:,", id
-                                       , "\nStart at:,Chapter ",st,",(scored ",s,")\n\n"
+                                       , "\nStart at:,Chapter ",st,",(Adjusted Raw Score: ",s,")\n\n"
                                        , hdr, bdy]
                               where n   = Text.unpack t
                                     id  = Text.unpack i
@@ -134,7 +134,7 @@ toCSV a@(Assessment i v t ls) = Text.pack $ concat [ "Teacher:,",n, "\nStudent:,
                                     fls Nothing    = lls
                                     fls (Just lsn) = filter (/= lsn) lls
                                     cls = csLesson <$> (fls l')
-                                    hdr = "Lesson,Description,Adjusted Raw Score\n"
+                                    hdr = "Lesson,Description,Score\n"
                                     bdy = concat $ ((++ "\n") . Text.unpack) <$> cls
 
 saveFile :: Assessment -> String -> IO ()
