@@ -3,14 +3,15 @@ module EqCommon where
 import           Data.List
 import           Data.Foldable        (toList)
 import           Data.Maybe
-import qualified Data.Map          as Map
-import           Data.Map             (Map)
-import qualified Data.Sequence     as Seq
-import           Data.Sequence        (Seq)
-import qualified Data.Text         as Text
-import           Data.Text            (Text)
-import           Text.Pandoc       as Doc
-import           Text.Pandoc.Error    (handleError)
+import qualified Data.ByteString.Lazy as DBL
+import qualified Data.Map             as Map
+import           Data.Map                (Map)
+import qualified Data.Sequence        as Seq
+import           Data.Sequence           (Seq)
+import qualified Data.Text            as Text
+import           Data.Text               (Text)
+import           Text.Pandoc          as Doc
+import           Text.Pandoc.Error       (handleError)
 
 data EqVersion  = Eq2 | Eq3 deriving (Eq, Ord, Show, Read)
 type Chapter    = Int
@@ -138,14 +139,15 @@ toCSV a@(Assessment i v t ls) = Text.pack $ concat [ "Teacher:,",n, "\nStudent:,
                                     bdy = concat $ ((++ "\n") . Text.unpack) <$> cls
 
 saveFile :: Assessment -> String -> IO ()
-saveFile a ext = writeFile (concat [t,"_",s,".",ext]) f
+saveFile a ext | ext == "docx" = writeDocx def i >>= DBL.writeFile n
+               | otherwise     = writeFile n f
        where i = handleError . readLaTeX def $ toLaTeX a
+             n = concat [t,"_",s,".",ext]
              f = case ext of
                     --"csv"  ->
                     "htm"  -> writeHtmlString def i
                     --"pdf"  ->
                     "rtf"  -> writeRTF        def i
-                    --"docx" -> writeDocx       def i
                     --"xlsx" ->
              t = Text.unpack $ teacher a
              s = Text.unpack $ student a
