@@ -138,17 +138,23 @@ toCSV a@(Assessment i v t ls) = Text.pack $ concat [ "Teacher:,",n, "\nStudent:,
                                     hdr = "Lesson,Description,Score\n"
                                     bdy = concat $ ((++ "\n") . Text.unpack) <$> cls
 
+writeCSV :: WriterOptions -> Pandoc -> String
+writeCSV _ p = "skeleton"
+
+--writeXLSX :: WriterOptions -> Pandoc -> IO DBL.ByteString
+--writeXLSX _ p = return $ DBL.pack "skeleton"
+
 saveFile :: Assessment -> String -> IO ()
 saveFile a ext | ext == "docx" = writeDocx def i >>= DBL.writeFile n
+               -- | ext == "xlsx" = writeXLSX def i >>= DBL.writeFile n
                | otherwise     = writeFile n f
        where i = handleError . readLaTeX def $ toLaTeX a
              n = concat [t,"_",s,".",ext]
              f = case ext of
-                    --"csv"  ->
+                    --"csv"  -> writeCSV        def i
                     "htm"  -> writeHtmlString def i
                     --"pdf"  ->
                     "rtf"  -> writeRTF        def i
-                    --"xlsx" ->
              t = Text.unpack $ teacher a
              s = Text.unpack $ student a
 
