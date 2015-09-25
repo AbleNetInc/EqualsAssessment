@@ -4,6 +4,7 @@ import           Data.List
 import           Data.Foldable        (toList)
 import           Data.Maybe
 import qualified Data.ByteString.Lazy as DBL
+import qualified Data.ByteString.UTF8 as U8
 import qualified Data.Map             as Map
 import           Data.Map                (Map)
 import qualified Data.Sequence        as Seq
@@ -141,8 +142,8 @@ toCSV a@(Assessment i v t ls) = Text.pack $ concat [ "Teacher:,",n, "\nStudent:,
 writeCSV :: WriterOptions -> Pandoc -> String
 writeCSV _ p = "skeleton"
 
---writeXLSX :: WriterOptions -> Pandoc -> IO DBL.ByteString
---writeXLSX _ p = return $ DBL.pack "skeleton"
+writeXLSX :: WriterOptions -> Pandoc -> IO DBL.ByteString
+writeXLSX _ p = return . DBL.fromStrict $ U8.fromString "skeleton"
 
 saveFile :: Assessment -> String -> IO ()
 saveFile a ext | ext == "docx" = writeDocx def i >>= DBL.writeFile n
