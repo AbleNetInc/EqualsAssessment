@@ -189,18 +189,18 @@ validSectionIn s v = (Seq.elemIndexL s sList) /= Nothing
                                 ]
 
 rawTotal :: Assessment -> Int
-rawTotal (Assessment _ _ _ ls) = foldl (+) 0 $ score <$> ls
+rawTotal a = foldl (+) 0 $ score <$> (lessons a)
 
 adaptedTotal :: Assessment -> Double
-adaptedTotal (Assessment _ _ _ ls) = foldl (+) 0 $ adaptedScore <$> ls
+adaptedTotal a = foldl (+) 0 $ adaptedScore <$> (lessons a)
 
 suggestedStart :: Assessment -> Chapter
-suggestedStart a@(Assessment _ v _ _) = 1 + idx ch
-                                      where aScr   = adaptedTotal a
-                                            ch     = Seq.findIndexL (aScr <=) b
-                                            b      = scoreBounds v
-                                            idx (Just c) = c
-                                            idx Nothing  = 0
+suggestedStart a = 1 + idx ch
+                 where aScr   = adaptedTotal a
+                       ch     = Seq.findIndexL (aScr <=) b
+                       b      = scoreBounds $ ver a
+                       idx (Just c) = c
+                       idx Nothing  = 0
 
 scoreBounds :: EqVersion -> (Seq Double)
 scoreBounds Eq2 = Seq.fromList $ zipWith (+) ((27.5 *) <$> [1..12]) adj
