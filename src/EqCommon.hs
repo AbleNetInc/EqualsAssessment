@@ -48,17 +48,6 @@ adaptedScore l | score l /= 1 = 0
                | adapted l    = 0.5
                | otherwise    = 1
 
-csLesson :: Lesson -> Text
-csLesson l = Text.pack $ intercalate "," [s,n,c]
-       where s = intercalate "." [show $ ch,[sc],show $ cnt]
-             ch = chapter l
-             sc = section l
-             cn = count l
-             n = Text.unpack . snd $ lName l
-             c = show $ adaptedScore l
-             cnt | ch == 11 && sc == 'E' && cn > 6 = cn - 1
-                 | otherwise                       = cn
-
 data Assessment = Assessment { student :: Name
                              , ver     :: EqVersion
                              , teacher :: Name
@@ -82,6 +71,17 @@ retrieveLesson ls (c,s,o) | found     = Just l
                                 found = idx /= Nothing
                                 l     = Seq.index ls $ fromJust idx
 
+csLesson :: Lesson -> String
+csLesson l = intercalate "," [s,n,c]
+       where s = intercalate "." [show $ ch,[sc],show $ cnt]
+             ch = chapter l
+             sc = section l
+             cn = count l
+             n = Text.unpack . snd $ lName l
+             c = show $ adaptedScore l
+             cnt | ch == 11 && sc == 'E' && cn > 6 = cn - 1
+                 | otherwise                       = cn
+
 ltLesson :: Lesson -> String
 ltLesson l@(Lesson c s o n t r a) = intercalate " & " [i,d,ars] ++ "\\\\\\hline"
        where i   = intercalate "." [show $ c,[s],show $ cnt]
@@ -90,57 +90,58 @@ ltLesson l@(Lesson c s o n t r a) = intercalate " & " [i,d,ars] ++ "\\\\\\hline"
              cnt | c == 11 && s == 'E' && o > 6 = o - 1
                  | otherwise                    = o
 
+makeExceptions :: Assessment -> Assessment
+makeExceptions a@(Assessment i v t ls) | ver a == Eq2 = nA
+                                       | otherwise    = a
+             where l  = retrieveLesson ls (11,'E',5)
+                   l' = retrieveLesson ls (11,'E',6)
+                   (ns,na) = bottomScore l l'
+                   a' = updateLesson a (11,'E',5) (Just ns, Just na)
+                   nls Nothing    = lessons a'
+                   nls (Just lsn) = Seq.filter (/= lsn) $ lessons a'
+                   nA = Assessment i v t $ nls l'
+
 toLaTeX :: Assessment -> String
-toLaTeX a@(Assessment i v t ls)
+toLaTeX a
       = intercalate "\n" ["\\documentclass[letterpaper]{article}"
                          ,"\\usepackage{ifxetex,longtable}"
                          ,"\\usepackage[margin=0.5in]{geometry}"
                          ,"\\begin{document}"
                          ,"\\section*{Equals Assessment Results}"
                          ,"\\noindent"
-                         ,concat ["Teacher: ",Text.unpack t,"\\\\"]
-                         ,concat ["Student: ",Text.unpack i,"\\\\"]
+                         ,concat ["Teacher: ",t,"\\\\"]
+                         ,concat ["Student: ",i,"\\\\"]
                          ,concat ["Start at Chapter ",ch," (Adjusted Raw Score: ",sc,")\\\\"]
                          ,"\\ifxetex\\let\\tabular\\longtable\\let\\endtabular\\endlongtable\\fi"
                          ,"\\begin{tabular}[c]{|l|l|r|}"
                          ,"\\hline"
                          ,"Lesson & Description & Score\\\\\\hline"
-                         ,intercalate "\n" $ ltLesson <$> fls l'
+                         ,intercalate "\n" $ ltLesson <$> sl
                          ,"\\end{tabular}"
                          ,"\\end{document}"
-                         ] where l  = retrieveLesson ls (11,'E',5)
-                                 l' = retrieveLesson ls (11,'E',6)
-                                 (ns,na) = bottomScore l l'
-                                 a' = updateLesson a (11,'E',5) (Just ns, Just na)
-                                 a'' = updateLesson a' (11,'E',6) (Just 0, Just False)
-                                 lls = toList . Seq.sort $ lessons a''
-                                 fls Nothing = lls
-                                 fls (Just lsn) = filter (/= lsn) lls
-                                 ch = show $ suggestedStart a''
-                                 sc = show $ adaptedTotal a''
+                         ] where na = makeExceptions a
+                                 ls = lessons na
+                                 sl = toList $ Seq.sort ls
+                                 ch = show $ suggestedStart na
+                                 sc = show $ adaptedTotal na
+                                 i  = Text.unpack $ student na
+                                 t  = Text.unpack $ teacher na
 
-toCSV :: Assessment -> Text
-toCSV a@(Assessment i v t ls) = Text.pack $ concat [ "Teacher:,",n, "\nStudent:,", id
-                                       , "\nStart at:,Chapter ",st,",(Adjusted Raw Score: ",s,")\n\n"
-                                       , hdr, bdy]
-                              where n   = Text.unpack t
-                                    id  = Text.unpack i
-                                    l   = retrieveLesson ls (11,'E',5)
-                                    l'  = retrieveLesson ls (11,'E',6)
-                                    (ns,na) = bottomScore l l'
-                                    a'  = updateLesson a (11,'E',5) (Just ns,Just na)
-                                    a'' = updateLesson a' (11,'E',6) (Just 0,Just False)
-                                    st  = show $ suggestedStart a''
-                                    s   = show $ adaptedTotal a''
-                                    lls = toList . Seq.sort $ lessons a'
-                                    fls Nothing    = lls
-                                    fls (Just lsn) = filter (/= lsn) lls
-                                    cls = csLesson <$> (fls l')
-                                    hdr = "Lesson,Description,Score\n"
-                                    bdy = concat $ ((++ "\n") . Text.unpack) <$> cls
-
-writeCSV :: WriterOptions -> Pandoc -> String
-writeCSV _ p = "skeleton"
+toCSV :: Assessment -> String
+toCSV a = intercalate "\n" [ concat ["Teacher:,", t]
+                           , concat ["Student:,", i]
+                           , concat ["Start at:,Chapter ",ch
+                                    ," (Adjusted Raw Score: ",sc,")\n"]
+                           , "Lesson,Description,Score"
+                           , intercalate "\n" $ csLesson <$> sl
+                           ]
+        where na = makeExceptions a
+              ls = lessons na
+              sl = toList $ Seq.sort ls
+              ch = show $ suggestedStart na
+              sc = show $ adaptedTotal na
+              i  = Text.unpack $ student na
+              t  = Text.unpack $ teacher na
 
 writeXLSX :: WriterOptions -> Pandoc -> IO DBL.ByteString
 writeXLSX _ p = return . DBL.fromStrict $ U8.fromString "skeleton"
@@ -152,7 +153,7 @@ saveFile a ext | ext == "docx" = writeDocx def i >>= DBL.writeFile n
        where i = handleError . readLaTeX def $ toLaTeX a
              n = concat [t,"_",s,".",ext]
              f = case ext of
-                    --"csv"  -> writeCSV        def i
+                    --"csv"  -> toCSV a
                     "htm"  -> writeHtmlString def i
                     --"pdf"  ->
                     "rtf"  -> writeRTF        def i
