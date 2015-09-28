@@ -219,7 +219,7 @@ runWebServer pnum = Web.scotty pnum $ do
                            student <- Web.param "i"
                            let v   = (read version) :: EqVersion
                                as  = blankAssessment v student teacher
-                               scs = drop 3 $ take (length p - 3) p
+                               scs = drop 2 $ take (length p - 3) p
                                nls = (read . Lazy.unpack . fst <$> scs) :: [(Int,Char,Int)]
                                nss = (read . Lazy.unpack . snd <$> scs) :: [(Maybe Int,Maybe Bool)]
                                nas = foldl' (\x (y,z) -> updateLesson x y z) as $ zip nls nss
