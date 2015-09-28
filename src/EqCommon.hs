@@ -156,7 +156,6 @@ saveFile a ext | ext == "docx" = writeDocx def i >>= DBL.writeFile n
              f = case ext of
                     "csv"  -> toCSV a
                     "htm"  -> writeHtmlString def i
-                    --"pdf"  ->
                     "rtf"  -> writeRTF        def i
              t = Text.unpack $ teacher a
              s = Text.unpack $ student a
@@ -165,12 +164,12 @@ type Specifier  = (Chapter, Section, Int, (Name,Name))
 
 newLesson :: EqVersion -> Specifier -> (Seq Tag) -> Score -> Bool -> Lesson
 newLesson v (c,s,o,n) t r a | not vCh   = error "Invalid Chapter"
-                                | not vSec  = error "Invalid Section"
-                                | not vScr  = error "Invalid Score"
-                                | otherwise = (Lesson c s o n t r a)
-                                where vCh  = c `validChapterIn` v
-                                      vSec = s `validSectionIn` v
-                                      vScr = r `elem` [(-1)..1]
+                            | not vSec  = error "Invalid Section"
+                            | not vScr  = error "Invalid Score"
+                            | otherwise = (Lesson c s o n t r a)
+                            where vCh  = c `validChapterIn` v
+                                  vSec = s `validSectionIn` v
+                                  vScr = r `elem` [(-1)..1]
 
 validChapterIn :: Chapter -> EqVersion -> Bool
 validChapterIn c v = (Seq.elemIndexL c cList) /= Nothing
