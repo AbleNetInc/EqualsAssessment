@@ -151,7 +151,7 @@ saveFile a ext | ext == "docx" = writeDocx def i >>= DBL.writeFile n
                -- | ext == "xlsx" = writeXLSX def i >>= DBL.writeFile n
                | otherwise     = writeFile n f
        where i = handleError . readLaTeX def $ toLaTeX a
-             n = concat [t,"_",s,".",ext]
+             n = concat ["exports/",t,"_",s,".",ext]
              f = case ext of
                     "csv"  -> toCSV a
                     "htm"  -> writeHtmlString def i
