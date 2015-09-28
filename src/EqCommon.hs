@@ -111,8 +111,10 @@ toLaTeX a
                          ,"\\noindent"
                          ,concat ["Teacher: ",t,"\\\\"]
                          ,concat ["Student: ",i,"\\\\"]
-                         ,concat ["Start at Chapter ",ch," (Adjusted Raw Score: ",sc,")\\\\"]
-                         ,"\\ifxetex\\let\\tabular\\longtable\\let\\endtabular\\endlongtable\\fi"
+                         ,concat ["Start at Chapter ",ch
+                                 ," (Adjusted Raw Score: ",sc,")\\\\"]
+                         ,concat ["\\ifxetex\\let\\tabular\\longtable"
+                                 ,"\\let\\endtabular\\endlongtable\\fi"]
                          ,"\\begin{tabular}[c]{|l|l|r|}"
                          ,"\\hline"
                          ,"Lesson & Description & Score\\\\\\hline"
@@ -181,9 +183,10 @@ validChapterIn c v = (Seq.elemIndexL c cList) /= Nothing
 validSectionIn :: Section -> EqVersion -> Bool
 validSectionIn s v = (Seq.elemIndexL s sList) /= Nothing
                    where sList    = fromJust $ Map.lookup v sections
-                         sections = Map.fromList [ (Eq2, Seq.fromList ['A'..'E'])
-                                                 , (Eq3, Seq.fromList ['A'..'E'])
-                                                 ]
+                         sections = Map.fromList
+                                [ (Eq2, Seq.fromList ['A'..'E'])
+                                , (Eq3, Seq.fromList ['A'..'E'])
+                                ]
 
 rawTotal :: Assessment -> Int
 rawTotal (Assessment _ _ _ ls) = foldl (+) 0 $ score <$> ls
@@ -205,10 +208,10 @@ scoreBounds Eq2 = Seq.fromList $ zipWith (+) ((27.5 *) <$> [1..12]) adj
 scoreBounds _   = Seq.empty
 
 updateScore :: Lesson -> Maybe Score -> Maybe Bool -> Lesson
-updateScore (Lesson c s o n t _ _) (Just r') (Just a') = (Lesson c s o n t r' a')
-updateScore (Lesson c s o n t r _) Nothing   (Just a') = (Lesson c s o n t r a')
-updateScore (Lesson c s o n t _ a) (Just r') Nothing   = (Lesson c s o n t r' a)
-updateScore (Lesson c s o n t r a) Nothing   Nothing   = (Lesson c s o n t r a)
+updateScore (Lesson c s o n t _ _) (Just r') (Just a') = Lesson c s o n t r' a'
+updateScore (Lesson c s o n t r _) Nothing   (Just a') = Lesson c s o n t r  a'
+updateScore (Lesson c s o n t _ a) (Just r') Nothing   = Lesson c s o n t r' a
+updateScore (Lesson c s o n t r a) Nothing   Nothing   = Lesson c s o n t r  a
 
 updateLesson :: Assessment -> (Int,Char,Int) -> (Maybe Score,Maybe Bool) -> Assessment
 updateLesson a@(Assessment n v t ls) (c,s,o) (r,b) = Assessment n v t $ newLs idx
