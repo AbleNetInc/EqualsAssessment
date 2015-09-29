@@ -187,10 +187,10 @@ validSectionIn s v = (Seq.elemIndexL s sList) /= Nothing
                                 ]
 
 rawTotal :: Assessment -> Int
-rawTotal a = foldl (+) 0 $ score <$> (lessons a)
+rawTotal a = foldl1 (+) $ score <$> (lessons a)
 
 adaptedTotal :: Assessment -> Double
-adaptedTotal a = foldl (+) 0 $ adaptedScore <$> (lessons a)
+adaptedTotal a = foldl1 (+) $ adaptedScore <$> (lessons a)
 
 suggestedStart :: Assessment -> Chapter
 suggestedStart a = 1 + idx ch
