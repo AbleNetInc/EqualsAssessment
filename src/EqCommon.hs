@@ -160,18 +160,14 @@ toCSV a = unlines [ concat ["Teacher:,", t]
 
 toExcel :: Assessment -> Xlsx
 toExcel a = def & atSheet "Assessment" ?~ s
-      where cs = fromRows $ [(1, [(1, scl "Equals Assessment Results")])
-                            ,(3, [(1, scl $ mconcat ["Teacher: ", teacher a])])
-                            ,(4, [(1, scl $ mconcat ["Studnet: ", student a])])
-                            ,(5, [(1, scl $ mconcat ["Start at Chapter ",ch
-                                                    ," (Adjusted Raw Score: "
-                                                    ,sc,")"])
-                                 ])
-                            ,(7, zip [1..3] $ scl <$> ["Lesson","Description"
-                                                      ,"Score"])
-                            ] ++ (zip [8..] $ exLesson <$> sl
-                                 :: [(Int, [(Int, Cell)])])
-            s  = def { _wsCells = cs }
+      where cs = [(1, [(1, scl "Equals Assessment Results")])
+                 ,(3, [(1, scl $ mconcat ["Teacher: ", teacher a])])
+                 ,(4, [(1, scl $ mconcat ["Studnet: ", student a])])
+                 ,(5, [(1, scl $ mconcat ["Start at Chapter ",ch," (Adjusted ",
+                                          "Raw Score: ",sc,")"])])
+                 ,(7, zip [1..3] $ scl <$> ["Lesson","Description","Score"])
+                 ] ++ (zip [8..] $ exLesson <$> sl)
+            s  = def { _wsCells = fromRows cs }
             na = makeExceptions a
             ls = lessons na
             sl = toList $ Seq.sort ls
