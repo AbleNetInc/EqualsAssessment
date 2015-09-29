@@ -194,7 +194,7 @@ runWebServer pnum = Web.scotty pnum $ do
                                                   input_ [type_ "submit", name_ "s", value_ "Export"];
                                                   select_ [name_ "ext"] $ do option_ [value_ "csv" ] "to CSV"
                                                                              option_ [value_ "htm" ] "to HTML"
-                                                                             --option_ [value_ "pdf" ] "to PDF"
+                                                                             option_ [value_ "pdf" ] "to PDF"
                                                                              option_ [value_ "rtf" ] "to RTF"
                                                                              option_ [value_ "docx"] "to Word"
                                                                              --option_ [value_ "xlsx"] "to Excel"

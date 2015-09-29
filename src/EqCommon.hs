@@ -13,6 +13,7 @@ import qualified Data.Text            as Text
 import           Data.Text               (Text)
 import           Text.Pandoc          as Doc
 import           Text.Pandoc.Error       (handleError)
+import           System.Command          (rawSystem, inDirectory')
 
 data EqVersion  = Eq2 | Eq3 deriving (Eq, Ord, Show, Read)
 type Chapter    = Int
@@ -149,14 +150,19 @@ writeXLSX _ p = return . DBL.fromStrict $ U8.fromString "skeleton"
 
 saveFile :: Assessment -> String -> IO ()
 saveFile a ext | ext == "docx" = writeDocx def i >>= DBL.writeFile n
+               | ext == "pdf"  = do writeFile ("exports/" ++ n') f
+                                    inDirectory' "exports" $ rawSystem "xelatex" [n']
+                                    return ()
                -- | ext == "xlsx" = writeXLSX def i >>= DBL.writeFile n
                | otherwise     = writeFile n f
        where i = handleError . readLaTeX def $ toLaTeX a
              n = concat ["exports/",t,"_",s,".",ext]
+             n' = concat [t,"_",s,".tex"]
              f = case ext of
                     "csv"  -> toCSV a
                     "htm"  -> writeHtmlString def i
                     "rtf"  -> writeRTF        def i
+                    "pdf"  -> toLaTeX a
              t = Text.unpack $ teacher a
              s = Text.unpack $ student a
 
