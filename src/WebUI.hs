@@ -197,7 +197,7 @@ runWebServer pnum = Web.scotty pnum $ do
                                                                              option_ [value_ "pdf" ] "to PDF"
                                                                              option_ [value_ "rtf" ] "to RTF"
                                                                              option_ [value_ "docx"] "to Word"
-                                                                             --option_ [value_ "xlsx"] "to Excel"
+                                                                             option_ [value_ "xlsx"] "to Excel"
                                                   br_ []; br_ []
                                                   tbs
                                                   table_ [style_ "margin-top: 1px; width: 770px;"] $ do

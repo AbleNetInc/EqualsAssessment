@@ -96,6 +96,14 @@ ltLesson l@(Lesson c s o n t r a) = intercalate " & " [i,d,ars] ++ "\\\\\\hline"
              cnt | c == 11 && s == 'E' && o > 6 = o - 1
                  | otherwise                    = o
 
+exLesson :: Lesson -> [(Int, Cell)]
+exLesson l@(Lesson c s o n t r a)
+       = [(1, Cell Nothing . Just $ CellText id)
+         ,(2, Cell Nothing . Just . CellText $ snd n)
+         ,(3, Cell Nothing . Just . CellDouble $ adaptedScore l)
+         ]
+       where id = Text.pack $ intercalate "." [show c,[s],show o]
+
 makeExceptions :: Assessment -> Assessment
 makeExceptions a@(Assessment i v t ls) | ver a == Eq2 = nA
                                        | otherwise    = a
@@ -151,8 +159,23 @@ toCSV a = unlines [ concat ["Teacher:,", t]
               t  = Text.unpack $ teacher na
 
 toExcel :: Assessment -> Xlsx
-toExcel a = let s = def & cellValueAt (2,2) ?~ CellText "Equals Assessment Results" in
-                def & atSheet "Test" ?~ s
+toExcel a = let cs = fromRows $ [(1, [(1, scl $ CellText "Equals Assessment Results")])
+                                ,(3, [(1, scl . CellText $ mconcat ["Teacher: ", teacher a])])
+                                ,(4, [(1, scl . CellText $ mconcat ["Studnet: ", student a])])
+                                ,(5, [(1, scl . CellText $ mconcat ["Start at Chapter ",ch," (Adjusted Raw Score: ",sc,")"])])
+                                ,(7, [(1, scl $ CellText "Lesson")
+                                     ,(2, scl $ CellText "Description")
+                                     ,(3, scl $ CellText "Score")
+                                     ])
+                                ] ++ (zip [8..] $ exLesson <$> sl :: [(Int, [(Int, Cell)])])
+                s  = (def { _wsCells = cs }) :: Worksheet
+                na = makeExceptions a
+                ls = lessons na
+                sl = toList $ Seq.sort ls
+                ch = Text.pack . show $ suggestedStart na
+                sc = Text.pack . show $ adaptedTotal na
+                scl = Cell Nothing . Just
+                 in def & atSheet "Assessment" ?~ s
 
 saveFile :: Assessment -> String -> IO ()
 saveFile a ext | ext == "docx" = writeDocx def i >>= DBL.writeFile n
