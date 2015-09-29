@@ -182,17 +182,20 @@ toExcel a = def & atSheet "Assessment" ?~ s
             scl = Cell Nothing . Just . CellText
 
 saveFile :: Assessment -> String -> IO ()
-saveFile a ext | ext == "docx" = writeDocx def i >>= DBL.writeFile n
-               | ext == "pdf"  = do writeFile ("exports/" ++ n') f
-                                    let xel = rawSystem "xelatex" [n']
-                                    inDirectory' "exports" xel
-                                    return ()
-               | ext == "xlsx" = do c <- getClockTime
-                                    DBL.writeFile n . fromXlsx c $ toExcel a
-               | otherwise     = writeFile n f
+saveFile a ext | ext `elem` odds = sW
+               | otherwise       = writeFile n f
        where i = handleError . readLaTeX def $ toLaTeX a
              n = concat ["exports/",t,"_",s,".",ext]
              n' = concat [t,"_",s,".tex"]
+             odds = ["docx","pdf","xlsx"]
+             sW = case ext of
+                     "docx" -> writeDocx def i >>= DBL.writeFile n
+                     "xlsx" -> do c <- getClockTime
+                                  DBL.writeFile n . fromXlsx c $ toExcel a
+                     "pdf"  -> do writeFile ("exports/" ++ n') f
+                                  let xel = rawSystem "xelatex" [n']
+                                  inDirectory' "exports" xel
+                                  return ()
              f = case ext of
                     "csv"  -> toCSV a
                     "htm"  -> writeHtmlString def i
