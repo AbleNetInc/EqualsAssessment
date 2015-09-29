@@ -1,7 +1,9 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module EqCommon where
 
 import           Data.List
-import           Data.Foldable        (toList)
+import           Data.Foldable           (toList)
 import           Data.Maybe
 import qualified Data.ByteString.Lazy as DBL
 import qualified Data.ByteString.UTF8 as U8
@@ -14,6 +16,9 @@ import           Data.Text               (Text)
 import           Text.Pandoc          as Doc
 import           Text.Pandoc.Error       (handleError)
 import           System.Command          (rawSystem, inDirectory')
+import           Codec.Xlsx
+import           Control.Lens
+import           System.Time             (getClockTime)
 
 data EqVersion  = Eq2 | Eq3 deriving (Eq, Ord, Show, Read)
 type Chapter    = Int
@@ -145,15 +150,19 @@ toCSV a = unlines [ concat ["Teacher:,", t]
               i  = Text.unpack $ student na
               t  = Text.unpack $ teacher na
 
-writeXLSX :: WriterOptions -> Pandoc -> IO DBL.ByteString
-writeXLSX _ p = return . DBL.fromStrict $ U8.fromString "skeleton"
+toExcel :: Assessment -> IO Xlsx
+toExcel a = do let s = def & cellValueAt (2,2) ?~ CellText "Equals Assessment Results"
+               return $ def & atSheet "Test" ?~ s
 
 saveFile :: Assessment -> String -> IO ()
 saveFile a ext | ext == "docx" = writeDocx def i >>= DBL.writeFile n
                | ext == "pdf"  = do writeFile ("exports/" ++ n') f
                                     inDirectory' "exports" $ rawSystem "xelatex" [n']
                                     return ()
-               -- | ext == "xlsx" = writeXLSX def i >>= DBL.writeFile n
+               | ext == "xlsx" = do c <- getClockTime
+                                    x <- toExcel a
+                                    let b = fromXlsx c x
+                                    DBL.writeFile n b
                | otherwise     = writeFile n f
        where i = handleError . readLaTeX def $ toLaTeX a
              n = concat ["exports/",t,"_",s,".",ext]
