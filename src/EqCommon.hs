@@ -150,19 +150,16 @@ toCSV a = unlines [ concat ["Teacher:,", t]
               i  = Text.unpack $ student na
               t  = Text.unpack $ teacher na
 
-toExcel :: Assessment -> IO Xlsx
-toExcel a = do let s = def & cellValueAt (2,2) ?~ CellText "Equals Assessment Results"
-               return $ def & atSheet "Test" ?~ s
+toExcel :: Assessment -> Xlsx
+toExcel a = let s = def & cellValueAt (2,2) ?~ CellText "Equals Assessment Results" in
+                def & atSheet "Test" ?~ s
 
 saveFile :: Assessment -> String -> IO ()
 saveFile a ext | ext == "docx" = writeDocx def i >>= DBL.writeFile n
                | ext == "pdf"  = do writeFile ("exports/" ++ n') f
                                     inDirectory' "exports" $ rawSystem "xelatex" [n']
                                     return ()
-               | ext == "xlsx" = do c <- getClockTime
-                                    x <- toExcel a
-                                    let b = fromXlsx c x
-                                    DBL.writeFile n b
+               | ext == "xlsx" = do c <- getClockTime; DBL.writeFile n . fromXlsx c $ toExcel a
                | otherwise     = writeFile n f
        where i = handleError . readLaTeX def $ toLaTeX a
              n = concat ["exports/",t,"_",s,".",ext]
