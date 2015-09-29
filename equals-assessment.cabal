@@ -8,7 +8,7 @@ author:              Sam Stuewe (HalosGhost)
 maintainer:          sstuewe@ablenetinc.com
 build-type:          Simple
 extra-source-files:  README.rst
-cabal-version:       >=1.10
+cabal-version:       >= 1.10
 
 executable eqassess
   main-is:             Main.hs
