@@ -182,12 +182,11 @@ toExcel a = def & atSheet "Assessment" ?~ s
             scl = Cell Nothing . Just . CellText
 
 saveFile :: Assessment -> String -> IO ()
-saveFile a ext | ext `elem` odds = sW
-               | otherwise       = writeFile n f
+saveFile a ext | ext `elem` ["docx","pdf","xlsx"] = sW
+               | otherwise                        = writeFile n f
        where i = handleError . readLaTeX def $ toLaTeX a
              n = concat ["exports/",t,"_",s,".",ext]
              n' = concat [t,"_",s,".tex"]
-             odds = ["docx","pdf","xlsx"]
              sW = case ext of
                      "docx" -> writeDocx def i >>= DBL.writeFile n
                      "xlsx" -> do c <- getClockTime
