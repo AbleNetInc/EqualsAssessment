@@ -167,10 +167,8 @@ toExcel a = def & atSheet "Assessment" ?~ s
                                                     ," (Adjusted Raw Score: "
                                                     ,sc,")"])
                                  ])
-                            ,(7, [(1, scl "Lesson")
-                                 ,(2, scl "Description")
-                                 ,(3, scl "Score")
-                                 ])
+                            ,(7, zip [1..3] $ scl <$> ["Lesson","Description"
+                                                      ,"Score"])
                             ] ++ (zip [8..] $ exLesson <$> sl
                                  :: [(Int, [(Int, Cell)])])
             s  = def { _wsCells = cs }
