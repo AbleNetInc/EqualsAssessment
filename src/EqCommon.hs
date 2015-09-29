@@ -159,30 +159,36 @@ toCSV a = unlines [ concat ["Teacher:,", t]
               t  = Text.unpack $ teacher na
 
 toExcel :: Assessment -> Xlsx
-toExcel a = let cs = fromRows $ [(1, [(1, scl $ CellText "Equals Assessment Results")])
-                                ,(3, [(1, scl . CellText $ mconcat ["Teacher: ", teacher a])])
-                                ,(4, [(1, scl . CellText $ mconcat ["Studnet: ", student a])])
-                                ,(5, [(1, scl . CellText $ mconcat ["Start at Chapter ",ch," (Adjusted Raw Score: ",sc,")"])])
-                                ,(7, [(1, scl $ CellText "Lesson")
-                                     ,(2, scl $ CellText "Description")
-                                     ,(3, scl $ CellText "Score")
-                                     ])
-                                ] ++ (zip [8..] $ exLesson <$> sl :: [(Int, [(Int, Cell)])])
-                s  = (def { _wsCells = cs }) :: Worksheet
-                na = makeExceptions a
-                ls = lessons na
-                sl = toList $ Seq.sort ls
-                ch = Text.pack . show $ suggestedStart na
-                sc = Text.pack . show $ adaptedTotal na
-                scl = Cell Nothing . Just
-                 in def & atSheet "Assessment" ?~ s
+toExcel a = def & atSheet "Assessment" ?~ s
+      where cs = fromRows $ [(1, [(1, scl "Equals Assessment Results")])
+                            ,(3, [(1, scl $ mconcat ["Teacher: ", teacher a])])
+                            ,(4, [(1, scl $ mconcat ["Studnet: ", student a])])
+                            ,(5, [(1, scl $ mconcat ["Start at Chapter ",ch
+                                                    ," (Adjusted Raw Score: "
+                                                    ,sc,")"])
+                                 ])
+                            ,(7, [(1, scl "Lesson")
+                                 ,(2, scl "Description")
+                                 ,(3, scl "Score")
+                                 ])
+                            ] ++ (zip [8..] $ exLesson <$> sl
+                                 :: [(Int, [(Int, Cell)])])
+            s  = def { _wsCells = cs }
+            na = makeExceptions a
+            ls = lessons na
+            sl = toList $ Seq.sort ls
+            ch = Text.pack . show $ suggestedStart na
+            sc = Text.pack . show $ adaptedTotal na
+            scl = Cell Nothing . Just . CellText
 
 saveFile :: Assessment -> String -> IO ()
 saveFile a ext | ext == "docx" = writeDocx def i >>= DBL.writeFile n
                | ext == "pdf"  = do writeFile ("exports/" ++ n') f
-                                    inDirectory' "exports" $ rawSystem "xelatex" [n']
+                                    let xel = rawSystem "xelatex" [n']
+                                    inDirectory' "exports" xel
                                     return ()
-               | ext == "xlsx" = do c <- getClockTime; DBL.writeFile n . fromXlsx c $ toExcel a
+               | ext == "xlsx" = do c <- getClockTime
+                                    DBL.writeFile n . fromXlsx c $ toExcel a
                | otherwise     = writeFile n f
        where i = handleError . readLaTeX def $ toLaTeX a
              n = concat ["exports/",t,"_",s,".",ext]
