@@ -102,40 +102,40 @@ makeExceptions a@(Assessment i v t ls) | ver a == Eq2 = nA
                    nA = Assessment i v t $ nls l'
 
 toLaTeX :: Assessment -> String
-toLaTeX a = intercalate "\n" ["\\documentclass[letterpaper]{article}"
-                             ,"\\usepackage{ifxetex,longtable}"
-                             ,"\\usepackage[margin=0.5in]{geometry}"
-                             ,"\\begin{document}"
-                             ,"\\section*{Equals Assessment Results}"
-                             ,"\\noindent"
-                             ,concat ["Teacher: ",t,"\\\\"]
-                             ,concat ["Student: ",i,"\\\\"]
-                             ,concat ["Start at Chapter ",ch
-                                     ," (Adjusted Raw Score: ",sc,")\\\\"]
-                             ,concat ["\\ifxetex\\let\\tabular\\longtable"
-                                     ,"\\let\\endtabular\\endlongtable\\fi"]
-                             ,"\\begin{tabular}[c]{|l|l|r|}"
-                             ,"\\hline"
-                             ,"Lesson & Description & Score\\\\\\hline"
-                             ,intercalate "\n" $ ltLesson <$> sl
-                             ,"\\end{tabular}"
-                             ,"\\end{document}"
-                             ] where na = makeExceptions a
-                                     ls = lessons na
-                                     sl = toList $ Seq.sort ls
-                                     ch = show $ suggestedStart na
-                                     sc = show $ adaptedTotal na
-                                     i  = Text.unpack $ student na
-                                     t  = Text.unpack $ teacher na
+toLaTeX a = unlines ["\\documentclass[letterpaper]{article}"
+                    ,"\\usepackage{ifxetex,longtable}"
+                    ,"\\usepackage[margin=0.5in]{geometry}"
+                    ,"\\begin{document}"
+                    ,"\\section*{Equals Assessment Results}"
+                    ,"\\noindent"
+                    ,concat ["Teacher: ",t,"\\\\"]
+                    ,concat ["Student: ",i,"\\\\"]
+                    ,concat ["Start at Chapter ",ch
+                            ," (Adjusted Raw Score: ",sc,")\\\\"]
+                    ,concat ["\\ifxetex\\let\\tabular\\longtable"
+                            ,"\\let\\endtabular\\endlongtable\\fi"]
+                    ,"\\begin{tabular}[c]{|l|l|r|}"
+                    ,"\\hline"
+                    ,"Lesson & Description & Score\\\\\\hline"
+                    ,unlines $ ltLesson <$> sl
+                    ,"\\end{tabular}"
+                    ,"\\end{document}"
+                    ] where na = makeExceptions a
+                            ls = lessons na
+                            sl = toList $ Seq.sort ls
+                            ch = show $ suggestedStart na
+                            sc = show $ adaptedTotal na
+                            i  = Text.unpack $ student na
+                            t  = Text.unpack $ teacher na
 
 toCSV :: Assessment -> String
-toCSV a = intercalate "\n" [ concat ["Teacher:,", t]
-                           , concat ["Student:,", i]
-                           , concat ["Start at:,Chapter ",ch
-                                    ," (Adjusted Raw Score: ",sc,")\n"]
-                           , "Lesson,Description,Score"
-                           , intercalate "\n" $ csLesson <$> sl
-                           ]
+toCSV a = unlines [ concat ["Teacher:,", t]
+                  , concat ["Student:,", i]
+                  , concat ["Start at:,Chapter ",ch
+                           ," (Adjusted Raw Score: ",sc,")\n"]
+                  , "Lesson,Description,Score"
+                  , unlines $ csLesson <$> sl
+                  ]
         where na = makeExceptions a
               ls = lessons na
               sl = toList $ Seq.sort ls
