@@ -98,11 +98,11 @@ ltLesson l@(Lesson c s o n t r a) = intercalate " & " [i,d,ars] ++ "\\\\\\hline"
 
 exLesson :: Lesson -> [(Int, Cell)]
 exLesson l@(Lesson c s o n t r a)
-       = [(1, Cell Nothing . Just $ CellText id)
-         ,(2, Cell Nothing . Just . CellText $ snd n)
-         ,(3, Cell Nothing . Just . CellDouble $ adaptedScore l)
-         ]
-       where id = Text.pack $ intercalate "." [show c,[s],show o]
+       = [(1, sc $ CellText id)
+         ,(2, sc . CellText $ snd n)
+         ,(3, sc . CellDouble $ adaptedScore l)
+         ] where id = Text.pack $ intercalate "." [show c,[s],show o]
+                 sc = Cell Nothing . Just
 
 makeExceptions :: Assessment -> Assessment
 makeExceptions a@(Assessment i v t ls) | ver a == Eq2 = nA
@@ -199,11 +199,11 @@ saveFile a ext | ext `elem` ["docx","pdf","xlsx"] = sW
 
 type Specifier  = (Chapter, Section, Int, (Name,Name))
 
-newLesson :: EqVersion -> Specifier -> (Seq Tag) -> Score -> Bool -> Lesson
+newLesson :: EqVersion -> Specifier -> Seq Tag -> Score -> Bool -> Lesson
 newLesson v (c,s,o,n) t r a | not vCh   = error "Invalid Chapter"
                             | not vSec  = error "Invalid Section"
                             | not vScr  = error "Invalid Score"
-                            | otherwise = (Lesson c s o n t r a)
+                            | otherwise = Lesson c s o n t r a
                             where vCh  = c `validChapterIn` v
                                   vSec = s `validSectionIn` v
                                   vScr = r `elem` [(-1)..1]
@@ -237,7 +237,7 @@ suggestedStart a = 1 + idx ch
                        idx (Just c) = c
                        idx Nothing  = 0
 
-scoreBounds :: EqVersion -> (Seq Double)
+scoreBounds :: EqVersion -> Seq Double
 scoreBounds Eq2 = Seq.fromList $ zipWith (+) ((27.5 *) <$> [1..12]) adj
                 where adj = [0,0.5..] >>= replicate 5
 scoreBounds _   = Seq.empty
