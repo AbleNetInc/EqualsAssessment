@@ -50,37 +50,47 @@ css = Text.intercalate " "
     ,    "border-collapse: collapse;"
     ,    "padding: 5px;"
     , "}"
+    , "select {"
+    ,    "border: 1px solid #c5c0bc;"
+    ,    "padding: 10px 15px !important;"
+    ,    "border-radius: 25px;"
+    ,    "height: 45px;"
+    ,    "background: transparent url(\"assets/ui-select-arrow.jpg\") no-repeat scroll right 10px center / 16px 8px !important;"
+    ,    "-moz-appearance: none;"
+    , "}"
     , ".tab {"
-    ,    "background: #eee;"
+    ,    "background: #665d56 none repeat scroll 0% 0%;"
+    ,    "color: #fff;"
     ,    "margin-right: 10px;"
-    ,    "padding: 2px;"
+    ,    "padding: 7px 15px !important;"
+    ,    "border-radius: 20px 20px 0px 0px;"
+    ,    "line-height: 27px;"
+    ,    "height: 38px !important;"
+    ,    "white-space: nowrap;"
     ,    "border: 1px solid #bbb;"
+    ,    "border-color: #B4AFAB #B4AFAB transparent;"
     ,    "text-decoration: none;"
     ,    "font-size: 13px;"
+    ,    "text-transform: uppercase;"
     , "}"
     , ".selected {"
-    ,    "background: #fff;"
+    ,    "background: #fff none repeat scroll 0% 0%;"
+    ,    "color: #665d56;"
     , "}"
     , ".hidden {"
     ,    "display: none;"
     , "}"
     ]
 
-home, ico, bnr :: Text
-home = "https://www.ablenetinc.com/"
-ico  = mconcat [home, "media/favicon/default/favicon.ico"]
-bnr  = mconcat [home, "Portals/0/images/Equals-Online-Assessment-LogIn.jpg"]
-
 header :: Html ()
 header = head_ $ do
      meta_ [charset_ "UTF-8"]
      style_ css
      title_ "Equals Assessment"
-     link_ [rel_ "icon", href_ ico, type_ "image/x-icon"]
-     link_ [rel_ "shortcut icon", href_ ico, type_ "image/x-icon"]
+     link_ [href_ "assets/favicon.ico", rel_ "icon", type_ "image/x-icon"]
 
 banner :: Html ()
-banner = do img_ [style_ "margin-left: 11.5%", src_ bnr]
+banner = do img_ [style_ "margin-left: 11.5%", src_ "assets/banner.jpg"]
             p_ [style_ "color: red;"] $
                mconcat ["Note: While you may save your data, ",all," assessment data is deleted each night at midnight (Central Time)"]
             where all = span_ [style_ "font-style: italic;"] "all"
@@ -107,6 +117,10 @@ runWebServer pnum = Web.scotty pnum $ do
                                              input_ [class_ "hidden", type_ "radio", name_ "v", value_ "Eq2", checked_]
                                              input_ [type_ "submit", name_ "c", value_ "Load"]
                                              input_ [type_ "submit", name_ "c", value_ "New"]
+
+                  Web.get "/assets/:file" $ do
+                          f <- Web.param "file"
+                          Web.file $ mconcat ["assets/",f]
 
                   Web.get "/assess" $ do
                           teacher <- Web.param "u"
