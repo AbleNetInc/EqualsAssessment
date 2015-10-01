@@ -32,9 +32,12 @@ tbLesson l = tr_ [class_ c] $ do td_ ""; td_ s; td_ [style_ "text-align: center;
              oc = [if m == "(1,'C',4)" || m == "(9,'A',5)" then onchange_ (mconcat ["copyScore('",o,"','",val,"')"]) else alt_ ""
                   | val <- ["(Just (-1),Nothing)","(Just 0,Nothing)","(Just 1,Nothing)"]]
              cc = if m == "(1,'C',4)" || m == "(9,'A',5)" then onchange_ (mconcat ["copyAdapt(this,'",o,"')"]) else alt_ ""
-             s = do input_ [type_ "radio", name_ m, oc !! 0, value_ "(Just (-1),Nothing)", ch !! 0]; "blank"
-                    input_ [type_ "radio", name_ m, oc !! 1, value_ "(Just 0,Nothing)",    ch !! 1]; "0"
-                    input_ [type_ "radio", name_ m, oc !! 2, value_ "(Just 1,Nothing)",    ch !! 2]; "1"
+             s = do input_ [type_ "radio", name_ m, oc !! 0, value_ "(Just (-1),Nothing)", ch !! 0, id_ "blank"]
+                    label_ [for_ "blank", style_ "margin-right: 15px;"] "blank"
+                    input_ [type_ "radio", name_ m, oc !! 1, value_ "(Just 0,Nothing)",    ch !! 1, id_ "zero"]
+                    label_ [for_ "zero", style_ "margin-right: 15px;"] "0"
+                    input_ [type_ "radio", name_ m, oc !! 2, value_ "(Just 1,Nothing)",    ch !! 2, id_ "one"]
+                    label_ [for_ "one"] "1"
              a = input_ [type_ "checkbox", name_ m, cc, value_ "(Nothing,Just True)",  b]
              b = if adapted l then checked_ else alt_ ""
              hidden = m == "(1,'C',5)" || m == "(9,'A',4)"
