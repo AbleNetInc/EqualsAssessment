@@ -167,7 +167,8 @@ toExcel a = def & atSheet "Assessment" ?~ s
                                           "Raw Score: ",sc,")"])])
                  ,(7, zip [1..3] $ scl <$> ["Lesson","Description","Score"])
                  ] ++ (zip [8..] $ exLesson <$> sl)
-            s  = def { _wsCells = fromRows cs }
+            s  = def { _wsCells   = fromRows cs
+                     , _wsColumns = [ColumnsWidth 2 2 68.7 0] }
             na = makeExceptions a
             ls = lessons na
             sl = toList $ Seq.sort ls
