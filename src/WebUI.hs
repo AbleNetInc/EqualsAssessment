@@ -119,7 +119,7 @@ header = head_ $ do
      meta_ [charset_ "UTF-8"]
      style_ css
      title_ "Equals Assessment"
-     link_ [href_ "assets/favicon.ico", rel_ "icon", type_ "image/x-icon"]
+     link_ [href_ "https://www.ablenetinc.com/media/favicon/default/favicon.ico", rel_ "icon", type_ "image/x-icon"]
 
 banner :: Html ()
 banner = do img_ [style_ "margin-left: 11.5%", src_ "assets/banner.jpg"]
