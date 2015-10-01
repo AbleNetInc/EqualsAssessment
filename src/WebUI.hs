@@ -42,6 +42,7 @@ tbLesson l = tr_ [class_ c] $ do td_ ""; td_ s; td_ [style_ "text-align: center;
 css :: Text
 css = Text.intercalate " "
     [ "body {"
+    ,    "font-family: Arial, Helvetica, sans-serif;"
     ,    "margin: 0;"
     ,    "padding: 0;"
     , "}"
