@@ -50,13 +50,25 @@ css = Text.intercalate " "
     ,    "border-collapse: collapse;"
     ,    "padding: 5px;"
     , "}"
+    , "input {"
+    ,    "margin-right: 10px;"
+    , "}"
     , "select {"
     ,    "border: 1px solid #c5c0bc;"
-    ,    "padding: 10px 15px !important;"
+    ,    "padding: 10px 30px 10px 15px !important;"
     ,    "border-radius: 25px;"
     ,    "height: 45px;"
     ,    "background: transparent url(\"assets/ui-select-arrow.jpg\") no-repeat scroll right 10px center / 16px 8px !important;"
     ,    "-moz-appearance: none;"
+    , "}"
+    , ".button {"
+    ,    "border: 1px solid #c5c0bc;"
+    ,    "padding: 10px 15px !important;"
+    ,    "border-radius: 25px;"
+    ,    "height: 45px;"
+    ,    "text-transform: uppercase;"
+    ,    "background: #fff none repeat scroll 0% 0%;"
+    ,    "color: #665d56;"
     , "}"
     , ".tab {"
     ,    "background: #665d56 none repeat scroll 0% 0%;"
@@ -68,7 +80,7 @@ css = Text.intercalate " "
     ,    "height: 38px !important;"
     ,    "white-space: nowrap;"
     ,    "border: 1px solid #bbb;"
-    ,    "border-color: #B4AFAB #B4AFAB transparent;"
+    ,    "border-color: #b4afab #b4afab transparent;"
     ,    "text-decoration: none;"
     ,    "font-size: 13px;"
     ,    "text-transform: uppercase;"
@@ -115,8 +127,8 @@ runWebServer pnum = Web.scotty pnum $ do
                                                      br_ []
                                                      "Student ID: "; input_ [type_ "number", min_ "0", name_ "i", required_ ""]
                                              input_ [class_ "hidden", type_ "radio", name_ "v", value_ "Eq2", checked_]
-                                             input_ [type_ "submit", name_ "c", value_ "Load"]
-                                             input_ [type_ "submit", name_ "c", value_ "New"]
+                                             input_ [class_ "button", type_ "submit", name_ "c", value_ "Load"]
+                                             input_ [class_ "button", type_ "submit", name_ "c", value_ "New"]
 
                   Web.get "/assets/:file" $ do
                           f <- Web.param "file"
@@ -200,9 +212,9 @@ runWebServer pnum = Web.scotty pnum $ do
                                                with form_ [method_ "POST", action_ "/save", enctype_ "multipart/form-data"] $ do
                                                   p_ $ do if a == as && (score <$> ll) == (score <$> (lessons as)) then "New " else ""
                                                           "Assessment by ";t;" for ";s;":"
-                                                  input_ [type_ "submit", name_ "s", value_ "Save"]; " "
-                                                  input_ [type_ "submit", name_ "s", value_ "New"]; " "
-                                                  input_ [type_ "submit", name_ "s", value_ "Export"];
+                                                  input_ [class_ "button", type_ "submit", name_ "s", value_ "Save"]; " "
+                                                  input_ [class_ "button", type_ "submit", name_ "s", value_ "New"]; " "
+                                                  input_ [class_ "button", type_ "submit", name_ "s", value_ "Export"];
                                                   select_ [name_ "ext"] $ do option_ [value_ "xlsx"] "to Excel"
                                                                              option_ [value_ "csv" ] "to CSV"
                                                                              option_ [value_ "htm" ] "to HTML"
