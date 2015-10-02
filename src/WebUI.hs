@@ -19,8 +19,9 @@ import           Control.Monad.IO.Class                   (liftIO)
 import           Network.Wai.Middleware.RequestLogger     (logStdoutDev)
 
 tbLesson :: Lesson -> Html ()
-tbLesson l = tr_ [class_ c] $ do td_ ""; td_ s; td_ [style_ "text-align: center;"] a; td_ n
+tbLesson l = tr_ [class_ c, style_ st] $ do td_ ""; td_ s; td_ [style_ "text-align: center;"] a; td_ n
        where n = if m == "(1,'C',4)" then adj else toHtml . fst $ lName l
+             st = "display: none;"
              adj = "identify primary and secondary colors"
              c = if hidden then "hidden" else head . toList $ tags l
              r = score l
@@ -49,6 +50,10 @@ css = Text.intercalate " "
     ,    "margin: 0;"
     ,    "padding: 0;"
     , "}"
+    , "div.main {"
+    ,    "width: 58%;"
+    ,    "margin: auto;"
+    , "}"
     , "table, th, td {"
     ,    "border: 1px solid #b4afab;"
     ,    "border-collapse: collapse;"
@@ -75,6 +80,20 @@ css = Text.intercalate " "
     ,    "height: 45px;"
     ,    "background: transparent url(\"assets/ui-select-arrow.jpg\") no-repeat scroll right 10px center / 16px 8px !important;"
     ,    "-moz-appearance: none;"
+    , "}"
+    , ".action {"
+    ,    "border: 1px solid #963821;"
+    ,    "padding: 10px 15px !important;"
+    ,    "border-radius: 25px;"
+    ,    "height: 45px;"
+    ,    "text-transform: uppercase;"
+    ,    "background: #963821 none repeat scroll 0% 0%;"
+    ,    "color: #fff;"
+    , "}"
+    , ".action:hover {"
+    ,    "background: #dd7b00 none repeat scroll 0% 0%;"
+    ,    "border: 1px solid #dd7b00;"
+    ,    "color: #fff;"
     , "}"
     , ".button {"
     ,    "border: 1px solid #dd7b00;"
@@ -122,8 +141,10 @@ header = head_ $ do
      link_ [href_ "https://www.ablenetinc.com/media/favicon/default/favicon.ico", rel_ "icon", type_ "image/x-icon"]
 
 banner :: Html ()
-banner = do img_ [style_ "margin-left: 11.5%", src_ "assets/banner.jpg"]
-            p_ [style_ "color: red;"] $
+banner = do img_ [ style_ "margin-top: 20px; margin-left: 42.5%; width: 15%;"
+                 , src_ "assets/banner.jpg"]
+            h1_ "Equals Online Assessment"
+            p_ [style_ "color: #963821;"] $
                mconcat ["Note: While you may save your data, ",all," assessment data is deleted each night at midnight (Central Time)"]
             where all = span_ [style_ "font-style: italic;"] "all"
 
@@ -134,7 +155,7 @@ runWebServer pnum = Web.scotty pnum $ do
                   Web.get "/" $ do
                           Web.html . renderText $ do doctypehtml_
                                  $ do header
-                                      body_ $ div_ [style_ "width: 770px; margin: auto;"] $ do
+                                      body_ $ div_ [class_ "main"] $ do
                                           let italic = span_ [style_ "font-style: italic;"]
                                           banner
                                           p_ "To get started, complete the assessment and fill out the paper copy of the student response booklet (protocol). Then:"
@@ -218,7 +239,7 @@ runWebServer pnum = Web.scotty pnum $ do
                                                          ]
                           Web.html . renderText $ do doctypehtml_
                                  $ do header
-                                      body_ $ div_ [style_ "width: 770px; margin: auto;"]
+                                      body_ $ div_ [class_ "main"]
                                           $ do let italic = span_ [style_ "font-style: italic;"]
                                                banner
                                                ol_ $ do li_ "Click on a tab to select the appropriate subtest."
@@ -226,7 +247,7 @@ runWebServer pnum = Web.scotty pnum $ do
                                                         li_ $ mconcat ["Check the boxes for all adapted items given. The electronic scoring will automatically eliminate checks for scores of ",italic "0","."]
                                                         li_ "Click on each tab to enter scores for each subtest. You will not need to save between tabs."
                                                         li_ $ mconcat ["When finished, you may click ",italic "Save"," to temporarily save the data (optional)."]
-                                                        li_ $ mconcat ["Click ",italic "Export"," to generate the report to an Excel-compatible spreadsheet. ",italic "Save as"," to your Desktop and rename the file to the student's name. You may need to adjust column and row widths inside Excel to your preference."]
+                                                        li_ $ mconcat ["Click ",italic "Export"," to generate the report to your preferrred format. ",italic "Save as"," to your Desktop and rename the file to the student's name."]
                                                         li_ $ mconcat ["When finished, click ",italic "New"," to begin another assessment."]
                                                script_ js
                                                with form_ [method_ "POST", action_ "/save", enctype_ "multipart/form-data"] $ do
@@ -234,16 +255,17 @@ runWebServer pnum = Web.scotty pnum $ do
                                                           "Assessment by ";t;" for ";s;":"
                                                   input_ [class_ "button", type_ "submit", name_ "s", value_ "Save"]; " "
                                                   input_ [class_ "button", type_ "submit", name_ "s", value_ "New"]; " "
-                                                  input_ [class_ "button", type_ "submit", name_ "s", value_ "Export"];
-                                                  select_ [name_ "ext"] $ do option_ [value_ "xlsx"] "to Excel"
-                                                                             option_ [value_ "csv" ] "to CSV"
-                                                                             option_ [value_ "htm" ] "to HTML"
-                                                                             option_ [value_ "pdf" ] "to PDF"
-                                                                             option_ [value_ "rtf" ] "to RTF"
-                                                                             option_ [value_ "docx"] "to Word"
+                                                  div_ [style_ "float: right;"] $ do
+                                                      input_ [class_ "action", type_ "submit", name_ "s", value_ "Export"];
+                                                      select_ [name_ "ext"] $ do option_ [value_ "xlsx"] "to Excel"
+                                                                                 option_ [value_ "csv" ] "to CSV"
+                                                                                 option_ [value_ "htm" ] "to HTML"
+                                                                                 option_ [value_ "pdf" ] "to PDF"
+                                                                                 option_ [value_ "rtf" ] "to RTF"
+                                                                                 option_ [value_ "docx"] "to Word"
                                                   br_ []; br_ []
                                                   tbs
-                                                  table_ [style_ "margin-top: 1px; width: 770px;"] $ do
+                                                  table_ [style_ "margin-top: 1px; width: 100%;"] $ do
                                                        tr_ [id_ "heading"] $ do th_ "Test"
                                                                                 th_ "Score"
                                                                                 th_ "Adapted"
@@ -286,72 +308,77 @@ runWebServer pnum = Web.scotty pnum $ do
                   Web.get "/source" $ do
                           Web.html . renderText $ do doctypehtml_
                                  $ do header
-                                      body_ $ do h1_ "Technologies we utilize"
-                                                 p_  $ mconcat ["We use a variety of technologies in the creation of this service and would like to give credit where it is due. "
-                                                               ,"To that end, below you will find a list of the technologies we use (along with links to their respective projects) and descriptions of how we use them."]
-                                                 ul_ $ do li_ $ do a_ [href_ "http://www.ubuntu.com/"] "Ubuntu"
-                                                                   " is a Free and open-source "
-                                                                   a_ [href_ "http://www.linuxfoundation.org/"] "Linux Distribution"
-                                                                   ". We use an Ubuntu virtual machine for our server to ensure stability, speed and flexibility."
-                                                          li_ $ do a_ [href_ "https://sqlite.org/"] "SQLite"
-                                                                   " is a powerful, but simple database. "
-                                                                   "We use it to temporarily store assessment data."
-                                                          li_ $ do a_ [href_ "http://www.latex-project.org/"] "LaTeX"
-                                                                   " is a document processing system with unparalleled quality and performance. "
-                                                                   "We use a particular version (called “xelatex”) during exporting assessments to PDF format."
-                                                          li_ $ do a_ [href_ "https://www.haskell.org/"] "Haskell"
-                                                                   " is a powerful and flexible Functional Programming language. "
-                                                                   "We use it as our host language to create the Equals Online Assessment."
-                                                          li_ $ do "A complete list of our Haskell library dependencies is available in the table below."
-                                                                   table_ $ do tr_ $ do td_ "Name"; td_ "Description"; td_ "License"
-                                                                               tr_ $ do td_ $ a_ [href_ "https://hackage.haskell.org/package/base"] "Base"
-                                                                                        td_ "For the basic logic of the Haskell language"
-                                                                                        td_ $ a_ [href_ "https://hackage.haskell.org/package/base-4.8.1.0/src/LICENSE"] "BSD3"
-                                                                               tr_ $ do td_ $ a_ [href_ "https://hackage.haskell.org/package/containers"] "Containers"
-                                                                                        td_ "For performant Map and Sequence data structures"
-                                                                                        td_ $ a_ [href_ "https://hackage.haskell.org/package/containers-0.5.6.3/src/LICENSE"] "BSD3"
-                                                                               tr_ $ do td_ $ a_ [href_ "https://hackage.haskell.org/package/text"] "Text"
-                                                                                        td_ "For a performant implementation of Strngs"
-                                                                                        td_ $ a_ [href_ "https://hackage.haskell.org/package/text-1.2.1.3/src/LICENSE"] "BSD3"
-                                                                               tr_ $ do td_ $ a_ [href_ "https://hackage.haskell.org/package/scotty"] "Scotty"
-                                                                                        td_ "For quickly creating and serving web interfaces"
-                                                                                        td_ $ a_ [href_ "https://hackage.haskell.org/package/scotty-0.10.2/src/LICENSE"] "BSD3"
-                                                                               tr_ $ do td_ $ a_ [href_ "https://hackage.haskell.org/package/transformers"] "Transformers"
-                                                                                        td_ "For handling type interaction with the database"
-                                                                                        td_ $ a_ [href_ "https://hackage.haskell.org/package/transformers-0.4.3.0/src/LICENSE"] "BSD3"
-                                                                               tr_ $ do td_ $ a_ [href_ "https://hackage.haskell.org/package/sqlite"] "SQLite"
-                                                                                        td_ "For saving/reading to/from the database"
-                                                                                        td_ $ a_ [href_ "https://hackage.haskell.org/package/sqlite-0.5.2.2/src/LICENSE"] "BSD3"
-                                                                               tr_ $ do td_ $ a_ [href_ "https://hackage.haskell.org/package/wai-extra"] "Wai-Extra"
-                                                                                        td_ "For a logging middleware accessed from Scotty"
-                                                                                        td_ $ a_ [href_ "https://hackage.haskell.org/package/wai-extra-3.0.10/src/LICENSE"] "MIT"
-                                                                               tr_ $ do td_ $ a_ [href_ "https://hackage.haskell.org/package/lucid"] "Lucid"
-                                                                                        td_ "For achieving type-checked HTML templating for all pages we serve"
-                                                                                        td_ $ a_ [href_ "https://hackage.haskell.org/package/lucid-2.9.2/src/LICENSE"] "BSD3"
-                                                                               tr_ $ do td_ $ a_ [href_ "https://hackage.haskell.org/package/pandoc"] "Pandoc"
-                                                                                        td_ "For exporting the assessment in Docx, HTML and RTF formats"
-                                                                                        td_ $ a_ [href_ "https://hackage.haskell.org/package/pandoc-1.15.0.6/src/COPYING"] "GPLv2"
-                                                                               tr_ $ do td_ $ a_ [href_ "https://hackage.haskell.org/package/bytestring"] "ByteString"
-                                                                                        td_ "For writing and reading binary formats for assessment exportation"
-                                                                                        td_ $ a_ [href_ "https://hackage.haskell.org/package/bytestring-0.10.6.0/src/LICENSE"] "BSD3"
-                                                                               tr_ $ do td_ $ a_ [href_ "https://hackage.haskell.org/package/utf8-string"] "UTF8-String"
-                                                                                        td_ "For handling extended unicode characters gracefully"
-                                                                                        td_ $ a_ [href_ "https://hackage.haskell.org/package/utf8-string-1.0.1.1/src/LICENSE"] "BSD3"
-                                                                               tr_ $ do td_ $ a_ [href_ "https://hackage.haskell.org/package/system-command"] "System-Command"
-                                                                                        td_ "For calling out to xelatex (for the assessment PDF export"
-                                                                                        td_ $ a_ [href_ "https://hackage.haskell.org/package/system-command-0.0.10/src/LICENSE"] "BSD3"
-                                                                               tr_ $ do td_ $ a_ [href_ "https://hackage.haskell.org/package/old-time"] "Old-Time"
-                                                                                        td_ "For retrieving the time in a legacy format (for compatibility with Xlsx"
-                                                                                        td_ $ a_ [href_ "https://hackage.haskell.org/package/old-time-1.1.0.3/src/LICENSE"] "BSD3"
-                                                                               tr_ $ do td_ $ a_ [href_ "https://hackage.haskell.org/package/xlsx"] "Xlsx"
-                                                                                        td_ "For exporting the assessment in Xlsx format"
-                                                                                        td_ $ a_ [href_ "https://hackage.haskell.org/package/xlsx-0.1.1.1/src/LICENSE"] "MIT"
-                                                                               tr_ $ do td_ $ a_ [href_ "https://hackage.haskell.org/package/lens"] "Lens"
-                                                                                        td_ "For programmatically generating worksheets in Xlsx"
-                                                                                        td_ $ a_ [href_ "https://hackage.haskell.org/package/lens-4.13/src/LICENSE"] "BSD3"
-                                                 h2_ "AbleNet loves Open Source!"
-                                                 p_ $ do "We firmly believe that our community can make our products better!"
-                                                         "So, to every user who purchases a license of Equals (and the Online Assessment), we provide a copy of the "
-                                                         a_ [href_ "#"] "source code (to be linked)"
-                                                         " of this tool! You can use this software under the terms of the "
-                                                         a_ [href_ "#"] "GPLv3 License (to be linked)"
+                                      body_ $ do div_ [class_ "main"] $ do
+                                                    banner
+                                                    h2_ "Technologies we utilize"
+                                                    p_  $ mconcat ["We use a variety of technologies in the creation of this service and would like to give credit where it is due. "
+                                                                  ,"To that end, below you will find a list of the technologies we use (along with links to their respective projects) and descriptions of how we use them."]
+                                                    ul_ $ do li_ $ do a_ [href_ "http://www.ubuntu.com/"] "Ubuntu"
+                                                                      " is a Free and open-source "
+                                                                      a_ [href_ "http://www.linuxfoundation.org/"] "Linux Distribution"
+                                                                      ". We use an Ubuntu virtual machine for our server to ensure stability, speed and flexibility."
+                                                             li_ $ do a_ [href_ "https://sqlite.org/"] "SQLite"
+                                                                      " is a powerful, but simple database. "
+                                                                      "We use it to temporarily store assessment data."
+                                                             li_ $ do a_ [href_ "http://www.latex-project.org/"] "LaTeX"
+                                                                      " is a document processing system with unparalleled quality and performance. "
+                                                                      "We use a particular version (called “xelatex”) during exporting assessments to PDF format."
+                                                             li_ $ do a_ [href_ "https://www.git-scm.com/"] "Git"
+                                                                      " is a source-control management software with fabulous performance and functionality. "
+                                                                      "We use it to keep track of all our changes made to the software."
+                                                             li_ $ do a_ [href_ "https://www.haskell.org/"] "Haskell"
+                                                                      " is a powerful and flexible Functional Programming language. "
+                                                                      "We use it as our host language to create the Equals Online Assessment."
+                                                             li_ $ do "A complete list of our Haskell library dependencies is available in the table below."
+                                                                      table_ $ do tr_ $ do td_ "Name"; td_ "Description"; td_ "License"
+                                                                                  tr_ $ do td_ $ a_ [href_ "https://hackage.haskell.org/package/base"] "Base"
+                                                                                           td_ "For the basic logic of the Haskell language"
+                                                                                           td_ $ a_ [href_ "https://hackage.haskell.org/package/base-4.8.1.0/src/LICENSE"] "BSD3"
+                                                                                  tr_ $ do td_ $ a_ [href_ "https://hackage.haskell.org/package/containers"] "Containers"
+                                                                                           td_ "For performant Map and Sequence data structures"
+                                                                                           td_ $ a_ [href_ "https://hackage.haskell.org/package/containers-0.5.6.3/src/LICENSE"] "BSD3"
+                                                                                  tr_ $ do td_ $ a_ [href_ "https://hackage.haskell.org/package/text"] "Text"
+                                                                                           td_ "For a performant implementation of Strngs"
+                                                                                           td_ $ a_ [href_ "https://hackage.haskell.org/package/text-1.2.1.3/src/LICENSE"] "BSD3"
+                                                                                  tr_ $ do td_ $ a_ [href_ "https://hackage.haskell.org/package/scotty"] "Scotty"
+                                                                                           td_ "For quickly creating and serving web interfaces"
+                                                                                           td_ $ a_ [href_ "https://hackage.haskell.org/package/scotty-0.10.2/src/LICENSE"] "BSD3"
+                                                                                  tr_ $ do td_ $ a_ [href_ "https://hackage.haskell.org/package/transformers"] "Transformers"
+                                                                                           td_ "For handling type interaction with the database"
+                                                                                           td_ $ a_ [href_ "https://hackage.haskell.org/package/transformers-0.4.3.0/src/LICENSE"] "BSD3"
+                                                                                  tr_ $ do td_ $ a_ [href_ "https://hackage.haskell.org/package/sqlite"] "SQLite"
+                                                                                           td_ "For saving/reading to/from the database"
+                                                                                           td_ $ a_ [href_ "https://hackage.haskell.org/package/sqlite-0.5.2.2/src/LICENSE"] "BSD3"
+                                                                                  tr_ $ do td_ $ a_ [href_ "https://hackage.haskell.org/package/wai-extra"] "Wai-Extra"
+                                                                                           td_ "For a logging middleware accessed from Scotty"
+                                                                                           td_ $ a_ [href_ "https://hackage.haskell.org/package/wai-extra-3.0.10/src/LICENSE"] "MIT"
+                                                                                  tr_ $ do td_ $ a_ [href_ "https://hackage.haskell.org/package/lucid"] "Lucid"
+                                                                                           td_ "For achieving type-checked HTML templating for all pages we serve"
+                                                                                           td_ $ a_ [href_ "https://hackage.haskell.org/package/lucid-2.9.2/src/LICENSE"] "BSD3"
+                                                                                  tr_ $ do td_ $ a_ [href_ "https://hackage.haskell.org/package/pandoc"] "Pandoc"
+                                                                                           td_ "For exporting the assessment in Docx, HTML and RTF formats"
+                                                                                           td_ $ a_ [href_ "https://hackage.haskell.org/package/pandoc-1.15.0.6/src/COPYING"] "GPLv2"
+                                                                                  tr_ $ do td_ $ a_ [href_ "https://hackage.haskell.org/package/bytestring"] "ByteString"
+                                                                                           td_ "For writing and reading binary formats for assessment exportation"
+                                                                                           td_ $ a_ [href_ "https://hackage.haskell.org/package/bytestring-0.10.6.0/src/LICENSE"] "BSD3"
+                                                                                  tr_ $ do td_ $ a_ [href_ "https://hackage.haskell.org/package/utf8-string"] "UTF8-String"
+                                                                                           td_ "For handling extended unicode characters gracefully"
+                                                                                           td_ $ a_ [href_ "https://hackage.haskell.org/package/utf8-string-1.0.1.1/src/LICENSE"] "BSD3"
+                                                                                  tr_ $ do td_ $ a_ [href_ "https://hackage.haskell.org/package/system-command"] "System-Command"
+                                                                                           td_ "For calling out to xelatex (for the assessment PDF export"
+                                                                                           td_ $ a_ [href_ "https://hackage.haskell.org/package/system-command-0.0.10/src/LICENSE"] "BSD3"
+                                                                                  tr_ $ do td_ $ a_ [href_ "https://hackage.haskell.org/package/old-time"] "Old-Time"
+                                                                                           td_ "For retrieving the time in a legacy format (for compatibility with Xlsx"
+                                                                                           td_ $ a_ [href_ "https://hackage.haskell.org/package/old-time-1.1.0.3/src/LICENSE"] "BSD3"
+                                                                                  tr_ $ do td_ $ a_ [href_ "https://hackage.haskell.org/package/xlsx"] "Xlsx"
+                                                                                           td_ "For exporting the assessment in Xlsx format"
+                                                                                           td_ $ a_ [href_ "https://hackage.haskell.org/package/xlsx-0.1.1.1/src/LICENSE"] "MIT"
+                                                                                  tr_ $ do td_ $ a_ [href_ "https://hackage.haskell.org/package/lens"] "Lens"
+                                                                                           td_ "For programmatically generating worksheets in Xlsx"
+                                                                                           td_ $ a_ [href_ "https://hackage.haskell.org/package/lens-4.13/src/LICENSE"] "BSD3"
+                                                    h2_ "AbleNet loves Open Source!"
+                                                    p_ $ do "We firmly believe that our community can make our products better!"
+                                                            "So, to every user who purchases a license of Equals (and the Online Assessment), we provide a copy of the "
+                                                            a_ [href_ "#"] "source code (to be linked)"
+                                                            " of this tool! You can use this software under the terms of the "
+                                                            a_ [href_ "#"] "GPLv3 License (to be linked)"
