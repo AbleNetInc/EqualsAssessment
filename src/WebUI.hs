@@ -176,7 +176,7 @@ css = Text.intercalate " "
     , "}"
     , "div.tabs {"
     ,    "overflow: hidden;"
-    ,    "width: 94%;"
+    ,    "width: 95%;"
     ,    "white-space: nowrap;"
     ,    "float: left;"
     ,    "padding-top: 6px;"
@@ -268,9 +268,9 @@ runWebServer pnum = Web.scotty pnum $ do
                               ls  = tbLesson <$> ll
                               tgs = nub . concat $ (toList . tags) <$> ll
                               nav n = a_ [class_ "tab", id_ n, href_ "#", onclick_ $ mconcat ["showRows('",n,"')"]]
-                              nl  = div_ [class_ "lscroll"] " "
-                              nr  = div_ [class_ "rscroll"] " "
-                              tbs = nav_ $ do nl; div_ [class_ "tabs"] (mconcat $ zipWith ($) (nav <$> tgs) (toHtml <$> tgs)); nr
+                              nl  = div_ [class_ "lscroll", onclick_ "sLeft('tabbar');"] " "
+                              nr  = div_ [class_ "rscroll", onclick_ "sRight('tabbar');"] " "
+                              tbs = nav_ $ do nl; div_ [class_ "tabs", id_ "tabbar"] (mconcat $ zipWith ($) (nav <$> tgs) (toHtml <$> tgs)); nr
                               js  = Text.intercalate " " [ "function showRows(id) {"
                                                          ,   "var trs = document.getElementsByTagName(\"tr\");"
                                                          ,   "for (i = 0; i < trs.length; i++) {"
@@ -312,6 +312,12 @@ runWebServer pnum = Web.scotty pnum $ do
                                                          ,       "c++;"
                                                          ,     "}"
                                                          ,   "}"
+                                                         , "}"
+                                                         , "function sLeft(id) {"
+                                                         ,   "document.getElementById(id).scrollLeft -= 50;"
+                                                         , "}"
+                                                         , "function sRight(id) {"
+                                                         ,   "document.getElementById(id).scrollLeft += 50;"
                                                          , "}"
                                                          , "(function (i,s,o,g,r,a,m) {"
                                                          ,    "i['GoogleAnalyticsObject']=r;i[r]=i[r]||function () {"
