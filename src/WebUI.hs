@@ -95,6 +95,7 @@ css = Text.intercalate " "
     ,    "vertical-align: bottom;"
     ,    "line-height: 35px;"
     ,    "margin-right: 10px;"
+    ,    "float: left;"
     , "}"
     , "div.lscroll:hover {"
     ,    "background-image: url(\"/assets/ml_h.png\");"
@@ -106,7 +107,7 @@ css = Text.intercalate " "
     ,    "height: 41px !important;"
     ,    "vertical-align: bottom;"
     ,    "line-height: 35px;"
-    ,    "margin-right: 10px;"
+    ,    "float: right;"
     , "}"
     , "div.rscroll:hover {"
     ,    "background-image: url(\"/assets/mr_h.png\");"
@@ -172,8 +173,10 @@ css = Text.intercalate " "
     , "}"
     , "div.tabs {"
     ,    "overflow: hidden;"
-    ,    "width: 100%;"
+    ,    "width: 93%;"
     ,    "white-space: nowrap;"
+    ,    "float: left;"
+    ,    "padding-top: 6px;"
     , "}"
     , ".tab {"
     ,    "outline: none;"
@@ -263,7 +266,7 @@ runWebServer pnum = Web.scotty pnum $ do
                               nav n = a_ [class_ "tab", id_ n, href_ "#", onclick_ $ mconcat ["showRows('",n,"')"]]
                               nl  = div_ [class_ "lscroll"] " "
                               nr  = div_ [class_ "rscroll"] " "
-                              tbs = nav_ $ do nl; mconcat $ zipWith ($) (nav <$> tgs) (toHtml <$> tgs); nr
+                              tbs = nav_ $ do nl; div_ [class_ "tabs"] (mconcat $ zipWith ($) (nav <$> tgs) (toHtml <$> tgs)); nr
                               js  = Text.intercalate " " [ "function showRows(id) {"
                                                          ,   "var trs = document.getElementsByTagName(\"tr\");"
                                                          ,   "for (i = 0; i < trs.length; i++) {"
@@ -344,7 +347,7 @@ runWebServer pnum = Web.scotty pnum $ do
                                                                                  option_ [value_ "rtf" ] "RTF"
                                                                                  option_ [value_ "docx"] "Word"
                                                   br_ []; br_ []
-                                                  div_ [class_ "tabs"] tbs
+                                                  tbs
                                                   table_ [style_ "margin-top: 1px; width: 100%;"] $ do
                                                        tr_ [id_ "heading"] $ do th_ "Test"
                                                                                 th_ "Score"
