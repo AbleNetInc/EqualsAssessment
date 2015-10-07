@@ -9,12 +9,11 @@ import           EqSQL
 import qualified Web.Scotty                            as Web
 import           Lucid.Base
 import           Lucid.Html5
-import           Data.Monoid                              (mconcat)
 import qualified Data.Text                             as Text
 import           Data.Text                                (Text)
 import qualified Data.Text.Lazy                        as Lazy
 import           Data.Foldable                            (toList)
-import           Data.List                                (intercalate, nub, foldl')
+import           Data.List                                (nub, foldl')
 import           Control.Monad.IO.Class                   (liftIO)
 import           Network.Wai.Middleware.RequestLogger     (logStdoutDev)
 
@@ -214,12 +213,12 @@ header = head_ $ do
      link_ [href_ "https://www.ablenetinc.com/media/favicon/default/favicon.ico", rel_ "icon", type_ "image/x-icon"]
 
 banner :: Html ()
-banner = do img_ [ style_ "margin-top: 20px; margin-left: 42.75%; width: 15%;"
+banner = do img_ [ style_ "margin-top: 20px; margin-left: 42.75%; width: 100px;"
                  , src_ "assets/banner.jpg"]
             h1_ "Equals Online Assessment"
             p_ [style_ "color: #963821;"] $
-               mconcat ["Note: While you may save your data, ",all," assessment data is deleted each night at midnight (Central Time)"]
-            where all = span_ [style_ "font-style: italic;"] "all"
+               mconcat ["Note: While you may save your data, ",all'," assessment data is deleted each night at midnight (Central Time)"]
+            where all' = span_ [style_ "font-style: italic;"] "all"
 
 footer :: Html ()
 footer = do footer_ $ do a_ [href_ "/source", class_ "footer"] "Technologies we rely on"
