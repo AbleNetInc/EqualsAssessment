@@ -11,6 +11,7 @@ extra-source-files:  README.rst
 cabal-version:       >= 1.10
 
 executable eqassess
+  ghc-options:       -Wall -O2
   main-is:           Main.hs
   other-extensions:  OverloadedStrings
   build-depends:     base           >= 4.8    && <4.9,
