@@ -97,11 +97,11 @@ ltLesson l@(Lesson c s o n _ _ _) = intercalate " & " [i,d,ars] ++ "\\\\\\hline"
 
 exLesson :: Lesson -> [(Int, Cell)]
 exLesson l@(Lesson c s o n _ _ _)
-       = [(1, sc $ CellText id)
+       = [(1, sc $ CellText id')
          ,(2, sc . CellText $ snd n)
          ,(3, sc . CellDouble $ adaptedScore l)
-         ] where id = Text.pack $ intercalate "." [show c,[s],show o]
-                 sc = Cell Nothing . Just
+         ] where id' = Text.pack $ intercalate "." [show c,[s],show o]
+                 sc  = Cell Nothing . Just
 
 makeExceptions :: Assessment -> Assessment
 makeExceptions a@(Assessment i v t ls) | ver a == Eq2 = nA
