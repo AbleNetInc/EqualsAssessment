@@ -88,7 +88,7 @@ csLesson l = intercalate "," [s,n,c]
                  | otherwise                       = cn
 
 ltLesson :: Lesson -> String
-ltLesson l@(Lesson c s o n t r a) = intercalate " & " [i,d,ars] ++ "\\\\\\hline"
+ltLesson l@(Lesson c s o n _ _ _) = intercalate " & " [i,d,ars] ++ "\\\\\\hline"
        where i   = intercalate "." [show $ c,[s],show $ cnt]
              d   = Text.unpack $ snd n
              ars = show $ adaptedScore l
@@ -96,7 +96,7 @@ ltLesson l@(Lesson c s o n t r a) = intercalate " & " [i,d,ars] ++ "\\\\\\hline"
                  | otherwise                    = o
 
 exLesson :: Lesson -> [(Int, Cell)]
-exLesson l@(Lesson c s o n t r a)
+exLesson l@(Lesson c s o n _ _ _)
        = [(1, sc $ CellText id)
          ,(2, sc . CellText $ snd n)
          ,(3, sc . CellDouble $ adaptedScore l)
