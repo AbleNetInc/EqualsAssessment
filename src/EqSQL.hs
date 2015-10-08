@@ -40,10 +40,10 @@ deleteAssessment v d s t = do let query = concat ["delete from ",show v," where 
                               return e
 
 rowToAssessment :: EqVersion -> (Row String) -> Assessment
-rowToAssessment v r = Assessment id v t $ Seq.fromList ls
-                    where id = Text.pack . fromJust $ lookup "id"      r
-                          t  = Text.pack . fromJust $ lookup "teacher" r
-                          vS = Map.lookup v lessonSets
+rowToAssessment v r = Assessment id' v t $ Seq.fromList ls
+                    where id' = Text.pack . fromJust $ lookup "id"      r
+                          t   = Text.pack . fromJust $ lookup "teacher" r
+                          vS  = Map.lookup v lessonSets
                           l Nothing     = 0
                           l (Just lset) = Seq.length lset
                           ls = [(read . fromJust $ lookup x r) :: Lesson| x <- show <$> [0..((l vS)-1)]]
@@ -56,4 +56,4 @@ retrieveAssessment d v s t = do let query = concat ["select * from ",show v," wh
                                 case e of
                                      Right ([]:_) -> return $ blankAssessment v s t
                                      Right (r:_)  -> return . rowToAssessment v $ head r
-                                     Left s       -> error s
+                                     Left s'      -> error s'
