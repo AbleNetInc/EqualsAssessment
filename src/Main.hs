@@ -54,3 +54,4 @@ parseArgs as = Config { eqHelp    = as `hasArg` ("-h", "--help"   )
                               nextArg s l     = l !! (1 + (fromJust $ elemIndex s l))
                               optArg (s,l) ls | elem s ls = nextArg s ls
                                               | elem l ls = nextArg l ls
+                              optArg (_,_) _  = ""
