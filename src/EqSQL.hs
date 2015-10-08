@@ -7,11 +7,8 @@ import           Data.Maybe
 import           Data.List
 import           Data.Foldable      (toList)
 import qualified Data.Map        as Map
-import           Data.Map           (Map)
 import qualified Data.Sequence   as Seq
-import           Data.Sequence      (Seq)
 import qualified Data.Text       as Text
-import           Data.Text          (Text)
 
 initDB :: String -> EqVersion -> IO (Maybe String)
 initDB d v = do let vSet = Map.lookup v lessonSets
