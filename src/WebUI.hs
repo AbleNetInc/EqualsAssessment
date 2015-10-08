@@ -395,8 +395,8 @@ runWebServer pnum = Web.scotty pnum $ do
                                                    _      -> "text/plain"
                                                Web.setHeader "Content-Disposition" . Lazy.pack $ mconcat ["attachment; filename=",fn]
                                                Web.file $ mconcat ["exports/",fn]
-                                "Save"   -> Web.redirect . Lazy.pack $ concat ["/assess?u=",teacher',"&i=",student',"&v=",version,"&c=Load"]
                                 "New"    -> Web.redirect "/"
+                                _        -> Web.redirect . Lazy.pack $ concat ["/assess?u=",teacher',"&i=",student',"&v=",version,"&c=Load"]
 
                   Web.get "/source" $ do
                           Web.html . renderText $ do doctypehtml_
