@@ -252,15 +252,15 @@ runWebServer pnum = Web.scotty pnum $ do
                           Web.file $ mconcat ["assets/",f]
 
                   Web.get "/assess" $ do
-                          teacher <- Web.param "u"
-                          student <- Web.param "i"
+                          teacher' <- Web.param "u"
+                          student' <- Web.param "i"
                           version <- Web.param "v"
                           clobber <- Web.param "c"
                           let v   = (read version) :: EqVersion
-                          a       <- liftIO $ retrieveAssessment "EqDB" v student teacher
-                          let as  = blankAssessment v student teacher
-                              t   = toHtml teacher
-                              s   = toHtml student
+                          a       <- liftIO $ retrieveAssessment "EqDB" v student' teacher'
+                          let as  = blankAssessment v student' teacher'
+                              t   = toHtml teacher'
+                              s   = toHtml student'
                               ll  = lessons $ case (clobber :: String) of
                                                    "New"  -> as
                                                    "Load" -> a
@@ -364,8 +364,8 @@ runWebServer pnum = Web.scotty pnum $ do
                                                                                 th_ "Lesson"
                                                        mconcat $ toList ls
                                                   input_ [class_ "hidden", type_ "radio", name_ "v", value_ "Eq2", checked_]
-                                                  input_ [class_ "hidden", type_ "text", name_ "u", value_ $ Text.pack teacher]
-                                                  input_ [class_ "hidden", type_ "text", name_ "i", value_ $ Text.pack student]
+                                                  input_ [class_ "hidden", type_ "text", name_ "u", value_ $ Text.pack teacher']
+                                                  input_ [class_ "hidden", type_ "text", name_ "i", value_ $ Text.pack student']
                                       footer
 
                   Web.post "/save" $ do
