@@ -23,7 +23,7 @@ initDB d v = do let vSet = Map.lookup v lessonSets
 
 saveAssessment :: String -> Assessment -> IO (Maybe String)
 saveAssessment d (Assessment s v t l)
-             = do deleteAssessment v d (Text.unpack s) $ Text.unpack t
+             = do _ <- deleteAssessment v d (Text.unpack s) $ Text.unpack t
                   let cols = "\"id\"" : "\"teacher\"" : ((show . show) <$> [0..(Seq.length l)-1])
                       vals = (Text.unpack <$> [s,t]) ++ (toList $ show <$> l)
                       row  = zip cols vals
