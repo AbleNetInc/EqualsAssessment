@@ -262,8 +262,8 @@ runWebServer pnum = Web.scotty pnum $ do
                               t   = toHtml teacher'
                               s   = toHtml student'
                               ll  = lessons $ case (clobber :: String) of
-                                                   "New"  -> as
-                                                   "Load" -> a
+                                                   "New" -> as
+                                                   _     -> a
                               ls  = tbLesson <$> ll
                               tgs = nub . concat $ (toList . tags) <$> ll
                               nav n = a_ [class_ "tab", id_ n, href_ "#", onclick_ $ mconcat ["showRows('",n,"')"]]
