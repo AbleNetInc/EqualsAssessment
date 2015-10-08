@@ -382,9 +382,9 @@ runWebServer pnum = Web.scotty pnum $ do
                                nss = (read . Lazy.unpack . snd <$> scs) :: [(Maybe Int,Maybe Bool)]
                                nas = foldl' (\x (y,z) -> updateLesson x y z) as $ zip nls nss
                                fn  = mconcat [teacher',"_",student',".",ext]
-                           na      <- liftIO $ saveAssessment "EqDB" nas
+                           _na      <- liftIO $ saveAssessment "EqDB" nas
                            case (ret :: String) of
-                                "Export" -> do sf <- liftIO $ saveFile nas ext
+                                "Export" -> do _sf <- liftIO $ saveFile nas ext
                                                Web.setHeader "Content-Type" $ case ext of
                                                    "csv"  -> "text/csv"
                                                    "htm"  -> "text/html; charset=UTF-8"
