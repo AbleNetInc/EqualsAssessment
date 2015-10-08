@@ -187,13 +187,15 @@ saveFile a ext | ext `elem` ["docx","pdf","xlsx"] = sW
                                   DBL.writeFile n . fromXlsx c $ toExcel a
                      "pdf"  -> do writeFile ("exports/" ++ n') f
                                   let xel = rawSystem "xelatex" [n']
-                                  inDirectory' "exports" xel
+                                  _ <- inDirectory' "exports" xel
                                   return ()
+                     _      -> do return ()
              f = case ext of
                     "csv"  -> toCSV a
                     "htm"  -> writeHtmlString def i
                     "rtf"  -> writeRTF        def i
                     "pdf"  -> toLaTeX a
+                    _      -> ""
              t = Text.unpack $ teacher a
              s = Text.unpack $ student a
 
