@@ -6,9 +6,8 @@ import           Data.List
 import           Data.Foldable           (toList)
 import           Data.Maybe
 import qualified Data.ByteString.Lazy as DBL
-import qualified Data.ByteString.UTF8 as U8
 import qualified Data.Map             as Map
-import           Data.Map                (Map)
+import           Data.Map                ()
 import qualified Data.Sequence        as Seq
 import           Data.Sequence           (Seq)
 import qualified Data.Text            as Text
