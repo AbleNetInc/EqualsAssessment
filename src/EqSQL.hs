@@ -54,6 +54,7 @@ retrieveAssessment d v s t = do let query = concat ["select * from ",show v," wh
                                 e <- execStatement h query
                                 closeConnection h
                                 case e of
+                                     Right ([]:_) -> return $ blankAssessment v s t
                                      Right (r:_)  -> return . rowToAssessment v $ head r
                                      Right _      -> return $ blankAssessment v s t
                                      Left s'      -> error s'
