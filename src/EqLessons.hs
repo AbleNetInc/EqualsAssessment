@@ -9,7 +9,7 @@ import qualified Data.Text      as Text
 
 blankAssessment :: EqVersion -> String -> String -> Assessment
 blankAssessment v s t = Assessment (Text.pack s) v (Text.pack t) . ls $ Map.lookup v lessonSets
-                      where ls (Just s) = s
+                      where ls (Just s') = s'
                             ls Nothing  = Seq.empty
 
 taggedBlankLessons :: EqVersion -> Chapter -> Section -> [(Int,(Name,Name))] -> [Tag] -> [Lesson]
