@@ -213,7 +213,7 @@ header = head_ $ do
      link_ [href_ "https://www.ablenetinc.com/media/favicon/default/favicon.ico", rel_ "icon", type_ "image/x-icon"]
 
 banner :: Html ()
-banner = do img_ [ style_ "margin-top: 20px; margin-left: 42.75%; width: 100px;"
+banner = do img_ [ style_ "margin-top: 20px; margin-left: 42.75%; width: 175px;"
                  , src_ "assets/banner.jpg"]
             h1_ "Equals Online Assessment"
             p_ [style_ "color: #963821;"] $
