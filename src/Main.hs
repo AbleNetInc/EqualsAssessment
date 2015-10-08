@@ -1,7 +1,6 @@
 module Main where
 
 import EqCommon
-import EqLessons
 import EqSQL
 import WebUI
 import System.Environment (getArgs)
