@@ -373,15 +373,15 @@ runWebServer pnum = Web.scotty pnum $ do
                            ext     <- Web.param "ext"
                            ret     <- Web.param "s"
                            version <- Web.param "v"
-                           teacher <- Web.param "u"
-                           student <- Web.param "i"
+                           teacher' <- Web.param "u"
+                           student' <- Web.param "i"
                            let v   = (read version) :: EqVersion
-                               as  = blankAssessment v student teacher
+                               as  = blankAssessment v student' teacher'
                                scs = drop 2 $ take (length p - 3) p
                                nls = (read . Lazy.unpack . fst <$> scs) :: [(Int,Char,Int)]
                                nss = (read . Lazy.unpack . snd <$> scs) :: [(Maybe Int,Maybe Bool)]
                                nas = foldl' (\x (y,z) -> updateLesson x y z) as $ zip nls nss
-                               fn  = mconcat [teacher,"_",student,".",ext]
+                               fn  = mconcat [teacher',"_",student',".",ext]
                            na      <- liftIO $ saveAssessment "EqDB" nas
                            case (ret :: String) of
                                 "Export" -> do sf <- liftIO $ saveFile nas ext
@@ -395,7 +395,7 @@ runWebServer pnum = Web.scotty pnum $ do
                                                    _      -> "text/plain"
                                                Web.setHeader "Content-Disposition" . Lazy.pack $ mconcat ["attachment; filename=",fn]
                                                Web.file $ mconcat ["exports/",fn]
-                                "Save"   -> Web.redirect . Lazy.pack $ concat ["/assess?u=",teacher,"&i=",student,"&v=",version,"&c=Load"]
+                                "Save"   -> Web.redirect . Lazy.pack $ concat ["/assess?u=",teacher',"&i=",student',"&v=",version,"&c=Load"]
                                 "New"    -> Web.redirect "/"
 
                   Web.get "/source" $ do
