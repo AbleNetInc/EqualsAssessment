@@ -6,7 +6,6 @@ import           Data.Map          (Map)
 import qualified Data.Sequence  as Seq
 import           Data.Sequence     (Seq)
 import qualified Data.Text      as Text
-import           Data.Text         (Text)
 
 blankAssessment :: EqVersion -> String -> String -> Assessment
 blankAssessment v s t = Assessment (Text.pack s) v (Text.pack t) . ls $ Map.lookup v lessonSets
