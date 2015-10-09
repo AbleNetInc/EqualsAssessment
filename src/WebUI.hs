@@ -461,7 +461,7 @@ runWebServer pnum = Web.scotty pnum $ do
                                                                                            td_ "For calling out to xelatex (for the assessment PDF export"
                                                                                            td_ $ a_ [href_ "https://hackage.haskell.org/package/system-command-0.0.10/src/LICENSE", class_ "inline"] "BSD3"
                                                                                   tr_ $ do td_ $ a_ [href_ "https://hackage.haskell.org/package/old-time", class_ "inline"] "Old-Time"
-                                                                                           td_ "For retrieving the time in a legacy format (for compatibility with Xlsx"
+                                                                                           td_ "For retrieving the time in a legacy format (for compatibility with Xlsx)"
                                                                                            td_ $ a_ [href_ "https://hackage.haskell.org/package/old-time-1.1.0.3/src/LICENSE", class_ "inline"] "BSD3"
                                                                                   tr_ $ do td_ $ a_ [href_ "https://hackage.haskell.org/package/xlsx", class_ "inline"] "Xlsx"
                                                                                            td_ "For exporting the assessment in Xlsx format"
