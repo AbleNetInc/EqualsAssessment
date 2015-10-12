@@ -16,6 +16,8 @@ import           Data.Foldable                            (toList)
 import           Data.List                                (nub, foldl')
 import           Control.Monad.IO.Class                   (liftIO)
 import           Network.Wai.Middleware.RequestLogger     (logStdoutDev)
+import           Network.Wai.Middleware.Static            (addBase, noDots
+                                                          ,staticPolicy, (>->))
 
 tbLesson :: Lesson -> Html ()
 tbLesson l = tr_ [class_ c, style_ st] $ do td_ ""; td_ s; td_ [style_ "text-align: center;"] a; td_ n
@@ -210,7 +212,6 @@ header = head_ $ do
      meta_ [charset_ "UTF-8"]
      style_ css
      title_ "Equals Assessment"
-     link_ [href_ "https://www.ablenetinc.com/media/favicon/default/favicon.ico", rel_ "icon", type_ "image/x-icon"]
 
 banner :: Html ()
 banner = do img_ [ style_ "margin-top: 20px; margin-left: 42.75%; width: 175px;"
@@ -225,6 +226,7 @@ footer = do footer_ $ do a_ [href_ "/source", class_ "footer"] "Technologies we 
 
 runWebServer :: Int -> IO ()
 runWebServer pnum = Web.scotty pnum $ do
+                  Web.middleware $ staticPolicy (noDots >-> addBase "assets")
                   Web.middleware logStdoutDev
 
                   Web.get "/" $ do
