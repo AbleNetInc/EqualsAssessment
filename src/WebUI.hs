@@ -210,6 +210,7 @@ css = Text.intercalate " "
 header :: Html ()
 header = head_ $ do
      meta_ [charset_ "UTF-8"]
+     meta_ [name_ "viewport", content_ "width=device-width,initial-scale=1"]
      style_ css
      title_ "Equals Assessment"
 
@@ -230,8 +231,10 @@ runWebServer pnum = Web.scotty pnum $ do
                   Web.middleware logStdoutDev
 
                   Web.get "/" $ do
-                          Web.html . renderText $ do doctypehtml_
-                                 $ do header
+                          Web.html . renderText $ do
+                            doctype_
+                            html_ [lang_ "en"] $ do
+                                      header
                                       body_ $ div_ [class_ "main"] $ do
                                           let italic = span_ [style_ "font-style: italic;"]
                                           banner
@@ -331,8 +334,10 @@ runWebServer pnum = Web.scotty pnum $ do
                                                          , mconcat ["window.onload = function () { showRows('",head tgs,"');"]
                                                          , "};"
                                                          ]
-                          Web.html . renderText $ do doctypehtml_
-                                 $ do header
+                          Web.html . renderText $ do
+                             doctype_
+                             html_ [lang_ "en"] $ do
+                                      header
                                       body_ $ div_ [class_ "main"]
                                           $ do let italic = span_ [style_ "font-style: italic;"]
                                                banner
@@ -401,8 +406,10 @@ runWebServer pnum = Web.scotty pnum $ do
                                 _        -> Web.redirect . Lazy.pack $ concat ["/assess?u=",teacher',"&i=",student',"&v=",version,"&c=Load"]
 
                   Web.get "/source" $ do
-                          Web.html . renderText $ do doctypehtml_
-                                 $ do header
+                          Web.html . renderText $ do
+                             doctype_
+                             html_ [lang_ "en"] $ do
+                                      header
                                       body_ $ do div_ [class_ "main"] $ do
                                                     banner
                                                     h2_ "Technologies we utilize"
