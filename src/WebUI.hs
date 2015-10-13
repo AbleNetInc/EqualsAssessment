@@ -16,6 +16,8 @@ import           Data.Foldable                            (toList)
 import           Data.List                                (nub, foldl')
 import           Control.Monad.IO.Class                   (liftIO)
 import           Network.Wai.Middleware.RequestLogger     (logStdoutDev)
+import           Network.Wai.Middleware.Gzip              (gzip, gzipFiles, def
+                                                          ,GzipFiles(GzipCompress))
 import           Network.Wai.Middleware.Static            (addBase, noDots
                                                           ,staticPolicy, (>->))
 
@@ -228,6 +230,7 @@ footer = do footer_ $ do a_ [href_ "/source", class_ "footer"] "Technologies we 
 runWebServer :: Int -> IO ()
 runWebServer pnum = Web.scotty pnum $ do
                   Web.middleware $ staticPolicy (noDots >-> addBase "assets")
+                  Web.middleware $ gzip $ def { gzipFiles = GzipCompress }
                   Web.middleware logStdoutDev
 
                   Web.get "/" $ do
