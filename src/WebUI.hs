@@ -217,7 +217,7 @@ header = head_ $ do
      title_ "Equals Assessment"
 
 banner :: Html ()
-banner = do img_ [ style_ "margin-top: 20px; margin-left: 42.75%; width: 175px;"
+banner = do img_ [ style_ "margin-top: 20px; margin-left: 42.75%; width: 175px; height: 109px;"
                  , src_ "assets/banner.jpg"
                  , width_ "320px", height_ "200px"]
             h1_ "Equals Online Assessment"
