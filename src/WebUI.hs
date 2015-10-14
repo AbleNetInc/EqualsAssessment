@@ -218,7 +218,8 @@ header = head_ $ do
 
 banner :: Html ()
 banner = do img_ [ style_ "margin-top: 20px; margin-left: 42.75%; width: 175px;"
-                 , src_ "assets/banner.jpg"]
+                 , src_ "assets/banner.jpg"
+                 , width_ "320px", height_ "200px"]
             h1_ "Equals Online Assessment"
             p_ [style_ "color: #963821;"] $
                mconcat ["Note: While you may save your data, ",all'," assessment data is deleted each night at midnight (Central Time)"]
