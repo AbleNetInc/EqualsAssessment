@@ -417,7 +417,7 @@ lessonSets = Map.fromList
                  sd2 = [("write simple / equation using long division sign","write a division problem")
                        ,("solve division problems with divisor of 10","solve division problems with divisor of 10")
                        ,("use division to solve word problem with equal sets","use division to solve word problem  with equal sets")
-                       ,("divide by 100s and 10s++++","divide by 10s and 100s")
+                       ,("divide by 100s and 10s","divide by 10s and 100s")
                        ,("solve problems; 2-digit divisor-calculator","solve division problem with 2-digit divisor using calculator")
                        ,("choose multiplication or division to solve word problem","choose multiplication or division to solve word problem")
                        ,("identify factors and multiples - relate to division","identify multiples and factors")
