@@ -5,14 +5,14 @@ import EqSQL
 import WebUI
 import System.Environment (getArgs)
 import System.Exit        (exitWith, ExitCode(ExitFailure, ExitSuccess))
-import Data.List          (intercalate, elemIndex)
+import Data.List          (elemIndex)
 import Data.Maybe         (fromJust)
 
 version :: String
 version = "eqassess 2.1"
 
 usage :: String
-usage = intercalate "\n"
+usage = unlines
       [ "Usage: eqassess [options]\n"
       , "Options:"
       , "  -h, --help       Print this help and exit"
@@ -39,11 +39,11 @@ data EqAssessConf = Config
 
 dispatch :: EqAssessConf -> IO ()
 dispatch (Config h v i d r p)
-       | h         = putStrLn usage   >> exitSucc
+       | h         = putStr   usage   >> exitSucc
        | v         = putStrLn version >> exitSucc
        | r         = runWebServer p
        | i         = mapM_ (initDB d) [Eq2]
-       | otherwise = putStrLn usage   >> exitFail
+       | otherwise = putStr   usage   >> exitFail
 
 parseArgs :: [String] -> EqAssessConf
 parseArgs as = Config
