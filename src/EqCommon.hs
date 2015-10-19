@@ -19,20 +19,20 @@ import           Codec.Xlsx
 import           Control.Lens
 import           System.Time             (getClockTime)
 
-data EqVersion  = Eq2 | Eq3 deriving (Eq, Ord, Show, Read)
-type Chapter    = Int
-type Section    = Char
-type Name       = Text
-type Tag        = Text
-type Score      = Int
-data Lesson     = Lesson { chapter :: Chapter
-                         , section :: Section
-                         , count   :: Int
-                         , lName   :: (Name,Name)
-                         , tags    :: (Seq Tag)
-                         , score   :: Score
-                         , adapted :: Bool
-                         } deriving (Show, Read)
+data EqVersion = Eq2 | Eq3 deriving (Eq, Ord, Show, Read)
+type Chapter   = Int
+type Section   = Char
+type Name      = Text
+type Tag       = Text
+type Score     = Int
+data Lesson    = Lesson { chapter :: Chapter
+                        , section :: Section
+                        , count   :: Int
+                        , lName   :: (Name,Name)
+                        , tags    :: (Seq Tag)
+                        , score   :: Score
+                        , adapted :: Bool
+                        } deriving (Show, Read)
 
 instance Eq Lesson where
     l == l' = sameCh && sameSc && sameCo
@@ -71,7 +71,8 @@ bottomScore (Just l) (Just l') | al < al'  = (score l,  adapted l)
 retrieveLesson :: Seq Lesson -> (Chapter, Section, Int) -> Maybe Lesson
 retrieveLesson ls (c,s,o) | found     = Just l
                           | otherwise = Nothing
-                          where l'    = Lesson c s o (Text.empty,Text.empty) Seq.empty 0 False
+                          where l'    = Lesson c s o ns Seq.empty 0 False
+                                ns    = (Text.empty, Text.empty)
                                 idx   = Seq.elemIndexL l' ls
                                 found = idx /= Nothing
                                 l     = Seq.index ls $ fromJust idx
@@ -114,48 +115,45 @@ makeExceptions a@(Assessment i v t ls) | ver a == Eq2 = nA
                    nls (Just lsn) = Seq.filter (/= lsn) $ lessons a'
                    nA = Assessment i v t $ nls l'
 
-toLaTeX :: Assessment -> String
-toLaTeX a = unlines ["\\documentclass[letterpaper]{article}"
-                    ,"\\usepackage{ifxetex,longtable}"
-                    ,"\\usepackage[margin=0.5in]{geometry}"
-                    ,"\\begin{document}"
-                    ,"\\section*{Equals Assessment Results}"
-                    ,"\\noindent"
-                    ,concat ["Teacher: ",t,"\\\\"]
-                    ,concat ["Student: ",i,"\\\\"]
-                    ,concat ["Start at Chapter ",ch
-                            ," (Adjusted Raw Score: ",sc,")\\\\"]
-                    ,concat ["\\ifxetex\\let\\tabular\\longtable"
-                            ,"\\let\\endtabular\\endlongtable\\fi"]
-                    ,"\\begin{tabular}[c]{|l|l|r|}"
-                    ,"\\hline"
-                    ,"Lesson & Description & Score\\\\\\hline"
-                    ,unlines $ ltLesson <$> sl
-                    ,"\\end{tabular}"
-                    ,"\\end{document}"
-                    ] where na = makeExceptions a
-                            ls = lessons na
-                            sl = toList $ Seq.sort ls
-                            ch = show $ suggestedStart na
-                            sc = show $ adaptedTotal na
-                            i  = Text.unpack $ student na
-                            t  = Text.unpack $ teacher na
-
-toCSV :: Assessment -> String
-toCSV a = unlines [ concat ["Teacher:,", t]
-                  , concat ["Student:,", i]
-                  , concat ["Start at:,Chapter ",ch
-                           ," (Adjusted Raw Score: ",sc,")\n"]
-                  , "Lesson,Description,Score"
-                  , unlines $ csLesson <$> sl
-                  ]
-        where na = makeExceptions a
-              ls = lessons na
-              sl = toList $ Seq.sort ls
-              ch = show $ suggestedStart na
-              sc = show $ adaptedTotal na
-              i  = Text.unpack $ student na
-              t  = Text.unpack $ teacher na
+toTextOut :: Assessment -> String -> String
+toTextOut a ext = unlines lns
+        where lns | ext == "csv" = [ concat ["Teacher:,", t]
+                                   , concat ["Student:,", i]
+                                   , concat ["Start at:,Chapter ",ch," "
+                                            ,"(Adjusted Raw Score: ",sc,")\n"]
+                                   , "Lesson,Description,Score"
+                                   , fls
+                                   ]
+                  | otherwise    = [ "\\documentclass[letterpaper]{article}"
+                                   , "\\usepackage{ifxetex,longtable}"
+                                   , "\\usepackage[margin=0.5in]{geometry}"
+                                   , "\\begin{document}"
+                                   , "\\section*{Equals Assessment Results}"
+                                   , "\\noindent"
+                                   , concat ["Teacher: ",t,"\\\\"]
+                                   , concat ["Student: ",i,"\\\\"]
+                                   , concat ["Start at Chapter ",ch, " "
+                                            ,"(Adjusted Raw Score: ",sc,")\\\\"]
+                                   , concat ["\\ifxetex"
+                                            ,"\\let\\tabular\\longtable"
+                                            ,"\\let\\endtabular\\endlongtable"
+                                            ,"\\fi"]
+                                   , "\\begin{tabular}[c]{|l|l|r|}"
+                                   , "\\hline"
+                                   , "Lesson & Description & Score\\\\\\hline"
+                                   , fls
+                                   , "\\end{tabular}"
+                                   , "\\end{document}"
+                                   ]
+              fls | ext == "csv" = unlines $ csLesson <$> sl
+                  | otherwise    = unlines $ ltLesson <$> sl
+              na  = makeExceptions a
+              ls  = lessons na
+              sl  = toList $ Seq.sort ls
+              ch  = show $ suggestedStart na
+              sc  = show $ adaptedTotal na
+              i   = Text.unpack $ student na
+              t   = Text.unpack $ teacher na
 
 toExcel :: Assessment -> Xlsx
 toExcel a = def & atSheet "Assessment" ?~ s
@@ -178,7 +176,8 @@ toExcel a = def & atSheet "Assessment" ?~ s
 saveFile :: Assessment -> String -> IO ()
 saveFile a ext | ext `elem` ["docx","pdf","xlsx"] = sW
                | otherwise                        = writeFile n f
-       where i = handleError . readLaTeX def $ toLaTeX a
+       where i = handleError $ readLaTeX def lt
+             lt = toTextOut a ext
              n = concat ["exports/",t,"_",s,".",ext]
              n' = concat [t,"_",s,".tex"]
              sW = case ext of
@@ -191,10 +190,10 @@ saveFile a ext | ext `elem` ["docx","pdf","xlsx"] = sW
                                   return ()
                      _      -> do return ()
              f = case ext of
-                    "csv"  -> toCSV a
+                    "csv"  -> lt
                     "htm"  -> writeHtmlString def i
                     "rtf"  -> writeRTF        def i
-                    "pdf"  -> toLaTeX a
+                    "pdf"  -> lt
                     _      -> ""
              t = Text.unpack $ teacher a
              s = Text.unpack $ student a
@@ -250,9 +249,13 @@ updateScore (Lesson c s o n t r _) Nothing   (Just a') = Lesson c s o n t r  a'
 updateScore (Lesson c s o n t _ a) (Just r') Nothing   = Lesson c s o n t r' a
 updateScore (Lesson c s o n t r a) Nothing   Nothing   = Lesson c s o n t r  a
 
-updateLesson :: Assessment -> (Int,Char,Int) -> (Maybe Score,Maybe Bool) -> Assessment
+updateLesson :: Assessment
+             -> (Int,Char,Int)
+             -> (Maybe Score,Maybe Bool)
+             -> Assessment
 updateLesson (Assessment n v t ls) (c,s,o) (r,b) = Assessment n v t $ newLs idx
-           where l    = newLesson v (c,s,o,(Text.pack "",Text.pack "")) Seq.empty 0 False
+           where l    = newLesson v (c,s,o,ns) Seq.empty 0 False
+                 ns   = (Text.pack "", Text.pack "")
                  idx  = Seq.elemIndexL l ls
                  newL i         = updateScore (Seq.index ls i) r b
                  newLs Nothing  = ls
