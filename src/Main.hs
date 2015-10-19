@@ -28,30 +28,33 @@ exitFail, exitSucc :: IO ()
 exitFail = exitWith $ ExitFailure 1
 exitSucc = exitWith   ExitSuccess
 
-data EqAssessConf = Config { eqHelp    :: Bool
-                           , eqVersion :: Bool
-                           , eqInitDB  :: Bool
-                           , eqDbName  :: String
-                           , eqRunServ :: Bool
-                           , eqPortNum :: Int
-                           }
+data EqAssessConf = Config
+                  { eqHelp    :: Bool
+                  , eqVersion :: Bool
+                  , eqInitDB  :: Bool
+                  , eqDbName  :: String
+                  , eqRunServ :: Bool
+                  , eqPortNum :: Int
+                  }
 
 dispatch :: EqAssessConf -> IO ()
-dispatch (Config h v i d r p) | h         = putStrLn usage   >> exitSucc
-                              | v         = putStrLn version >> exitSucc
-                              | r         = runWebServer p
-                              | i         = mapM_ (initDB d) [Eq2]
-                              | otherwise = putStrLn usage   >> exitFail
+dispatch (Config h v i d r p)
+       | h         = putStrLn usage   >> exitSucc
+       | v         = putStrLn version >> exitSucc
+       | r         = runWebServer p
+       | i         = mapM_ (initDB d) [Eq2]
+       | otherwise = putStrLn usage   >> exitFail
 
 parseArgs :: [String] -> EqAssessConf
-parseArgs as = Config { eqHelp    = as `hasArg` ("-h", "--help"   )
-                      , eqVersion = as `hasArg` ("-v", "--version")
-                      , eqInitDB  = as `hasArg` ("-d", "--dbinit" )
-                      , eqRunServ = as `hasArg` ("-w", "--web"    )
-                      , eqDbName  = optArg ("-d", "--dbinit") as
-                      , eqPortNum = (read $ optArg ("-w", "--web") as) :: Int
-                      } where hasArg a (s,l)  = elem s a || elem l a
-                              nextArg s l     = l !! (1 + (fromJust $ elemIndex s l))
-                              optArg (s,l) ls | elem s ls = nextArg s ls
-                                              | elem l ls = nextArg l ls
-                              optArg (_,_) _  = ""
+parseArgs as = Config
+             { eqHelp    = as `hasArg` ("-h", "--help"   )
+             , eqVersion = as `hasArg` ("-v", "--version")
+             , eqInitDB  = as `hasArg` ("-d", "--dbinit" )
+             , eqRunServ = as `hasArg` ("-w", "--web"    )
+             , eqDbName  = optArg ("-d", "--dbinit") as
+             , eqPortNum = (read $ optArg ("-w", "--web") as) :: Int
+             } where hasArg a (s,l)  = elem s a || elem l a
+                     nextArg s l     = l !! (1 + (fromJust $ elemIndex s l))
+                     optArg (s,l) ls | elem s ls = nextArg s ls
+                                     | elem l ls = nextArg l ls
+                     optArg (_,_) _  = ""
