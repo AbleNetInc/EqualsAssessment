@@ -241,8 +241,8 @@ footer = do footer_ $ do a_ [href_ "/source", class_ "footer"] "Technologies we 
 runWebServer :: Int -> IO ()
 runWebServer pnum =
            defaultETagContext True >>= \ctx -> Web.scotty pnum $ do
-                  Web.middleware $ staticPolicy (noDots >-> addBase "assets")
-                  Web.middleware $ gzip $ def { gzipFiles = GzipCompress }
+                  Web.middleware . staticPolicy $ noDots >-> addBase "assets"
+                  Web.middleware . gzip $ def { gzipFiles = GzipCompress }
                   Web.middleware . etag ctx $ MaxAgeSeconds 604800
                   Web.middleware logStdoutDev
 
