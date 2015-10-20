@@ -16,6 +16,8 @@ import           Data.Foldable                            (toList)
 import           Data.List                                (nub, foldl')
 import           Control.Monad.IO.Class                   (liftIO)
 import           Network.Wai.Middleware.RequestLogger     (logStdoutDev)
+import           Network.Wai.Middleware.ETag              (etag, defaultETagContext
+                                                          ,MaxAge(..))
 import           Network.Wai.Middleware.Gzip              (gzip, gzipFiles, def
                                                           ,GzipFiles(GzipCompress))
 import           Network.Wai.Middleware.Static            (addBase, noDots
@@ -237,13 +239,14 @@ footer :: Html ()
 footer = do footer_ $ do a_ [href_ "/source", class_ "footer"] "Technologies we rely on"
 
 runWebServer :: Int -> IO ()
-runWebServer pnum = Web.scotty pnum $ do
+runWebServer pnum =
+           defaultETagContext True >>= \ctx -> Web.scotty pnum $ do
                   Web.middleware $ staticPolicy (noDots >-> addBase "assets")
                   Web.middleware $ gzip $ def { gzipFiles = GzipCompress }
+                  Web.middleware . etag ctx $ MaxAgeSeconds 604800
                   Web.middleware logStdoutDev
 
                   Web.get "/" $ do
-                          Web.setHeader "cache-control" "public,max-age=1800"
                           Web.html . renderText $ do
                             doctype_
                             html_ [lang_ "en"] $ do
@@ -266,8 +269,6 @@ runWebServer pnum = Web.scotty pnum $ do
                                       footer
 
                   Web.get "/assets/:file" $ do
-                          Web.setHeader "cache-control" "public,max-age=604800"
-                          Web.setHeader "last-modified" "Thu, 15 Oct 2015 13:04:59 GMT"
                           f <- Web.param "file"
                           Web.file $ mconcat ["assets/",f]
 
@@ -349,8 +350,6 @@ runWebServer pnum = Web.scotty pnum $ do
                                                          , mconcat ["window.onload = function () { showRows('",head tgs,"');"]
                                                          , "};"
                                                          ]
-                          Web.setHeader "cache-control" "private,max-age=900"
-                          Web.setHeader "last-modified" "Thu, 15 Oct 2015 13:04:59 GMT"
                           Web.html . renderText $ do
                              doctype_
                              html_ [lang_ "en"] $ do
@@ -424,8 +423,6 @@ runWebServer pnum = Web.scotty pnum $ do
                                 _        -> Web.redirect . Lazy.pack $ concat ["/assess?u=",teacher',"&i=",student',"&v=",version,"&c=Load"]
 
                   Web.get "/source" $ do
-                          Web.setHeader "cache-control" "public,max-age=3600"
-                          Web.setHeader "last-modified" "Thu, 15 Oct 2015 13:04:59 GMT"
                           Web.html . renderText $ do
                              doctype_
                              html_ [lang_ "en"] $ do
