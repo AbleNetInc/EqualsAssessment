@@ -493,7 +493,7 @@ runWebServer pnum =
                                                                                            td_ "For handling extended unicode characters gracefully"
                                                                                            td_ $ a_ [href_ "https://hackage.haskell.org/package/utf8-string-1.0.1.1/src/LICENSE", class_ "inline"] "BSD3"
                                                                                   tr_ $ do td_ $ a_ [href_ "https://hackage.haskell.org/package/system-command", class_ "inline"] "System-Command"
-                                                                                           td_ "For calling out to xelatex (for the assessment PDF export"
+                                                                                           td_ "For calling out to xelatex (for the assessment PDF export)"
                                                                                            td_ $ a_ [href_ "https://hackage.haskell.org/package/system-command-0.0.10/src/LICENSE", class_ "inline"] "BSD3"
                                                                                   tr_ $ do td_ $ a_ [href_ "https://hackage.haskell.org/package/old-time", class_ "inline"] "Old-Time"
                                                                                            td_ "For retrieving the time in a legacy format (for compatibility with Xlsx)"
