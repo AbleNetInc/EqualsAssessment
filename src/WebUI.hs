@@ -507,6 +507,6 @@ runWebServer pnum =
                                                     h2_ "AbleNet loves Open Source!"
                                                     p_ $ do "We firmly believe that our community can make our products better!"
                                                             " So, to every user who purchases a license of Equals (and the Online Assessment), we provide a copy of the "
-                                                            a_ [href_ "#", class_ "inline"] "source code (to be linked)"
+                                                            a_ [href_ "https://github.com/AbleNetInc/EqualsAssessment", class_ "inline"] "source code"
                                                             " of this tool! You can use this software under the terms of the "
-                                                            a_ [href_ "#", class_ "inline"] "GPLv3 License (to be linked)"
+                                                            a_ [href_ "https://github.com/AbleNetInc/EqualsAssessment/blob/master/LICENSE", class_ "inline"] "GPLv3 License"
