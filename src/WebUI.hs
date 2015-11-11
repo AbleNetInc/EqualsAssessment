@@ -34,18 +34,19 @@ tbLesson l = tr_ [class_ c, style_ st] $ do td_ ""; td_ s; td_ [style_ "text-ali
              o = Text.pack $ concat ["(",show $ chapter l,",\\'",[section l],"\\',",show $ count l + thing,")"]
              thing | m == "(9,'A',5)" = (-1)
                    | otherwise        = 1
-             ch = [if r == x then checked_ else alt_ "" | x <- [(-1)..1]]
-             oc = [if m == "(1,'C',4)" || m == "(9,'A',5)" then onchange_ (mconcat ["copyScore('",o,"','",val,"')"]) else alt_ ""
+             ch = [if r == x then checked_ else title_ "" | x <- [(-1)..1]]
+             oc = [onchange_ $ if m == "(1,'C',4)" || m == "(9,'A',5)" then (mconcat ["copyScore('",o,"','",val,"')"]) else ""
                   | val <- ["(Just (-1),Nothing)","(Just 0,Nothing)","(Just 1,Nothing)"]]
-             cc = if m == "(1,'C',4)" || m == "(9,'A',5)" then onchange_ (mconcat ["copyAdapt(this,'",o,"')"]) else alt_ ""
-             s = do input_ [type_ "radio", name_ m, oc !! 0, value_ "(Just (-1),Nothing)", ch !! 0, id_ "blank"]
-                    label_ [for_ "blank", style_ "margin-right: 15px;"] "blank"
-                    input_ [type_ "radio", name_ m, oc !! 1, value_ "(Just 0,Nothing)",    ch !! 1, id_ "zero"]
-                    label_ [for_ "zero", style_ "margin-right: 15px;"] "0"
-                    input_ [type_ "radio", name_ m, oc !! 2, value_ "(Just 1,Nothing)",    ch !! 2, id_ "one"]
-                    label_ [for_ "one"] "1"
+             cc = onchange_ $ if m == "(1,'C',4)" || m == "(9,'A',5)" then (mconcat ["copyAdapt(this,'",o,"')"]) else ""
+             s = do input_ [type_ "radio", name_ m, oc !! 0, value_ "(Just (-1),Nothing)", ch !! 0, id_ $ ids !! 0]
+                    label_ [for_ (ids !! 0), style_ "margin-right: 15px;"] "blank"
+                    input_ [type_ "radio", name_ m, oc !! 1, value_ "(Just 0,Nothing)",    ch !! 1, id_ $ ids !! 1]
+                    label_ [for_ (ids !! 1), style_ "margin-right: 15px;"] "0"
+                    input_ [type_ "radio", name_ m, oc !! 2, value_ "(Just 1,Nothing)",    ch !! 2, id_ $ ids !! 2]
+                    label_ [for_ (ids !! 2)] "1"
+             ids = mconcat <$> [["blank",m],["zero",m],["one",m]]
              a = input_ [type_ "checkbox", name_ m, cc, value_ "(Nothing,Just True)",  b]
-             b = if adapted l then checked_ else alt_ ""
+             b = if adapted l then checked_ else title_ ""
              hidden = m == "(1,'C',5)" || m == "(9,'A',4)"
 
 css :: Text
@@ -229,7 +230,8 @@ header = head_ $ do
 banner :: Html ()
 banner = do img_ [ style_ "margin-top: 20px; margin-left: 42.75%; width: 175px; height: 109px;"
                  , src_ "assets/banner.jpg"
-                 , width_ "320px", height_ "200px"]
+                 , alt_ "AbleNet, Inc."
+                 , width_ "320", height_ "200"]
             h1_ "Equals Online Assessment"
             p_ [style_ "color: #963821;"] $
                mconcat ["Note: While you may save your data, ",all'," assessment data is deleted each night at midnight (Central Time)"]
@@ -266,7 +268,7 @@ runWebServer pnum =
                                              input_ [class_ "hidden", type_ "radio", name_ "v", value_ "Eq2", checked_]
                                              input_ [class_ "button", type_ "submit", name_ "c", value_ "Load"]
                                              input_ [class_ "button", type_ "submit", name_ "c", value_ "New"]
-                                      footer
+                                          footer
 
                   Web.get "/assets/:file" $ do
                           f <- Web.param "file"
@@ -290,7 +292,7 @@ runWebServer pnum =
                               nav n = a_ [class_ "tab", id_ n, href_ "#", onclick_ $ mconcat ["showRows('",n,"')"]]
                               nl  = div_ [class_ "lscroll", onclick_ "sLeft('tabbar');"] ""
                               nr  = div_ [class_ "rscroll", onclick_ "sRight('tabbar');"] ""
-                              tbs = nav_ $ do nl; div_ [class_ "tabs", id_ "tabbar"] (mconcat $ zipWith ($) (nav <$> tgs) (toHtml <$> tgs)); nr
+                              tbs = nav_ $ do nl; div_ [class_ "tabs", id_ "tabbar"] (mconcat $ zipWith ($) ((nav . head . Text.words) <$> tgs) (toHtml <$> tgs)); nr
                               js  = Text.intercalate " " [ "function showRows(id) {"
                                                          ,   "var trs = document.getElementsByTagName(\"tr\");"
                                                          ,   "for (i = 0; i < trs.length; i++) {"
@@ -347,14 +349,15 @@ runWebServer pnum =
                                                          , "})(window,document,'script','//www.google-analytics.com/analytics.js','ga');"
                                                          , "ga('create', 'UA-1851794-1', 'auto');"
                                                          , "ga('send', 'pageview');"
-                                                         , mconcat ["window.onload = function () { showRows('",head tgs,"');"]
+                                                         , mconcat ["window.onload = function () { showRows('",head (Text.words $ head tgs),"');"]
                                                          , "};"
                                                          ]
                           Web.html . renderText $ do
                              doctype_
                              html_ [lang_ "en"] $ do
                                       header
-                                      body_ $ div_ [class_ "main"]
+                                      body_ $ do
+                                        div_ [class_ "main"]
                                           $ do let italic = span_ [style_ "font-style: italic;"]
                                                banner
                                                ol_ $ do li_ "Click on a tab to select the appropriate subtest."
@@ -389,7 +392,7 @@ runWebServer pnum =
                                                   input_ [class_ "hidden", type_ "radio", name_ "v", value_ "Eq2", checked_]
                                                   input_ [class_ "hidden", type_ "text", name_ "u", value_ $ Text.pack teacher']
                                                   input_ [class_ "hidden", type_ "text", name_ "i", value_ $ Text.pack student']
-                                      footer
+                                        footer
 
                   Web.post "/save" $ do
                            p       <- Web.params
