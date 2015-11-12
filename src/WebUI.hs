@@ -276,8 +276,8 @@ runWebServer pnum =
                           Web.file $ mconcat ["assets/",f]
 
                   Web.get "/assess" $ do
-                          teacher' <- Web.param "u"
-                          student' <- Web.param "i"
+                          teacher' <- Web.param "u" `Web.rescue` (\_ -> Web.redirect "/")
+                          student' <- Web.param "i" `Web.rescue` (\_ -> Web.redirect "/")
                           version <- Web.param "v"
                           clobber <- Web.param "c"
                           let v   = (read version) :: EqVersion
