@@ -225,16 +225,16 @@ header = head_ $ do
      meta_ [charset_ "UTF-8"]
      meta_ [name_ "viewport", content_ "width=device-width,initial-scale=1"]
      style_ css
-     title_ "Equals Assessment"
+     title_ "Equals Assessment Online Scoring"
 
 banner :: Html ()
 banner = do img_ [ style_ "margin-top: 20px; margin-left: 42.75%; width: 175px; height: 109px;"
                  , src_ "assets/banner.jpg"
                  , alt_ "AbleNet, Inc."
                  , width_ "320", height_ "200"]
-            h1_ "Equals Online Assessment"
+            h1_ "Equals Assessment Online Scoring"
             p_ [style_ "color: #963821;"] $
-               mconcat ["Note: While you may save your data, ",all'," assessment data is deleted each night at midnight (Central Time)"]
+               mconcat ["Note: While you may temporarily save your data, ",all'," assessment data is deleted each night at midnight (Central Time)"]
             where all' = span_ [style_ "font-style: italic;"] "all"
 
 footer :: Html ()
@@ -256,7 +256,8 @@ runWebServer pnum =
                                       body_ $ div_ [class_ "main"] $ do
                                           let italic = span_ [style_ "font-style: italic;"]
                                           banner
-                                          p_ "To get started, complete the assessment and fill out the paper copy of the student response booklet (protocol). Then:"
+                                          p_ "To get started, complete the assessment and fill out the paper copy of the student response booklet (protocol)."
+                                          p_ "Then:"
                                           ol_ $ do li_ $ mconcat ["Fill out the ",italic "Username"," field with your name."]
                                                    li_ $ mconcat ["Enter a ",italic "Student ID"," number in case you need to leave and return to finish scoring later in the day. Only numbers are valid."]
                                                    li_ $ mconcat ["Click ",italic "New"," to enter data for the student."]
@@ -361,12 +362,12 @@ runWebServer pnum =
                                           $ do let italic = span_ [style_ "font-style: italic;"]
                                                banner
                                                ol_ $ do li_ "Click on a tab to select the appropriate subtest."
-                                                        li_ $ mconcat ["Using the buttons, select ",italic "1"," or ",italic "0"," to record the scores for each item in the student response booklet (protocol)."]
+                                                        li_ $ mconcat ["Using the buttons, select ",italic "1"," or ",italic "0"," to record the scores for each item from the completed student response booklet (protocol)."]
                                                         li_ $ mconcat ["Check the boxes for all adapted items given. The electronic scoring will automatically eliminate checks for scores of ",italic "0","."]
                                                         li_ "Click on each tab to enter scores for each subtest. You will not need to save between tabs."
                                                         li_ $ mconcat ["When finished, you may click ",italic "Save"," to temporarily save the data (optional)."]
-                                                        li_ $ mconcat ["Click ",italic "Export"," to generate the report to your preferrred format. ",italic "Save as"," to your Desktop and rename the file to the student's name."]
-                                                        li_ $ mconcat ["When finished, click ",italic "New"," to begin another assessment."]
+                                                        li_ $ mconcat ["Click ",italic "Export"," to generate the report to your preferred format (MS Excel format is the default). ",italic "Save as"," to your Desktop and rename the file with the student's name."]
+                                                        li_ $ mconcat ["When finished, click ",italic "New"," to begin scoring another assessment."]
                                                script_ js
                                                with form_ [method_ "POST", action_ "/save", enctype_ "multipart/form-data"] $ do
                                                   p_ $ do if a == as && (score <$> ll) == (score <$> (lessons as)) then "New " else ""
