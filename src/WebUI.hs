@@ -237,17 +237,20 @@ banner = do img_ [ style_ "margin-top: 20px; margin-left: 42.75%; width: 175px; 
                mconcat ["Note: While you may temporarily save your data, ",all'," assessment data is deleted each night at midnight (Central Time)"]
             where all' = span_ [style_ "font-style: italic;"] "all"
 
+ga :: Html ()
+ga = script_ $ Text.intercalate " " [ "(function (i,s,o,g,r,a,m) {"
+                                    ,    "i['GoogleAnalyticsObject']=r;i[r]=i[r]||function () {"
+                                    ,       "(i[r].q=i[r].q||[]).push(arguments)"
+                                    ,    "},i[r].l=1*new Date();a=s.createElement(o),"
+                                    ,    "m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)"
+                                    , "})(window,document,'script','//www.google-analytics.com/analytics.js','ga');"
+                                    , "ga('create', 'UA-1851794-6', 'auto');"
+                                    , "ga('send', 'pageview');"
+                                    ]
+
 footer :: Html ()
 footer = do footer_ $ do a_ [href_ "/source", class_ "footer"] "Technologies we rely on"
-            script_ $ Text.intercalate " " [ "(function (i,s,o,g,r,a,m) {"
-                                           ,    "i['GoogleAnalyticsObject']=r;i[r]=i[r]||function () {"
-                                           ,       "(i[r].q=i[r].q||[]).push(arguments)"
-                                           ,    "},i[r].l=1*new Date();a=s.createElement(o),"
-                                           ,    "m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)"
-                                           , "})(window,document,'script','//www.google-analytics.com/analytics.js','ga');"
-                                           , "ga('create', 'UA-1851794-6', 'auto');"
-                                           , "ga('send', 'pageview');"
-                                           ]
+            ga
 
 runWebServer :: Int -> IO ()
 runWebServer pnum =
@@ -513,3 +516,4 @@ runWebServer pnum =
                                                             a_ [href_ "https://github.com/AbleNetInc/EqualsAssessment", class_ "inline"] "source code"
                                                             " of this tool! You can use this software under the terms of the "
                                                             a_ [href_ "https://github.com/AbleNetInc/EqualsAssessment/blob/master/LICENSE", class_ "inline"] "GPLv3 License"
+                                      ga
