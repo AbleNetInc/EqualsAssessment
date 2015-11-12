@@ -247,6 +247,7 @@ runWebServer pnum =
                   Web.middleware . gzip $ def { gzipFiles = GzipCompress }
                   Web.middleware . etag ctx $ MaxAgeSeconds 604800
                   Web.middleware logStdoutDev
+                  Web.defaultHandler (\_ -> Web.redirect "/")
 
                   Web.get "/" $ do
                           Web.html . renderText $ do
@@ -276,10 +277,10 @@ runWebServer pnum =
                           Web.file $ mconcat ["assets/",f]
 
                   Web.get "/assess" $ do
-                          teacher' <- Web.param "u" `Web.rescue` (\_ -> Web.redirect "/")
-                          student' <- Web.param "i" `Web.rescue` (\_ -> Web.redirect "/")
-                          version <- Web.param "v"
-                          clobber <- Web.param "c"
+                          teacher' <- Web.param "u"
+                          student' <- Web.param "i"
+                          version  <- Web.param "v"
+                          clobber  <- Web.param "c"
                           let v   = (read version) :: EqVersion
                           a       <- liftIO $ retrieveAssessment "EqDB" v student' teacher'
                           let as  = blankAssessment v student' teacher'
