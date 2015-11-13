@@ -210,6 +210,7 @@ css = Text.intercalate " "
     ,    "border-color: #b4afab #b4afab transparent;"
     ,    "text-decoration: none;"
     ,    "text-transform: uppercase;"
+    ,    "cursor: pointer;"
     , "}"
     , ".selected {"
     ,    "background: #fff none repeat scroll 0% 0%;"
@@ -303,7 +304,7 @@ runWebServer pnum =
                                                    _     -> a
                               ls  = tbLesson <$> ll
                               tgs = nub . concat $ (toList . tags) <$> ll
-                              nav n = a_ [class_ "tab", id_ n, href_ "#", onclick_ $ mconcat ["showRows('",n,"')"]]
+                              nav n = a_ [class_ "tab", id_ n, onclick_ $ mconcat ["showRows('",n,"')"]]
                               nl  = div_ [class_ "lscroll", onclick_ "sLeft('tabbar');"] ""
                               nr  = div_ [class_ "rscroll", onclick_ "sRight('tabbar');"] ""
                               tbs = nav_ $ do nl; div_ [class_ "tabs", id_ "tabbar"] (mconcat $ zipWith ($) ((nav . head . Text.words) <$> tgs) (toHtml <$> tgs)); nr

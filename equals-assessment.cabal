@@ -1,5 +1,5 @@
 name:                equals-assessment
-version:             2.1.0.0
+version:             2.1.2.0
 synopsis:            A fast, simple pure-Haskell implementation of Equals Assessment
 homepage:            http://equals-assessment.ablenetinc.com
 license:             GPL-3
